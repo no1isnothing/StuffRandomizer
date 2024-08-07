@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/HomeFragment">
+
+    <fragment
+        android:id="@+id/HomeFragment"
+        android:name="com.example.stuffrandomizer.ui.HomeFragment"
+        android:label="@string/home_fragment_label"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_HomeFragment_to_ItemListsFragment"
+            app:destination="@id/ItemListsFragment" />
+        <action
+            android:id="@+id/action_HomeFragment_to_MatchListsFragment"
+            app:destination="@id/MatchListsFragment" />
+        <action
+            android:id="@+id/action_HomeFragment_to_MatchCreationFragment"
+            app:destination="@id/MatchCreationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/ItemListsFragment"
+        android:name="com.example.stuffrandomizer.ui.ItemListsFragment"
+        android:label="@string/item_lists_fragment_label"
+        tools:layout="@layout/fragment_item_lists">
+
+        <action
+            android:id="@+id/action_ItemListsFragment_to_HomeFragment"
+            app:destination="@id/HomeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/MatchListsFragment"
+        android:name="com.example.stuffrandomizer.ui.MatchListsFragment"
+        android:label="@string/match_lists_fragment_label"
+        tools:layout="@layout/fragment_match_lists">
+
+        <action
+            android:id="@+id/action_MatchListsFragment_to_HomeFragment"
+            app:destination="@id/HomeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/MatchCreationFragment"
+        android:name="com.example.stuffrandomizer.ui.MatchCreationFragment"
+        android:label="@string/match_creation_fragment_label"
+        tools:layout="@layout/fragment_match_creation">
+
+        <action
+            android:id="@+id/action_MatchCeationFragment_to_HomeFragment"
+            app:destination="@id/HomeFragment" />
+        <action
+            android:id="@+id/action_MatchCeationFragment_to_MatchEditFragment"
+            app:destination="@id/MatchEditFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/MatchEditFragment"
+        android:name="com.example.stuffrandomizer.ui.MatchEditFragment"
+        android:label="@string/match_edit_fragment_label"
+        tools:layout="@layout/fragment_match_edit">
+    </fragment>
+    <fragment
+        android:id="@+id/ItemListEditFragment"
+        android:name="com.example.stuffrandomizer.ui.ItemListEditFragment"
+        android:label="@string/item_lists_edit_fragment_label"
+        tools:layout="@layout/fragment_item_list_edit">
+    </fragment>
+</navigation>
