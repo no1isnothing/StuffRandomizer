@@ -4,16 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.stuffrandomizer.databinding.FragmentHomeBinding
 import com.example.stuffrandomizer.R
+import com.example.stuffrandomizer.StuffRandomizerApplication
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class HomeFragment : Fragment() {
-
+    private val mainViewModel: MainViewModel by viewModels {
+        MainViewModel.Companion.MainViewModelFactory((requireActivity().application as StuffRandomizerApplication).repository)
+    }
     private var _binding: FragmentHomeBinding? = null
 
     // This property is only valid between onCreateView and
@@ -24,7 +29,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
+        mainViewModel.getPreviewData()
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
 
@@ -38,6 +43,11 @@ class HomeFragment : Fragment() {
         }
         binding.buttonMatches.setOnClickListener {
             findNavController().navigate(R.id.action_HomeFragment_to_MatchListsFragment)
+        }
+
+
+        mainViewModel.previewString.observe(requireActivity()) { value ->
+            binding.matchesTextPreview.text = value
         }
     }
 

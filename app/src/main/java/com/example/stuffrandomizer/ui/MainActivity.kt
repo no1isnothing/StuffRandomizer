@@ -11,7 +11,10 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.stuffrandomizer.R
 import com.example.stuffrandomizer.StuffRandomizerApplication
+import com.example.stuffrandomizer.data.Match
+import com.example.stuffrandomizer.data.MatchSet
 import com.example.stuffrandomizer.databinding.ActivityMainBinding
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,11 +38,21 @@ class MainActivity : AppCompatActivity() {
 
         binding.fab.setOnClickListener { view ->
             navController.navigate(R.id.action_HomeFragment_to_MatchCreationFragment)
-            /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .setAnchorView(R.id.fab).show()*/
         }
+
+        //mainViewModel.insertMatchSet(createSampleData())
     }
+
+    private fun createSampleData(): MatchSet = MatchSet(
+            UUID.randomUUID(),
+            "Skyrim 2024",
+            listOf(
+                Match("Jane", mapOf(Pair("Aedra", "Talos"), Pair("Daedra", "Clavicus Vile"))),
+                Match("Bear", mapOf(Pair("Aedra", "Mara"), Pair("Daedra", "Peryite"))),
+                Match("The Tooth Fairy", mapOf(Pair("Aedra", "Julianos"), Pair("Daedra", "Vaermina"))),
+                Match("Gifty", mapOf(Pair("Aedra", "Stendar"), Pair("Daedra", "Merida"))),
+            )
+        )
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.

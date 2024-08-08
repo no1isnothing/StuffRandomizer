@@ -23,6 +23,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Match List" />
+
+        <TextView
+            android:id="@+id/matchesTextPreview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView

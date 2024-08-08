@@ -8,7 +8,7 @@ import androidx.room.Query
 @Dao
 interface MatchSetDao {
     @Query("SELECT * FROM matchset") //TODO: add order here?
-    fun getAllMatchSets(): List<MatchSet>
+    suspend fun getAllMatchSets(): List<MatchSet>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE) //TODO: decide on conflict strategy
     suspend fun insert(matchSet: MatchSet)
