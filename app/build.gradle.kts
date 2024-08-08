@@ -40,14 +40,11 @@ android {
 }
 
 dependencies {
-    val room_version = "2.6.1"
 
-    implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version")
-
-    // copied from tutorial, do I need these?
-    // To use Kotlin Symbol Processing (KSP)
+    annotationProcessor(libs.room.compiler)
     ksp(libs.room.compiler)
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -57,6 +54,9 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.gson)
     implementation(libs.room.ktx)
+    implementation(libs.room.runtime)
+    implementation(libs.flogger)
+    implementation(libs.flogger.backend)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

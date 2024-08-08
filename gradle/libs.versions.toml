@@ -14,6 +14,7 @@ navigationUiKtx = "2.7.7"
 cardview = "1.0.0"
 roomVersion = "2.6.1"
 kspVersion = "2.0.0-1.0.23"
+floggerVersion = "0.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,6 +30,9 @@ androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation
 androidx-cardview = { group = "androidx.cardview", name = "cardview", version.ref = "cardview" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersion" }
+flogger = { module = "com.google.flogger:flogger", version.ref = "floggerVersion"}
+flogger-backend = { module = "com.google.flogger:flogger-system-backend", version.ref = "floggerVersion"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
