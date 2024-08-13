@@ -17,6 +17,11 @@ class MainViewModel(private val matchRepository: MatchRepository) : ViewModel() 
     val previewString: LiveData<String?>
         get() = _previewString
 
+    private val _matches = MutableLiveData<List<MatchSet>>()
+
+    val matches: LiveData<List<MatchSet>>
+        get() = _matches
+
     fun insertMatchSet(matchSet: MatchSet) {
         viewModelScope.launch {
             matchRepository.insertMatchSet(matchSet)
@@ -24,7 +29,6 @@ class MainViewModel(private val matchRepository: MatchRepository) : ViewModel() 
     }
 
     // also maybe add a temporary button or something to add/remove data from the db instead of doing it in the main activity
-    // also add logging
     // then start adding tests at least for the data levels as you add to them
     fun getPreviewData() {
         viewModelScope.launch {
@@ -32,6 +36,7 @@ class MainViewModel(private val matchRepository: MatchRepository) : ViewModel() 
             logger.atWarning().log("Matches size %d first match name %s", matches.size, matches[0].matchName)
 
             _previewString.value = matches[0].matchName
+            _matches.value = matches
         }
     }
 
