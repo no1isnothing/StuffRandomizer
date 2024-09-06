@@ -6,10 +6,14 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [MatchSet::class], version = 1)
+/**
+ * A room database for storing matches and the information to create them.
+ */
+@Database(entities = [MatchSet::class, ItemList::class], version = 1)
 @TypeConverters(MatchConverter::class)
 abstract class MatchDatabase : RoomDatabase()  {
     abstract fun matchSetDao(): MatchSetDao
+    abstract fun itemListDao(): ItemListDao
 
     companion object {
         // Singleton prevents multiple instances of database opening at the
@@ -17,10 +21,8 @@ abstract class MatchDatabase : RoomDatabase()  {
         @Volatile
         private var INSTANCE: MatchDatabase? = null
 
-        // do we need this or is there a way to inject the database
+        //TODO #2: Investigate dependency injection
         fun getDatabase(context: Context): MatchDatabase {
-            // if the INSTANCE is not null, then return it,
-            // if it is, then create the database
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
@@ -28,7 +30,6 @@ abstract class MatchDatabase : RoomDatabase()  {
                     "match_database"
                 ).build()
                 INSTANCE = instance
-                // return instance
                 instance
             }
         }

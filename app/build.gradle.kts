@@ -1,7 +1,9 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.devtools.ksp)
+    id("de.mannodermaus.android-junit5") version "1.11.0.0"
 }
 
 android {
@@ -37,10 +39,24 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    packaging {
+        resources.pickFirsts.apply { add("META-INF/LICENSE.md")
+        add("META-INF/LICENSE-notice.md")}
+    }
+
+    tasks.withType<Test> {
+            useJUnitPlatform()
+    }
 }
 
 dependencies {
-
+    testImplementation(libs.junit.jupiter)
+    androidTestImplementation(libs.junit.jupiter)
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.0")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+    //androidTestRuntimeOnly(libs.junit.platform.launcher)
+    //androidTestImplementation(libs.junit.bom)
     annotationProcessor(libs.room.compiler)
     ksp(libs.room.compiler)
 
@@ -56,7 +72,5 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.flogger)
     implementation(libs.flogger.backend)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

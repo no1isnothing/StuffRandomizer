@@ -10,9 +10,7 @@ import com.example.stuffrandomizer.databinding.FragmentMatchCreationBinding
 import com.example.stuffrandomizer.R
 
 /**
- * A simple [Fragment] subclass.
- * Use the [MatchCreationFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * A [Fragment] for creating [MatchSet]s.
  */
 class MatchCreationFragment : Fragment() {
     private var _binding: FragmentMatchCreationBinding? = null

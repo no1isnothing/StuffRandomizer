@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -21,14 +20,14 @@ class HomeFragment : Fragment() {
     }
     private var _binding: FragmentHomeBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    // TODO #5: keep an eye out for null pointer exception here on back.
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        //TODO #6: Calls to view model for data should be more specific.
         mainViewModel.getPreviewData()
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root

@@ -8,9 +8,7 @@ import androidx.fragment.app.Fragment
 import com.example.stuffrandomizer.R
 
 /**
- * A simple [Fragment] subclass.
- * Use the [MatchEditFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * A [Fragment] for editing [MatchSet]s.
  */
 class MatchEditFragment : Fragment() {
 

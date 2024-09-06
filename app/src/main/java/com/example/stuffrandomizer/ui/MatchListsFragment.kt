@@ -15,55 +15,38 @@ import com.example.stuffrandomizer.data.MatchSet
 import com.example.stuffrandomizer.databinding.FragmentMatchListsBinding
 import com.google.common.flogger.FluentLogger
 
-
+/**
+ * A [RecyclerView.Adapter] for displaying [MatchSet]s.
+ */
 class MatchListsAdapter(private val dataSet: ArrayList<MatchSet>) :
     RecyclerView.Adapter<MatchListsAdapter.ViewHolder>() {
     val logger: FluentLogger = FluentLogger.forEnclosingClass()
 
-    /**
-     * Provide a reference to the type of views that you are using
-     * (custom ViewHolder)
-     */
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val titleView: TextView
-        val previewView: TextView
-
-        init {
-            // Define click listener for the ViewHolder's View
-            titleView = view.findViewById(R.id.matchsetTitle)
-            previewView = view.findViewById(R.id.matchAssigneesPreview)
-        }
+        val titleView: TextView = view.findViewById(R.id.matchsetTitle)
+        val previewView: TextView = view.findViewById(R.id.matchAssigneesPreview)
     }
 
-    // Create new views (invoked by the layout manager)
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
-        // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.matchset_item, viewGroup, false)
 
         return ViewHolder(view)
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        logger.atWarning().log("Binding view")
-        // Get element from your dataset at this position and replace the
-        // contents of the view with that element
+        logger.atInfo().log("Binding view")
         viewHolder.titleView.text = dataSet[position].matchName
-        //val list = dataSet[position].matches.stream().map { match -> match.assignee }.toList()
         viewHolder.previewView.text = dataSet[position].matches.stream().map { match -> match.assignee }.toList().joinToString()
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = dataSet.size
 
 }
 
 
 /**
- * A simple [Fragment] subclass.
- * Use the [MatchListsFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * A [Fragment] for displaying [MatchSet]s.
  */
 class MatchListsFragment : Fragment() {
     val logger: FluentLogger = FluentLogger.forEnclosingClass()
@@ -83,6 +66,7 @@ class MatchListsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // TODO #6: Make calls to view model more specific.
         mainViewModel.getPreviewData()
         _binding = FragmentMatchListsBinding.inflate(inflater, container, false)
 
@@ -98,7 +82,7 @@ class MatchListsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mainViewModel.matches.observe(requireActivity()) { matches ->
-            logger.atWarning().log("Setting Matches size %d", matches.size)
+            logger.atInfo().log("Setting Matches size %d", matches.size)
             matchList.addAll(matches)
             customAdapter.notifyDataSetChanged()
         }

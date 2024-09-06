@@ -9,5 +9,5 @@ data class MatchSet(
     @PrimaryKey val uid : UUID,
     val matchName: String,
     val matches: List<Match>
-    // would we want to keep the lists that make up this matchset? for rerolls or info?
+    // TODO #3: Determine if more data related to this, like ItemLists, should be stored.
 )

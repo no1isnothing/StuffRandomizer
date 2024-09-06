@@ -5,13 +5,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.stuffrandomizer.data.ItemList
 import com.example.stuffrandomizer.data.MatchRepository
 import com.example.stuffrandomizer.data.MatchSet
 import com.google.common.flogger.FluentLogger
 import kotlinx.coroutines.launch
 
+/**
+ * A [ViewModel] for interactions between the [MainActivity] and it's Fragment
+ * and the [MatchRepository].
+ */
 class MainViewModel(private val matchRepository: MatchRepository) : ViewModel() {
-    val logger: FluentLogger = FluentLogger.forEnclosingClass() //move to companion class?
+    private val logger: FluentLogger = FluentLogger.forEnclosingClass()
     private val _previewString = MutableLiveData<String?>()
 
     val previewString: LiveData<String?>
@@ -22,21 +27,35 @@ class MainViewModel(private val matchRepository: MatchRepository) : ViewModel() 
     val matches: LiveData<List<MatchSet>>
         get() = _matches
 
+    private val _itemLists = MutableLiveData<List<ItemList>>()
+
+    val itemLists: LiveData<List<ItemList>>
+        get() = _itemLists
+
     fun insertMatchSet(matchSet: MatchSet) {
         viewModelScope.launch {
             matchRepository.insertMatchSet(matchSet)
         }
     }
 
-    // also maybe add a temporary button or something to add/remove data from the db instead of doing it in the main activity
-    // then start adding tests at least for the data levels as you add to them
+    fun insertItemList(itemList: ItemList) {
+        viewModelScope.launch {
+            matchRepository.insertItemList(itemList)
+        }
+    }
+
     fun getPreviewData() {
         viewModelScope.launch {
+            // check on this loading correctly after new info is added
             val matches = matchRepository.getAllMatchSets()
+            val itemLists = matchRepository.getAllItemLists()
             logger.atWarning().log("Matches size %d first match name %s", matches.size, matches[0].matchName)
 
-            _previewString.value = matches[0].matchName
+            if(matches.size > 0) {
+                _previewString.value = matches[0].matchName
+            }
             _matches.value = matches
+            _itemLists.value = itemLists
         }
     }
 
@@ -46,6 +65,7 @@ class MainViewModel(private val matchRepository: MatchRepository) : ViewModel() 
          *
          * @param arg the repository to pass to [MainViewModel]
          */
+        // TODO #2: Setup dependency injection.
         class MainViewModelFactory(private val repository: MatchRepository) : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 if (modelClass.isAssignableFrom(MainViewModel::class.java)) {

@@ -8,9 +8,7 @@ import androidx.fragment.app.Fragment
 import com.example.stuffrandomizer.R
 
 /**
- * A simple [Fragment] subclass.
- * Use the [ItemListEditFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * A simple [Fragment] to edit [ItemList]s.
  */
 class ItemListEditFragment : Fragment() {
 

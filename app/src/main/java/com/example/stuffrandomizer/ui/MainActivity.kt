@@ -11,11 +11,15 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.stuffrandomizer.R
 import com.example.stuffrandomizer.StuffRandomizerApplication
+import com.example.stuffrandomizer.data.ItemList
 import com.example.stuffrandomizer.data.Match
 import com.example.stuffrandomizer.data.MatchSet
 import com.example.stuffrandomizer.databinding.ActivityMainBinding
 import java.util.UUID
 
+/**
+ * The launching [Activity] for the project. Starts the [HomeFragment].
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -39,11 +43,12 @@ class MainActivity : AppCompatActivity() {
         binding.fab.setOnClickListener { view ->
             navController.navigate(R.id.action_HomeFragment_to_MatchCreationFragment)
         }
-
-        //mainViewModel.insertMatchSet(createSampleData())
+        // TODO #7: Add better controls for prepopulating data.
+        //mainViewModel.insertMatchSet(createSampleMatchData())
+        //mainViewModel.insertItemList(createSampleItemListData())
     }
 
-    private fun createSampleData(): MatchSet = MatchSet(
+    private fun createSampleMatchData(): MatchSet = MatchSet(
             UUID.randomUUID(),
             "Skyrim 2024",
             listOf(
@@ -53,6 +58,21 @@ class MainActivity : AppCompatActivity() {
                 Match("Gifty", mapOf(Pair("Aedra", "Stendar"), Pair("Daedra", "Merida"))),
             )
         )
+    private fun createSampleItemListData(): ItemList = ItemList(
+        UUID.randomUUID(),
+        "Aedra",
+        listOf(
+            "Talos",
+            "Julianos",
+            "Arkay",
+            "Akatosh",
+            "Mara",
+            "Stendarr",
+            "Dibella",
+            "Kynareth",
+            "Zenithar"
+        )
+    )
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
