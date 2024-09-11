@@ -1,8 +1,8 @@
-package com.example.stuffrandomizer
+package com.thebipolaroptimist.stuffrandomizer
 
 import android.app.Application
-import com.example.stuffrandomizer.data.MatchDatabase
-import com.example.stuffrandomizer.data.MatchRepository
+import com.thebipolaroptimist.stuffrandomizer.data.MatchDatabase
+import com.thebipolaroptimist.stuffrandomizer.data.MatchRepository
 
 class StuffRandomizerApplication : Application() {
     val database by lazy { MatchDatabase.getDatabase(this) }

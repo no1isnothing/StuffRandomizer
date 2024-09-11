@@ -1,4 +1,4 @@
-package com.example.stuffrandomizer.data
+package com.thebipolaroptimist.stuffrandomizer.data
 
 /**
  * Repository for accessing saved [MatchSet]s and [ItemList]s

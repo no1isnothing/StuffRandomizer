@@ -1,4 +1,4 @@
-package com.example.stuffrandomizer.ui
+package com.thebipolaroptimist.stuffrandomizer.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,10 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.stuffrandomizer.R
-import com.example.stuffrandomizer.StuffRandomizerApplication
-import com.example.stuffrandomizer.data.ItemList
-import com.example.stuffrandomizer.databinding.FragmentItemListsBinding
+import com.thebipolaroptimist.stuffrandomizer.R
+import com.thebipolaroptimist.stuffrandomizer.StuffRandomizerApplication
+import com.thebipolaroptimist.stuffrandomizer.data.ItemList
+import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentItemListsBinding
 import com.google.common.flogger.FluentLogger
 
 

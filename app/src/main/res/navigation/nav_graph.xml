@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/HomeFragment"
-        android:name="com.example.stuffrandomizer.ui.HomeFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.HomeFragment"
         android:label="@string/home_fragment_label"
         tools:layout="@layout/fragment_home">
 
@@ -23,7 +23,7 @@
     </fragment>
     <fragment
         android:id="@+id/ItemListsFragment"
-        android:name="com.example.stuffrandomizer.ui.ItemListsFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.ItemListsFragment"
         android:label="@string/item_lists_fragment_label"
         tools:layout="@layout/fragment_item_lists">
 
@@ -33,7 +33,7 @@
     </fragment>
     <fragment
         android:id="@+id/MatchListsFragment"
-        android:name="com.example.stuffrandomizer.ui.MatchListsFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.MatchListsFragment"
         android:label="@string/match_lists_fragment_label"
         tools:layout="@layout/fragment_match_lists">
 
@@ -43,7 +43,7 @@
     </fragment>
     <fragment
         android:id="@+id/MatchCreationFragment"
-        android:name="com.example.stuffrandomizer.ui.MatchCreationFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.MatchCreationFragment"
         android:label="@string/match_creation_fragment_label"
         tools:layout="@layout/fragment_match_creation">
 
@@ -56,13 +56,13 @@
     </fragment>
     <fragment
         android:id="@+id/MatchEditFragment"
-        android:name="com.example.stuffrandomizer.ui.MatchEditFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.MatchEditFragment"
         android:label="@string/match_edit_fragment_label"
         tools:layout="@layout/fragment_match_edit">
     </fragment>
     <fragment
         android:id="@+id/ItemListEditFragment"
-        android:name="com.example.stuffrandomizer.ui.ItemListEditFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.ItemListEditFragment"
         android:label="@string/item_lists_edit_fragment_label"
         tools:layout="@layout/fragment_item_list_edit">
     </fragment>

@@ -1,4 +1,4 @@
-package com.example.stuffrandomizer.data
+package com.thebipolaroptimist.stuffrandomizer.data
 
 /**
  * A data class representing a match.

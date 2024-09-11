@@ -1,4 +1,4 @@
-package com.example.stuffrandomizer.data
+package com.thebipolaroptimist.stuffrandomizer.data
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson

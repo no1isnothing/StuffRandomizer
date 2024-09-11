@@ -1,4 +1,4 @@
-package com.example.stuffrandomizer.ui
+package com.thebipolaroptimist.stuffrandomizer.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.example.stuffrandomizer.databinding.FragmentHomeBinding
-import com.example.stuffrandomizer.R
-import com.example.stuffrandomizer.StuffRandomizerApplication
+import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentHomeBinding
+import com.thebipolaroptimist.stuffrandomizer.R
+import com.thebipolaroptimist.stuffrandomizer.StuffRandomizerApplication
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.

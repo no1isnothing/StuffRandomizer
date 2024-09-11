@@ -1,4 +1,4 @@
-package com.example.stuffrandomizer.ui
+package com.thebipolaroptimist.stuffrandomizer.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.stuffrandomizer.databinding.FragmentMatchCreationBinding
-import com.example.stuffrandomizer.R
+import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentMatchCreationBinding
+import com.thebipolaroptimist.stuffrandomizer.R
 
 /**
  * A [Fragment] for creating [MatchSet]s.

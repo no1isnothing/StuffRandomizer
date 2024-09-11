@@ -1,13 +1,13 @@
-package com.example.stuffrandomizer.ui
+package com.thebipolaroptimist.stuffrandomizer.ui
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.stuffrandomizer.data.ItemList
-import com.example.stuffrandomizer.data.MatchRepository
-import com.example.stuffrandomizer.data.MatchSet
+import com.thebipolaroptimist.stuffrandomizer.data.ItemList
+import com.thebipolaroptimist.stuffrandomizer.data.MatchRepository
+import com.thebipolaroptimist.stuffrandomizer.data.MatchSet
 import com.google.common.flogger.FluentLogger
 import kotlinx.coroutines.launch
 
@@ -49,9 +49,9 @@ class MainViewModel(private val matchRepository: MatchRepository) : ViewModel() 
             // check on this loading correctly after new info is added
             val matches = matchRepository.getAllMatchSets()
             val itemLists = matchRepository.getAllItemLists()
-            logger.atWarning().log("Matches size %d first match name %s", matches.size, matches[0].matchName)
 
-            if(matches.size > 0) {
+            if(matches.isNotEmpty()) {
+                logger.atWarning().log("Matches size %d first match name %s", matches.size, matches[0].matchName)
                 _previewString.value = matches[0].matchName
             }
             _matches.value = matches

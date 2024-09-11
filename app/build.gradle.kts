@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.stuffrandomizer"
+    namespace = "com.thebipolaroptimist.stuffrandomizer"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.stuffrandomizer"
+        applicationId = "com.thebipolaroptimist.stuffrandomizer"
         minSdk = 31
         targetSdk = 34
         versionCode = 1

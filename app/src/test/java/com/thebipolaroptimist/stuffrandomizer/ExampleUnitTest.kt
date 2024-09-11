@@ -1,4 +1,4 @@
-package com.example.stuffrandomizer
+package com.thebipolaroptimist.stuffrandomizer
 
 import org.junit.Test
 

@@ -1,4 +1,6 @@
-package com.example.stuffrandomizer.data
+package com.thebipolaroptimist.stuffrandomizer.data
+
+//package com.thebipolaroptimist
 
 import android.content.Context
 import androidx.room.Room
