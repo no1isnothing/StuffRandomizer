@@ -2,8 +2,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.devtools.ksp)
-    id("de.mannodermaus.android-junit5") version "1.11.0.0"
+    alias(libs.plugins.devtools.ksp) // faster/newer alternative to kapt
+    alias(libs.plugins.mannodermaus.junit5.android)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -51,15 +52,12 @@ android {
 }
 
 dependencies {
-    testImplementation(libs.junit.jupiter)
-    androidTestImplementation(libs.junit.jupiter)
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.0")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
-    //androidTestRuntimeOnly(libs.junit.platform.launcher)
-    //androidTestImplementation(libs.junit.bom)
     annotationProcessor(libs.room.compiler)
+    
+    ksp(libs.hilt.android.compiler)
     ksp(libs.room.compiler)
 
+    implementation(libs.hilt.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -72,5 +70,12 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.flogger)
     implementation(libs.flogger.backend)
+
+    testImplementation(libs.junit.jupiter)
+
+    testRuntimeOnly(libs.junit.jupiter.engine)
+
+    androidTestImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
 }

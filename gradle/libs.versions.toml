@@ -1,6 +1,8 @@
 [versions]
 agp = "8.5.1"
 gson = "2.11.0"
+hiltAndroid = "2.51.1"
+junitJupiterEngine = "5.11.0"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
 espressoCore = "3.6.1"
@@ -14,14 +16,18 @@ roomVersion = "2.7.0-alpha01"
 kspVersion = "2.0.0-1.0.23"
 floggerVersion = "0.8"
 junitJupiter = "5.8.1"
+hiltVersion = "2.51.1"
+mannodermausVersion = "1.11.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-junit-bom = { module = "org.junit:junit-bom", version.ref = "junitJupiter" }
-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiterEngine" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
@@ -38,4 +44,5 @@ junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter-api", versi
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion"}
-
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion"}
+mannodermaus-junit5-android = { id = "de.mannodermaus.android-junit5", version.ref = "mannodermausVersion" }
