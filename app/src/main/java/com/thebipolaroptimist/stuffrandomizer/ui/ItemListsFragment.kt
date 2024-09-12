@@ -14,6 +14,7 @@ import com.thebipolaroptimist.stuffrandomizer.StuffRandomizerApplication
 import com.thebipolaroptimist.stuffrandomizer.data.ItemList
 import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentItemListsBinding
 import com.google.common.flogger.FluentLogger
+import dagger.hilt.android.AndroidEntryPoint
 
 
 /**
@@ -41,11 +42,10 @@ class ItemListListsAdapter(private val dataSet: List<ItemList>) :
 /**
  * A simple [Fragment] for displaying [ItemList]s.
  */
+@AndroidEntryPoint
 class ItemListsFragment : Fragment() {
     val logger: FluentLogger = FluentLogger.forEnclosingClass()
-    private val mainViewModel: MainViewModel by viewModels {
-        MainViewModel.Companion.MainViewModelFactory((requireActivity().application as StuffRandomizerApplication).repository)
-    }
+    private val mainViewModel: MainViewModel by viewModels()
     private var _binding: FragmentItemListsBinding? = null
 
     var itemList = arrayListOf<ItemList>()

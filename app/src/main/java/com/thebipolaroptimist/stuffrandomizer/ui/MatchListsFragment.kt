@@ -14,6 +14,7 @@ import com.thebipolaroptimist.stuffrandomizer.StuffRandomizerApplication
 import com.thebipolaroptimist.stuffrandomizer.data.MatchSet
 import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentMatchListsBinding
 import com.google.common.flogger.FluentLogger
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * A [RecyclerView.Adapter] for displaying [MatchSet]s.
@@ -48,11 +49,10 @@ class MatchListsAdapter(private val dataSet: ArrayList<MatchSet>) :
 /**
  * A [Fragment] for displaying [MatchSet]s.
  */
+@AndroidEntryPoint
 class MatchListsFragment : Fragment() {
     val logger: FluentLogger = FluentLogger.forEnclosingClass()
-    private val mainViewModel: MainViewModel by viewModels {
-        MainViewModel.Companion.MainViewModelFactory((requireActivity().application as StuffRandomizerApplication).repository)
-    }
+    private val mainViewModel: MainViewModel by viewModels()
 
     private var _binding: FragmentMatchListsBinding? = null
 

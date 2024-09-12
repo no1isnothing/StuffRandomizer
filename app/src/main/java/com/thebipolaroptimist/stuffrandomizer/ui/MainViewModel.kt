@@ -9,13 +9,16 @@ import com.thebipolaroptimist.stuffrandomizer.data.ItemList
 import com.thebipolaroptimist.stuffrandomizer.data.MatchRepository
 import com.thebipolaroptimist.stuffrandomizer.data.MatchSet
 import com.google.common.flogger.FluentLogger
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * A [ViewModel] for interactions between the [MainActivity] and it's Fragment
  * and the [MatchRepository].
  */
-class MainViewModel(private val matchRepository: MatchRepository) : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor(private val matchRepository: MatchRepository) : ViewModel() {
     private val logger: FluentLogger = FluentLogger.forEnclosingClass()
     private val _previewString = MutableLiveData<String?>()
 
@@ -56,24 +59,6 @@ class MainViewModel(private val matchRepository: MatchRepository) : ViewModel() 
             }
             _matches.value = matches
             _itemLists.value = itemLists
-        }
-    }
-
-    companion object {
-        /**
-         * Factory for creating [MainViewModel]
-         *
-         * @param arg the repository to pass to [MainViewModel]
-         */
-        // TODO #2: Setup dependency injection.
-        class MainViewModelFactory(private val repository: MatchRepository) : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-                    @Suppress("UNCHECKED_CAST")
-                    return MainViewModel(repository) as T
-                }
-                throw IllegalArgumentException("Unknown ViewModel class")
-            }
         }
     }
 }

@@ -15,18 +15,18 @@ import com.thebipolaroptimist.stuffrandomizer.data.ItemList
 import com.thebipolaroptimist.stuffrandomizer.data.Match
 import com.thebipolaroptimist.stuffrandomizer.data.MatchSet
 import com.thebipolaroptimist.stuffrandomizer.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
 
 /**
  * The launching [Activity] for the project. Starts the [HomeFragment].
  */
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    private val mainViewModel: MainViewModel by viewModels {
-        MainViewModel.Companion.MainViewModelFactory((application as StuffRandomizerApplication).repository)
-    }
+    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
