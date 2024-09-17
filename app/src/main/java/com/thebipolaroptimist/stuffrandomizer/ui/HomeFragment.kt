@@ -9,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentHomeBinding
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.StuffRandomizerApplication
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -27,11 +26,8 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        //TODO #6: Calls to view model for data should be more specific.
-        mainViewModel.getPreviewData()
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,9 +40,10 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_HomeFragment_to_MatchListsFragment)
         }
 
-
-        mainViewModel.previewString.observe(requireActivity()) { value ->
-            binding.matchesTextPreview.text = value
+        mainViewModel.matches.observe(requireActivity()) { matches ->
+            if(matches.isNotEmpty()) {
+                binding.matchesTextPreview.text = matches[0].matchName
+            }
         }
     }
 

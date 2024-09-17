@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 /**
  * A dao for interacting with [ItemList]s stored in [MatchDatabase].
@@ -11,7 +12,7 @@ import androidx.room.Query
 @Dao
 interface ItemListDao {
     @Query("SELECT * FROM itemlist")
-    suspend fun getAllItemLists(): List<ItemList>
+    fun getAllItemLists(): Flow<List<ItemList>>
 
     //TODO #1: decide on conflict strategy
     @Insert(onConflict = OnConflictStrategy.IGNORE)

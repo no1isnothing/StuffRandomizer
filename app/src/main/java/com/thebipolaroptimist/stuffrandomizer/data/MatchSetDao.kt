@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 /**
  * A dao for interacting with [MatchSet]s stored in [MatchDatabase].
@@ -12,7 +13,7 @@ import androidx.room.Query
 interface MatchSetDao {
     //TODO #4: Determine order for MatchSet retrieval.
     @Query("SELECT * FROM matchset")
-    suspend fun getAllMatchSets(): List<MatchSet>
+    fun getAllMatchSets(): Flow<List<MatchSet>>
 
     //TODO #1: decide on conflict strategy
     @Insert(onConflict = OnConflictStrategy.IGNORE)

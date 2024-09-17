@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.StuffRandomizerApplication
 import com.thebipolaroptimist.stuffrandomizer.data.ItemList
 import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentItemListsBinding
 import com.google.common.flogger.FluentLogger
@@ -44,12 +43,12 @@ class ItemListListsAdapter(private val dataSet: List<ItemList>) :
  */
 @AndroidEntryPoint
 class ItemListsFragment : Fragment() {
-    val logger: FluentLogger = FluentLogger.forEnclosingClass()
+    private val logger: FluentLogger = FluentLogger.forEnclosingClass()
     private val mainViewModel: MainViewModel by viewModels()
     private var _binding: FragmentItemListsBinding? = null
 
-    var itemList = arrayListOf<ItemList>()
-    val adapter = ItemListListsAdapter(itemList)
+    private var itemList = arrayListOf<ItemList>()
+    private val adapter = ItemListListsAdapter(itemList)
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -59,8 +58,6 @@ class ItemListsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        //TODO #6: Calls to view model for data should be more specific.
-        mainViewModel.getPreviewData()
         _binding = FragmentItemListsBinding.inflate(inflater, container, false)
 
         val recyclerView: RecyclerView = binding.itemlist
@@ -74,6 +71,7 @@ class ItemListsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mainViewModel.itemLists.observe(requireActivity()) { itemLists ->
+            itemList.clear()
             logger.atInfo().log("Setting item list size %d", itemLists.size)
             itemList.addAll(itemLists)
             adapter.notifyDataSetChanged()
