@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentHomeBinding
 import com.thebipolaroptimist.stuffrandomizer.R
@@ -44,6 +45,10 @@ class HomeFragment : Fragment() {
             if(matches.isNotEmpty()) {
                 binding.matchesTextPreview.text = matches[0].matchName
             }
+        }
+
+        binding.homeFab.setOnClickListener { view ->
+            findNavController().navigate(R.id.action_HomeFragment_to_MatchCreationFragment)
         }
     }
 

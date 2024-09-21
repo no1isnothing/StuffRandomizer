@@ -39,10 +39,6 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
-
-        binding.fab.setOnClickListener { view ->
-            navController.navigate(R.id.action_HomeFragment_to_MatchCreationFragment)
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
