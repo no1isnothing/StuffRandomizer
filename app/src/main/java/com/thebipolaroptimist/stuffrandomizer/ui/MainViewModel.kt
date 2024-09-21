@@ -33,4 +33,16 @@ class MainViewModel @Inject constructor(private val matchRepository: MatchReposi
             matchRepository.insertItemList(itemList)
         }
     }
+
+    fun deleteItemLists() {
+        viewModelScope.launch {
+            matchRepository.deleteAllItemLists()
+        }
+    }
+
+    fun deleteMatchSets() {
+        viewModelScope.launch {
+            matchRepository.deleteAllMatchSets()
+        }
+    }
 }

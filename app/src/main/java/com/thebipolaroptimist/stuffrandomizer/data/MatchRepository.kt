@@ -28,4 +28,12 @@ class MatchRepository @Inject constructor(private val matchSetDao: MatchSetDao,
     suspend fun insertItemList(itemList: ItemList) {
         itemListDao.insert(itemList)
     }
+
+    suspend fun deleteAllMatchSets() {
+        matchSetDao.deleteAll()
+    }
+
+    suspend fun deleteAllItemLists() {
+        itemListDao.deleteAll()
+    }
 }

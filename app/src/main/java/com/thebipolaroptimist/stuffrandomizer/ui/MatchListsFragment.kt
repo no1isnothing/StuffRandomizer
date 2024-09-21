@@ -43,9 +43,7 @@ class MatchListsAdapter(private val dataSet: ArrayList<MatchSet>) :
     }
 
     override fun getItemCount() = dataSet.size
-
 }
-
 
 /**
  * A [Fragment] for displaying [MatchSet]s.
@@ -74,7 +72,6 @@ class MatchListsFragment : Fragment() {
         recyclerView.adapter = customAdapter
 
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -43,21 +43,57 @@ class MainActivity : AppCompatActivity() {
         binding.fab.setOnClickListener { view ->
             navController.navigate(R.id.action_HomeFragment_to_MatchCreationFragment)
         }
-        // TODO #7: Add better controls for prepopulating data.
-        //mainViewModel.insertMatchSet(createSampleMatchData())
-        //mainViewModel.insertItemList(createSampleItemListData())
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> true
+            // TODO #7: Remove, hide behind flag, or update to be 'default data'
+            R.id.action_add_data -> {
+                addSampleData()
+                true
+            }
+            // TODO #7: Remove, hide behind flag, or move to advanced settings with a warning
+            R.id.action_clear_data -> {
+                clearAllData()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        return navController.navigateUp(appBarConfiguration)
+                || super.onSupportNavigateUp()
+    }
+
+    private fun addSampleData() {
+        mainViewModel.insertMatchSet(createSampleMatchData())
+        mainViewModel.insertItemList(createSampleItemListData())
+    }
+
+    private fun clearAllData() {
+        mainViewModel.deleteItemLists()
+        mainViewModel.deleteMatchSets()
     }
 
     private fun createSampleMatchData(): MatchSet = MatchSet(
-            UUID.randomUUID(),
-            "Skyrim 2024",
-            listOf(
-                Match("Jane", mapOf(Pair("Aedra", "Talos"), Pair("Daedra", "Clavicus Vile"))),
-                Match("Bear", mapOf(Pair("Aedra", "Mara"), Pair("Daedra", "Peryite"))),
-                Match("The Tooth Fairy", mapOf(Pair("Aedra", "Julianos"), Pair("Daedra", "Vaermina"))),
-                Match("Gifty", mapOf(Pair("Aedra", "Stendar"), Pair("Daedra", "Merida"))),
-            )
+        UUID.randomUUID(),
+        "Skyrim 2024",
+        listOf(
+            Match("Jane", mapOf(Pair("Aedra", "Talos"), Pair("Daedra", "Clavicus Vile"))),
+            Match("Bear", mapOf(Pair("Aedra", "Mara"), Pair("Daedra", "Peryite"))),
+            Match("The Tooth Fairy", mapOf(Pair("Aedra", "Julianos"), Pair("Daedra", "Vaermina"))),
+            Match("Gifty", mapOf(Pair("Aedra", "Stendar"), Pair("Daedra", "Merida"))),
         )
+    )
     private fun createSampleItemListData(): ItemList = ItemList(
         UUID.randomUUID(),
         "Aedra",
@@ -73,26 +109,4 @@ class MainActivity : AppCompatActivity() {
             "Zenithar"
         )
     )
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
-    }
 }
