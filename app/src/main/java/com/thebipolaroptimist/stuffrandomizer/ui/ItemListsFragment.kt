@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thebipolaroptimist.stuffrandomizer.R
@@ -28,7 +29,7 @@ class ItemListListsAdapter(private val dataSet: List<ItemList>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
        val view = LayoutInflater.from(parent.context)
-           .inflate(R.layout.itemlist_item, parent, false)
+           .inflate(R.layout.itemlists_item, parent, false)
         return ViewHolder(view)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -63,6 +64,10 @@ class ItemListsFragment : Fragment() {
         val recyclerView: RecyclerView = binding.itemlist
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
+
+        binding.itemListFab.setOnClickListener { _ ->
+            findNavController().navigate(R.id.action_ItemListsFragment_to_ItemListCreationFragment)
+        }
 
         return binding.root
     }
