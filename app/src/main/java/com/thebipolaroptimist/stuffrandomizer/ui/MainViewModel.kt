@@ -21,6 +21,7 @@ class MainViewModel @Inject constructor(private val matchRepository: MatchReposi
 
     val matches = matchRepository.getAllMatchSets().asLiveData()
     val itemLists = matchRepository.getAllItemLists().asLiveData()
+    var inProgressItemList: ItemList? = null
 
     fun insertMatchSet(matchSet: MatchSet) {
         viewModelScope.launch {

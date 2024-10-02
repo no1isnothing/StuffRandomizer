@@ -5,6 +5,18 @@
     <string name="action_clear_data">Clear data</string>
     <string name="name">Name</string>
     <string name="items">Items</string>
+    <string name="warning_duplicate_item">Can\'t Add Duplicate Item to List</string>
+    <string name="warning_empty_item">Can\'t Add Empty Items to List</string>
+    <string name="warning_list_name_empty">Can\'t Save List Without Name</string>
+    <string name="warning_empty_item_list">Can\'t Save List Without Items</string>
+    <string name="discard_draft">Discard draft?</string>
+    <string name="discard">Discard</string>
+    <string name="cancel">Cancel</string>
+    <string name="hint_list_name">List Name</string>
+    <string name="hint_item">Item</string>
+    <string name="button_text_add_item">Add</string>
+    <string name="save">Save</string>
+
     <!-- Strings used for fragments for navigation -->
     <string name="home_fragment_label">Home</string>
     <string name="item_lists_fragment_label">Item Lists</string>

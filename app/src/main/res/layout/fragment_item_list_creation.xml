@@ -12,23 +12,27 @@
         android:text="@string/name" />
     <EditText
         android:id="@+id/nameText"
-        android:hint="List Name"
+        android:hint="@string/hint_list_name"
+        android:importantForAutofill="no"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:inputType="text"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/items" />
     <EditText
         android:id="@+id/itemText"
-        android:hint="Item"
+        android:hint="@string/hint_item"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:importantForAutofill="no"/>
     <Button
         android:id="@+id/addItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add"/>
+        android:text="@string/button_text_add_item"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/newItemList"
         android:layout_width="wrap_content"
@@ -39,10 +43,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Save"/>
+        android:text="@string/save"/>
     <Button
+        android:id="@+id/cancelItemListCreation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Cancel"/>
+        android:text="@string/cancel"/>
 </LinearLayout>

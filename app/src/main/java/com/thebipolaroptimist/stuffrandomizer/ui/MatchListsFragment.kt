@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thebipolaroptimist.stuffrandomizer.R
@@ -20,7 +20,6 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 class MatchListsAdapter(private val dataSet: ArrayList<MatchSet>) :
     RecyclerView.Adapter<MatchListsAdapter.ViewHolder>() {
-    private val logger: FluentLogger = FluentLogger.forEnclosingClass()
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleView: TextView = view.findViewById(R.id.matchsetTitle)
@@ -43,6 +42,10 @@ class MatchListsAdapter(private val dataSet: ArrayList<MatchSet>) :
     }
 
     override fun getItemCount() = dataSet.size
+
+    companion object {
+        private val logger: FluentLogger = FluentLogger.forEnclosingClass()
+    }
 }
 
 /**
@@ -50,8 +53,7 @@ class MatchListsAdapter(private val dataSet: ArrayList<MatchSet>) :
  */
 @AndroidEntryPoint
 class MatchListsFragment : Fragment() {
-    private val logger: FluentLogger = FluentLogger.forEnclosingClass()
-    private val mainViewModel: MainViewModel by viewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private var _binding: FragmentMatchListsBinding? = null
 
@@ -88,5 +90,9 @@ class MatchListsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private val logger: FluentLogger = FluentLogger.forEnclosingClass()
     }
 }

@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -44,8 +44,7 @@ class ItemListListsAdapter(private val dataSet: List<ItemList>) :
  */
 @AndroidEntryPoint
 class ItemListsFragment : Fragment() {
-    private val logger: FluentLogger = FluentLogger.forEnclosingClass()
-    private val mainViewModel: MainViewModel by viewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentItemListsBinding? = null
 
     private var itemList = arrayListOf<ItemList>()
@@ -86,5 +85,9 @@ class ItemListsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private val logger: FluentLogger = FluentLogger.forEnclosingClass()
     }
 }

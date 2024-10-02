@@ -10,7 +10,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.StuffRandomizerApplication
 import com.thebipolaroptimist.stuffrandomizer.data.ItemList
 import com.thebipolaroptimist.stuffrandomizer.data.Match
 import com.thebipolaroptimist.stuffrandomizer.data.MatchSet
@@ -19,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
 
 /**
- * The launching [Activity] for the project. Starts the [HomeFragment].
+ * The launching [AppCompatActivity] for the project. Starts the [HomeFragment].
  */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -64,9 +63,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Handles toolbar back button
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
+        return findNavController(R.id.nav_host_fragment_content_main).navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
     }
 
@@ -90,6 +89,7 @@ class MainActivity : AppCompatActivity() {
             Match("Gifty", mapOf(Pair("Aedra", "Stendar"), Pair("Daedra", "Merida"))),
         )
     )
+
     private fun createSampleItemListData(): ItemList = ItemList(
         UUID.randomUUID(),
         "Aedra",
