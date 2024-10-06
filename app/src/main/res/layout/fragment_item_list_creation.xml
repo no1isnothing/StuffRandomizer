@@ -32,7 +32,7 @@
         android:id="@+id/addItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_text_add_item"/>
+        android:text="@string/add"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/newItemList"
         android:layout_width="wrap_content"

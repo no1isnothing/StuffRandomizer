@@ -14,8 +14,7 @@ interface ItemListDao {
     @Query("SELECT * FROM itemlist")
     fun getAllItemLists(): Flow<List<ItemList>>
 
-    //TODO #1: decide on conflict strategy
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(itemList: ItemList)
 
     @Query("DELETE FROM itemlist")

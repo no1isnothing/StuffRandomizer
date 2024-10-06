@@ -30,7 +30,7 @@ class NewItemListAdapter(private val dataSet: List<String>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.new_itemlist_item, parent, false)
+            .inflate(R.layout.itemlist_item_new, parent, false)
         return ViewHolder(view)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

@@ -14,14 +14,18 @@
     <string name="cancel">Cancel</string>
     <string name="hint_list_name">List Name</string>
     <string name="hint_item">Item</string>
-    <string name="button_text_add_item">Add</string>
+    <string name="add">Add</string>
     <string name="save">Save</string>
+    <string name="key_uuid">uuid</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="matches">Matches</string>
 
     <!-- Strings used for fragments for navigation -->
     <string name="home_fragment_label">Home</string>
     <string name="item_lists_fragment_label">Item Lists</string>
     <string name="item_lists_creation_fragment_label">Item Lists Creation</string>
-    <string name="item_lists_edit_fragment_label">Item Lists Creation</string>
+    <string name="item_lists_edit_fragment_label">Item Lists Edit</string>
     <string name="match_lists_fragment_label">Match Lists</string>
     <string name="match_creation_fragment_label">Match Creation</string>
     <string name="match_edit_fragment_label">Match Edit</string>
