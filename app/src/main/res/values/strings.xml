@@ -20,6 +20,9 @@
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="matches">Matches</string>
+    <string name="roll">Roll</string>
+    <string name="assignees">Assignees</string>
+    <string name="assignments">Assignments</string>
 
     <!-- Strings used for fragments for navigation -->
     <string name="home_fragment_label">Home</string>

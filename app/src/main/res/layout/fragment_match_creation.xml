@@ -6,20 +6,35 @@
     android:orientation="vertical"
     tools:context=".ui.MatchCreationFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/assigneeText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/match_creation_fragment_label" />
+        android:text="@string/assignees" />
+
+    <Spinner
+        android:id="@+id/assigneeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/assignments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/assignments" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/assignmentsList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/buttonToHome"
+        android:id="@+id/buttonRoll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button" />
-    <Button
-        android:id="@+id/buttonToEdit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ToEdit" />
+        android:text="@string/roll"/>
+    <!--clicking button leads to the edit page.
+    If we want to allow reroll matches will need to include list ids -->
+
+    <!--Add option to add new list -->
 </LinearLayout>
