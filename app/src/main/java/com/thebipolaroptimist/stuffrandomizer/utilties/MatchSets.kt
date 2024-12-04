@@ -24,7 +24,7 @@ object MatchSets {
 
             for((index, match) in matches.withIndex()) {
                 val quotient = index/shuffledAssignmentList.size
-                var correctedIndex = index - (quotient * shuffledAssignmentList.size)
+                val correctedIndex = index - (quotient * shuffledAssignmentList.size)
 
                 match.assignments.put(assignmentList.listName, shuffledAssignmentList[correctedIndex])
             }
