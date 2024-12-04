@@ -8,6 +8,6 @@ import java.util.UUID
 data class MatchSet(
     @PrimaryKey val uid : UUID,
     val matchName: String,
-    val matches: List<Match>
-    // TODO #3: Determine if more data related to this, like ItemLists, should be stored.
+    val matches: List<Match>,
+    val assigneeList: String,
 )

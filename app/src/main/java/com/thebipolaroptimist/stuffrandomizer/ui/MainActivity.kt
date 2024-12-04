@@ -83,11 +83,12 @@ class MainActivity : AppCompatActivity() {
         UUID.randomUUID(),
         "Skyrim 2024",
         listOf(
-            Match("Jane", mapOf(Pair("Aedra", "Talos"), Pair("Daedra", "Clavicus Vile"))),
-            Match("Bear", mapOf(Pair("Aedra", "Mara"), Pair("Daedra", "Peryite"))),
-            Match("The Tooth Fairy", mapOf(Pair("Aedra", "Julianos"), Pair("Daedra", "Vaermina"))),
-            Match("Gifty", mapOf(Pair("Aedra", "Stendar"), Pair("Daedra", "Merida"))),
-        )
+            Match("Jane", hashMapOf(Pair("Aedra", "Talos"), Pair("Daedra", "Clavicus Vile"))),
+            Match("Bear", hashMapOf(Pair("Aedra", "Mara"), Pair("Daedra", "Peryite"))),
+            Match("The Tooth Fairy", hashMapOf(Pair("Aedra", "Julianos"), Pair("Daedra", "Vaermina"))),
+            Match("Gifty", hashMapOf(Pair("Aedra", "Stendar"), Pair("Daedra", "Merida"))),
+        ),
+        "Friends"
     )
 
     private fun createSampleItemListData(): ItemList = ItemList(

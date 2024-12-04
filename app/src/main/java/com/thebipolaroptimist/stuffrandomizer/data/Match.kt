@@ -8,4 +8,4 @@ package com.thebipolaroptimist.stuffrandomizer.data
  * For example, for a player, Jane, that was matched with the Aedrea, Talos, and Daedra, Azura,
  * A match would be ( assignee: "Jane", assignments: { "aedra" : "Talos", "daedra" : "Azura" })
  */
-data class Match(val assignee: String, var assignments: Map<String,String> )
+data class Match(val assignee: String, var assignments: MutableMap<String,String> )

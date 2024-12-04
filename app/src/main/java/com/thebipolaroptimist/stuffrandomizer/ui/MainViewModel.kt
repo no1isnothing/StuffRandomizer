@@ -22,6 +22,15 @@ class MainViewModel @Inject constructor(private val matchRepository: MatchReposi
     val matches = matchRepository.getAllMatchSets().asLiveData()
     val itemLists = matchRepository.getAllItemLists().asLiveData()
     var inProgressItemList: ItemList? = null
+    var inProgressMatchName: String? = null
+    var inProgressCheckBoxState: List<Boolean>? = null
+    var inProgressAssigneeSelection: String? = null
+
+    private fun clearInProgressMatchState() {
+        inProgressMatchName = null
+        inProgressCheckBoxState = null
+        inProgressAssigneeSelection = null
+    }
 
     fun insertMatchSet(matchSet: MatchSet) {
         viewModelScope.launch {
@@ -31,12 +40,14 @@ class MainViewModel @Inject constructor(private val matchRepository: MatchReposi
 
     fun insertItemList(itemList: ItemList) {
         viewModelScope.launch {
+            clearInProgressMatchState()
             matchRepository.insertItemList(itemList)
         }
     }
 
     fun deleteItemLists() {
         viewModelScope.launch {
+            clearInProgressMatchState()
             matchRepository.deleteAllItemLists()
         }
     }

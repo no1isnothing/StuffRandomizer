@@ -41,7 +41,8 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_HomeFragment_to_MatchListsFragment)
         }
 
-        mainViewModel.matches.observe(requireActivity()) { matches ->
+
+        mainViewModel.matches.observe(viewLifecycleOwner) { matches ->
             if(matches.isNotEmpty()) {
                 binding.matchesTextPreview.text = matches[0].matchName
             }

@@ -23,6 +23,9 @@
     <string name="roll">Roll</string>
     <string name="assignees">Assignees</string>
     <string name="assignments">Assignments</string>
+    <string name="hint_match_name">Match Name</string>
+    <string name="warning_match_name_empty">Can\'t Save Match Without Name</string>
+    <string name="warning_match_assignments_empty">Can\'t Create Match Without Selecting Assignment Lists</string>
 
     <!-- Strings used for fragments for navigation -->
     <string name="home_fragment_label">Home</string>

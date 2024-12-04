@@ -54,11 +54,14 @@
         tools:layout="@layout/fragment_match_creation">
 
         <action
-            android:id="@+id/action_MatchCeationFragment_to_HomeFragment"
+            android:id="@+id/action_MatchCreationFragment_to_HomeFragment"
             app:destination="@id/HomeFragment" />
         <action
-            android:id="@+id/action_MatchCeationFragment_to_MatchEditFragment"
+            android:id="@+id/action_MatchCreationFragment_to_MatchEditFragment"
             app:destination="@id/MatchEditFragment" />
+        <action
+            android:id="@+id/action_MatchCreationFragment_to_MatchListsFragment"
+            app:destination="@id/MatchListsFragment" />
     </fragment>
     <fragment
         android:id="@+id/ItemListCreationFragment"

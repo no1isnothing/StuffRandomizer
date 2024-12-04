@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -17,6 +18,7 @@ import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentMatchCreationB
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.ItemList
 import com.thebipolaroptimist.stuffrandomizer.data.MatchSet
+import com.thebipolaroptimist.stuffrandomizer.utilties.MatchSets
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -57,10 +59,11 @@ class MatchCreationFragment : Fragment() {
     private var _binding: FragmentMatchCreationBinding? = null
 
     private var itemLists = arrayListOf<ItemList>()
-    private var checkboxState = arrayListOf<Boolean>()
+    private var checkboxStates = arrayListOf<Boolean>()
     private var listNames = arrayListOf<String>()
 
-    private var adapter = SelectableItemListsAdapter(itemLists, checkboxState)
+    private var adapter = SelectableItemListsAdapter(itemLists, checkboxStates)
+    private var matchSaved = false
 
     private val binding get() = _binding!!
 
@@ -81,28 +84,93 @@ class MatchCreationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainViewModel.itemLists.observe(requireActivity()) { itemsList ->
+        // set values from viewmodel
+        if(mainViewModel.inProgressMatchName != null) {
+            binding.matchNameText.setText(mainViewModel.inProgressMatchName)
+            mainViewModel.inProgressMatchName = null
+        }
+
+        mainViewModel.itemLists.observe(viewLifecycleOwner) { itemsList ->
             itemLists.clear()
-            checkboxState.clear()
             listNames.clear()
 
             itemLists.addAll(itemsList)
-            checkboxState.addAll(Array(itemLists.size) { false } )
             listNames.addAll(itemLists.map { itemList -> itemList.listName })
+            val arrayAdapter = (binding.assigneeSpinner.adapter as ArrayAdapter<String>)
+            if(mainViewModel.inProgressCheckBoxState != null) {
+                checkboxStates.addAll(mainViewModel.inProgressCheckBoxState!!)
+                mainViewModel.inProgressCheckBoxState = null
+            }
+            if(mainViewModel.inProgressAssigneeSelection != null) {
+                binding.assigneeSpinner
+                    .setSelection(arrayAdapter.getPosition(mainViewModel.inProgressAssigneeSelection))
+                mainViewModel.inProgressAssigneeSelection = null
+            }
+            if(itemLists.size > checkboxStates.size) {
+                val diff = itemsList.size - checkboxStates.size
+                checkboxStates.addAll(Array(diff) { false })
+            }
             // TODO #15: Use DiffUtil to update lists.
             adapter.notifyDataSetChanged()
-            (binding.assigneeSpinner.adapter as ArrayAdapter<String>).notifyDataSetChanged()
+            arrayAdapter.notifyDataSetChanged()
         }
 
         binding.buttonRoll.setOnClickListener {
-            logger.atInfo().log("Check box state %s", checkboxState.joinToString())
+            logger.atInfo().log("Check box state %s", checkboxStates.joinToString())
             logger.atInfo().log("Spinner selection %s", binding.assigneeSpinner.selectedItem.toString())
-            // TODO #9: Use this information to create a MatchSet and navigate to edit page for it.
-            findNavController().navigate(R.id.action_MatchCeationFragment_to_MatchEditFragment)
+
+            if(createMatchSets()) {
+                findNavController().navigate(R.id.action_MatchCreationFragment_to_MatchListsFragment)
+            }
         }
     }
 
-    // TODO #9: Add onStop to save in progress data to ViewModel and update init code to use it.
+    private fun createMatchSets(): Boolean {
+        val name = binding.matchNameText.text.toString()
+
+        if(name.isEmpty()) {
+            Toast.makeText(context, getString(R.string.warning_match_name_empty), Toast.LENGTH_SHORT)
+                .show()
+            return false
+        }
+
+        val selectedLists = ArrayList<ItemList>()
+        var assigneeList: ItemList? = null
+        val assigneeListName = binding.assigneeSpinner.selectedItem.toString()
+
+        for((index, checkBoxState) in checkboxStates.withIndex()){
+            if(checkBoxState) {
+                selectedLists.add(itemLists[index])
+            }
+            if(itemLists[index].listName == assigneeListName) {
+                assigneeList = itemLists[index]
+            }
+        }
+        if(selectedLists.isEmpty()) {
+                Toast.makeText(context, getString(R.string.warning_match_assignments_empty), Toast.LENGTH_SHORT)
+                    .show()
+                return false
+        }
+        assigneeList?.let {
+            val matchSet = MatchSets.create(name, it, selectedLists)
+            mainViewModel.insertMatchSet(matchSet)
+            matchSaved = true
+        }
+        return true
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if(matchSaved) {
+            return
+        }
+
+        if(binding.matchNameText.text.isNotEmpty()) {
+            mainViewModel.inProgressMatchName = binding.matchNameText.text.toString()
+        }
+        mainViewModel.inProgressCheckBoxState = checkboxStates
+        mainViewModel.inProgressAssigneeSelection = binding.assigneeSpinner.selectedItem.toString()
+    }
 
     companion object {
         private val logger: FluentLogger = FluentLogger.forEnclosingClass()

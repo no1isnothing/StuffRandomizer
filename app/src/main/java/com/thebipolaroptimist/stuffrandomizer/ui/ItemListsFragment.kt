@@ -92,7 +92,7 @@ class ItemListsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.itemLists.observe(requireActivity()) { itemLists ->
+        mainViewModel.itemLists.observe(viewLifecycleOwner) { itemLists ->
             itemList.clear()
             logger.atInfo().log("Setting item list size %d", itemLists.size)
             itemList.addAll(itemLists)
