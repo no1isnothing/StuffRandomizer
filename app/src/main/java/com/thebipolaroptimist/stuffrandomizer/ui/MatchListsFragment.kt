@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thebipolaroptimist.stuffrandomizer.R
@@ -18,8 +19,8 @@ import dagger.hilt.android.AndroidEntryPoint
 /**
  * A [RecyclerView.Adapter] for displaying [MatchSet]s.
  */
-class MatchListsAdapter(private val dataSet: ArrayList<MatchSet>) :
-    RecyclerView.Adapter<MatchListsAdapter.ViewHolder>() {
+class MatchSetsAdapter(private val dataSet: ArrayList<MatchSet>) :
+    RecyclerView.Adapter<MatchSetsAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleView: TextView = view.findViewById(R.id.matchsetTitle)
@@ -37,8 +38,15 @@ class MatchListsAdapter(private val dataSet: ArrayList<MatchSet>) :
         logger.atInfo().log("Binding view")
         viewHolder.titleView.text = dataSet[position].matchName
         viewHolder.previewView.text =
-            dataSet[position].matches.asSequence().map { match -> match.assignee }.toList()
-                .joinToString()
+            dataSet[position].matches.joinToString { match -> match.assignee }
+        viewHolder.titleView.setOnClickListener { v ->
+            val bundle = Bundle()
+            bundle.putString(v.resources.getString(R.string.key_uuid),
+                dataSet[position].uid.toString())
+            v.findNavController()
+                .navigate(R.id.action_MatchListsFragment_to_MatchEditFragment,
+                    bundle)
+        }
     }
 
     override fun getItemCount() = dataSet.size
@@ -61,7 +69,7 @@ class MatchListsFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private var matchList = arrayListOf<MatchSet>()
-    private val customAdapter = MatchListsAdapter(matchList)
+    private val customAdapter = MatchSetsAdapter(matchList)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,7 +77,7 @@ class MatchListsFragment : Fragment() {
     ): View {
         _binding = FragmentMatchListsBinding.inflate(inflater, container, false)
 
-        val recyclerView: RecyclerView = binding.matchlist
+        val recyclerView: RecyclerView = binding.matchSetList
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = customAdapter
 
@@ -79,7 +87,7 @@ class MatchListsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.matches.observe(requireActivity()) { matches ->
+        mainViewModel.matches.observe(viewLifecycleOwner) { matches ->
             matchList.clear()
             logger.atInfo().log("Setting Matches size %d", matches.size)
             matchList.addAll(matches)

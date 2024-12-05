@@ -7,7 +7,7 @@
     tools:context=".ui.MatchListsFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/matchlist"
+        android:id="@+id/matchSetList"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

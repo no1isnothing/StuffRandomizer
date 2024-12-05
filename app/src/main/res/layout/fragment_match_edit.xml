@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.MatchEditFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!--TODO #12: Change to Framelayout with edit text -->
     <TextView
+        android:id="@+id/matchSetNameText"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/match_edit_fragment_label" />
+        android:layout_height="wrap_content" />
 
-</FrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/matchList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>

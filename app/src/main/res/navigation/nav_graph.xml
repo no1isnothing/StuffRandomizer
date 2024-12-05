@@ -46,6 +46,9 @@
         <action
             android:id="@+id/action_MatchListsFragment_to_HomeFragment"
             app:destination="@id/HomeFragment" />
+        <action
+            android:id="@+id/action_MatchListsFragment_to_MatchEditFragment"
+            app:destination="@id/MatchEditFragment" />
     </fragment>
     <fragment
         android:id="@+id/MatchCreationFragment"
