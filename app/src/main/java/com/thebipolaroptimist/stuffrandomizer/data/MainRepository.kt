@@ -18,7 +18,7 @@ class MainRepository @Inject constructor(private val partyDao: PartyDao,
     }
 
     fun getAllStuff(): Flow<List<Stuff>> {
-        return stuffDao.getAllItemLists()
+        return stuffDao.getAllStuff()
     }
 
     suspend fun insertParty(party: Party) {

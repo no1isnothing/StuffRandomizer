@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface StuffDao {
     @Query("SELECT * FROM stuff")
-    fun getAllItemLists(): Flow<List<Stuff>>
+    fun getAllStuff(): Flow<List<Stuff>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(stuff: Stuff)

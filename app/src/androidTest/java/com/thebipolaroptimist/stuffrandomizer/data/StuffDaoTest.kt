@@ -1,10 +1,9 @@
 package com.thebipolaroptimist.stuffrandomizer.data
 
-//package com.thebipolaroptimist
-
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -18,8 +17,7 @@ class StuffDaoTest {
     fun insertTest_success() = runTest {
         val stuff = Stuff(UUID.randomUUID(), "List1", listOf("item1", "item2"))
         dao.insert(stuff)
-
-        assertEquals(stuff, dao.getAllItemLists().first())
+        assertEquals(stuff, dao.getAllStuff().first().first())
     }
 
     companion object {
