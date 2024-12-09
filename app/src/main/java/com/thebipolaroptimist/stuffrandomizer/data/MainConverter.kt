@@ -9,12 +9,12 @@ import com.google.gson.reflect.TypeToken
  */
 class MainConverter {
     @TypeConverter
-    fun pairingListToString(members: List<Member>): String =
+    fun memberListToString(members: List<Member>): String =
         Gson().toJson(members).toString()
 
 
     @TypeConverter
-    fun stringToPairingList(pairings: String): List<Member> =
+    fun stringToMemberList(pairings: String): List<Member> =
         Gson().fromJson(pairings, object : TypeToken<List<Member>>() {}.type)
 
     @TypeConverter

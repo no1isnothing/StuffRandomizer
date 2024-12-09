@@ -5,13 +5,13 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/matchAssignee"
+        android:id="@+id/memberAssignee"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <!-- TODO #12: Make this a recycler view, if not clickable -->
     <TextView
-        android:id="@+id/matchAssignments"
+        android:id="@+id/memberAssignments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>

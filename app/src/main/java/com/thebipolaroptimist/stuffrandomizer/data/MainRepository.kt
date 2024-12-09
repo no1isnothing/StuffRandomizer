@@ -13,7 +13,7 @@ import javax.inject.Inject
 class MainRepository @Inject constructor(private val partyDao: PartyDao,
                                          private val stuffDao: StuffDao) {
 
-    fun getAllPairingGroups(): Flow<List<Party>> {
+    fun getAllParties(): Flow<List<Party>> {
         return partyDao.getAllParties()
     }
 
@@ -21,7 +21,7 @@ class MainRepository @Inject constructor(private val partyDao: PartyDao,
         return stuffDao.getAllItemLists()
     }
 
-    suspend fun insertPairingGroup(party: Party) {
+    suspend fun insertParty(party: Party) {
         partyDao.insert(party)
     }
 
@@ -29,7 +29,7 @@ class MainRepository @Inject constructor(private val partyDao: PartyDao,
         stuffDao.insert(stuff)
     }
 
-    suspend fun deleteAllPairingGroups() {
+    suspend fun deleteAllParties() {
         partyDao.deleteAll()
     }
 

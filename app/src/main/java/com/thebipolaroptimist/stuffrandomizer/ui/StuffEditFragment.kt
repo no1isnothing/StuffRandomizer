@@ -25,45 +25,45 @@ import java.util.UUID
 /**
  * A [RecyclerView.Adapter] for displaying strings to be used for displaying and editing [Stuff].
  */
-class EditableStuffAdapter(private val items: ArrayList<String>) :
-    RecyclerView.Adapter<EditableStuffAdapter.ViewHolder>() {
+class EditableThingAdapter(private val thingList: ArrayList<String>) :
+    RecyclerView.Adapter<EditableThingAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val textView: TextView = view.findViewById(R.id.item_name_view)
-        val editText: EditText = view.findViewById((R.id.item_name_edit))
-        val editButton: ImageButton = view.findViewById(R.id.item_edit_button)
-        val deleteButton: ImageButton = view.findViewById(R.id.item_delete_button)
+        val name: TextView = view.findViewById(R.id.thingNameView)
+        val nameEdit: EditText = view.findViewById((R.id.thingNameEdit))
+        val editButton: ImageButton = view.findViewById(R.id.thingEditButton)
+        val deleteButton: ImageButton = view.findViewById(R.id.thingDeleteButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.stuff_item_edit, parent, false)
+            .inflate(R.layout.thing_item_edit, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.textView.text = items[position]
+        holder.name.text = thingList[position]
         holder.editButton.setOnClickListener {
-            if (holder.textView.isVisible) {
-                holder.textView.visibility = GONE
-                holder.editText.setText(holder.textView.text)
-                holder.editText.visibility = VISIBLE
+            if (holder.name.isVisible) {
+                holder.name.visibility = GONE
+                holder.nameEdit.setText(holder.name.text)
+                holder.nameEdit.visibility = VISIBLE
                 holder.editButton.setImageResource(android.R.drawable.ic_menu_save)
             } else {
-                holder.textView.text = holder.editText.text
-                items[position] = holder.editText.text.toString()
-                holder.textView.visibility = VISIBLE
-                holder.editText.visibility = GONE
+                holder.name.text = holder.nameEdit.text
+                thingList[position] = holder.nameEdit.text.toString()
+                holder.name.visibility = VISIBLE
+                holder.nameEdit.visibility = GONE
                 holder.editButton.setImageResource(android.R.drawable.ic_menu_edit)
             }
         }
 
         holder.deleteButton.setOnClickListener {
-            items.removeAt(position)
+            thingList.removeAt(position)
             this.notifyDataSetChanged()
         }
     }
 
-    override fun getItemCount() = items.size
+    override fun getItemCount() = thingList.size
 }
 
 /**
@@ -73,8 +73,8 @@ class StuffEditFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentStuffEditBinding? = null
 
-    private val editStuffList = arrayListOf<String>()
-    private val adapter = EditableStuffAdapter(editStuffList)
+    private val editThingList = arrayListOf<String>()
+    private val thingAdapter = EditableThingAdapter(editThingList)
 
     private val binding get() = _binding!!
     private var uuid = TEMP_UUID
@@ -88,27 +88,27 @@ class StuffEditFragment : Fragment() {
         uuid = UUID.fromString(arguments?.getString(resources.getString(R.string.key_uuid)))
 
         val listWithId =
-            mainViewModel.itemLists
-                .value?.filter { itemList -> itemList.uid == uuid }
+            mainViewModel.stuffs
+                .value?.filter { stuff -> stuff.uid == uuid }
         listWithId?.get(0)?.let {
-            editStuffList.addAll(it.items)
+            editThingList.addAll(it.things)
             binding.editItemListName.setText(it.name)
         }
 
         val recyclerView = binding.editItemList
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = adapter
+        recyclerView.adapter = thingAdapter
 
         binding.editAddItem.setOnClickListener {
-            editStuffList.add("")
-            adapter.notifyDataSetChanged()
+            editThingList.add("")
+            thingAdapter.notifyDataSetChanged()
         }
 
         binding.editItemDiscard.setOnClickListener {
-            editStuffList.clear()
+            editThingList.clear()
             listWithId?.get(0)?.let {
-                editStuffList.addAll(it.items)
-                adapter.notifyDataSetChanged()
+                editThingList.addAll(it.things)
+                thingAdapter.notifyDataSetChanged()
                 binding.editItemListName.setText(it.name)
             }
         }
@@ -119,9 +119,9 @@ class StuffEditFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         logger.atInfo().log("On stop")
-        if(binding.editItemListName.text.isNotEmpty() || editStuffList.isNotEmpty()) {
-            val stuff = Stuff(uuid, binding.editItemListName.text.toString(), editStuffList)
-            mainViewModel.insertItemList(stuff)
+        if(binding.editItemListName.text.isNotEmpty() || editThingList.isNotEmpty()) {
+            val stuff = Stuff(uuid, binding.editItemListName.text.toString(), editThingList)
+            mainViewModel.insertStuff(stuff)
         }
     }
 

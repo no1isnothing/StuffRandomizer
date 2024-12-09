@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:text="@string/name" />
     <EditText
-        android:id="@+id/nameText"
+        android:id="@+id/new_stuff_name"
         android:hint="@string/hint_list_name"
         android:importantForAutofill="no"
         android:layout_width="wrap_content"
@@ -22,30 +22,30 @@
         android:layout_height="wrap_content"
         android:text="@string/items" />
     <EditText
-        android:id="@+id/itemText"
+        android:id="@+id/thing_text"
         android:hint="@string/hint_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="text"
         android:importantForAutofill="no"/>
     <Button
-        android:id="@+id/addItem"
+        android:id="@+id/add_thing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add"/>
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/newItemList"
+        android:id="@+id/new_stuff_list"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1"/>
     <Button
-        android:id="@+id/saveItemList"
+        android:id="@+id/save_stuff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/save"/>
     <Button
-        android:id="@+id/cancelItemListCreation"
+        android:id="@+id/cancel_stuff_creation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

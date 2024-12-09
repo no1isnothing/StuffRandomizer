@@ -20,27 +20,27 @@ import dagger.hilt.android.AndroidEntryPoint
 /**
  * A [RecyclerView.Adapter] for displaying [Stuff]s.
  */
-class StuffListAdapter(private val dataSet: List<Stuff>) :
+class StuffListAdapter(private val stuffList: List<Stuff>) :
     RecyclerView.Adapter<StuffListAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val titleView: TextView = view.findViewById(R.id.itemListTitle)
-        val previewView: TextView = view.findViewById(R.id.itemListPreview)
+        val name: TextView = view.findViewById(R.id.stuffName)
+        val preview: TextView = view.findViewById(R.id.thingListPreview)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.stuff_item, parent, false)
+            .inflate(R.layout.thing_item, parent, false)
         return ViewHolder(view)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.titleView.text = dataSet[position].name
-        holder.previewView.text = dataSet[position].items.joinToString()
+        holder.name.text = stuffList[position].name
+        holder.preview.text = stuffList[position].things.joinToString()
 
-        holder.titleView.setOnClickListener { v ->
+        holder.name.setOnClickListener { v ->
             val bundle = Bundle()
             bundle.putString(
                 v.resources.getString(R.string.key_uuid),
-                dataSet[position].uid.toString()
+                stuffList[position].uid.toString()
             )
             v.findNavController()
                 .navigate(
@@ -50,7 +50,7 @@ class StuffListAdapter(private val dataSet: List<Stuff>) :
         }
     }
 
-    override fun getItemCount() = dataSet.size
+    override fun getItemCount() = stuffList.size
 
     companion object {
         private val logger: FluentLogger = FluentLogger.forEnclosingClass()
@@ -65,8 +65,8 @@ class StuffListFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentStuffListBinding? = null
 
-    private var stuff = arrayListOf<Stuff>()
-    private val adapter = StuffListAdapter(stuff)
+    private var stuffList = arrayListOf<Stuff>()
+    private val stuffAdapter = StuffListAdapter(stuffList)
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -80,9 +80,9 @@ class StuffListFragment : Fragment() {
 
         val recyclerView: RecyclerView = binding.itemlist
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = adapter
+        recyclerView.adapter = stuffAdapter
 
-        binding.itemListFab.setOnClickListener { _ ->
+        binding.stuffFab.setOnClickListener { _ ->
             findNavController().navigate(R.id.action_StuffListFragment_to_StuffCreationFragment)
         }
 
@@ -92,11 +92,11 @@ class StuffListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.itemLists.observe(viewLifecycleOwner) { itemLists ->
-            stuff.clear()
+        mainViewModel.stuffs.observe(viewLifecycleOwner) { itemLists ->
+            stuffList.clear()
             logger.atInfo().log("Setting item list size %d", itemLists.size)
-            stuff.addAll(itemLists)
-            adapter.notifyDataSetChanged()
+            stuffList.addAll(itemLists)
+            stuffAdapter.notifyDataSetChanged()
         }
     }
 

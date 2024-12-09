@@ -8,11 +8,11 @@ import java.util.UUID
  * A data class representing a list that can be used to create a [Member].
  *
  * For example, a [Stuff] representing Aedra would be:
- * (name: "Aedra", items: ["Talos", "Julianos", ..., "Arkay", "Akatosh"])
+ * (name: "Aedra", things: ["Talos", "Julianos", ..., "Arkay", "Akatosh"])
  */
 @Entity
 data class Stuff(
     @PrimaryKey val uid : UUID,
     val name: String,
-    var items: List<String>
+    var things: List<String>
 )

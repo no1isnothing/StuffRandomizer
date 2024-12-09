@@ -19,42 +19,42 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(private val mainRepository: MainRepository) : ViewModel() {
     private val logger: FluentLogger = FluentLogger.forEnclosingClass()
 
-    val matches = mainRepository.getAllPairingGroups().asLiveData()
-    val itemLists = mainRepository.getAllStuff().asLiveData()
+    val parties = mainRepository.getAllParties().asLiveData()
+    val stuffs = mainRepository.getAllStuff().asLiveData()
     var inProgressStuff: Stuff? = null
-    var inProgressMatchName: String? = null
+    var inProgressPartyName: String? = null
     var inProgressCheckBoxState: List<Boolean>? = null
     var inProgressAssigneeSelection: String? = null
 
     private fun clearInProgressMatchState() {
-        inProgressMatchName = null
+        inProgressPartyName = null
         inProgressCheckBoxState = null
         inProgressAssigneeSelection = null
     }
 
-    fun insertMatchSet(party: Party) {
+    fun insertParty(party: Party) {
         viewModelScope.launch {
-            mainRepository.insertPairingGroup(party)
+            mainRepository.insertParty(party)
         }
     }
 
-    fun insertItemList(stuff: Stuff) {
+    fun insertStuff(stuff: Stuff) {
         viewModelScope.launch {
             clearInProgressMatchState()
             mainRepository.insertStuff(stuff)
         }
     }
 
-    fun deleteItemLists() {
+    fun deleteAllStuff() {
         viewModelScope.launch {
             clearInProgressMatchState()
             mainRepository.deleteAllStuff()
         }
     }
 
-    fun deleteMatchSets() {
+    fun deleteParties() {
         viewModelScope.launch {
-            mainRepository.deleteAllPairingGroups()
+            mainRepository.deleteAllParties()
         }
     }
 }

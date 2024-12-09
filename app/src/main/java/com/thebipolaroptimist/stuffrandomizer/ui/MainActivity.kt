@@ -70,13 +70,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addSampleData() {
-        mainViewModel.insertMatchSet(createSampleMatchData())
-        mainViewModel.insertItemList(createSampleItemListData())
+        mainViewModel.insertParty(createSampleMatchData())
+        mainViewModel.insertStuff(createSampleItemListData())
     }
 
     private fun clearAllData() {
-        mainViewModel.deleteItemLists()
-        mainViewModel.deleteMatchSets()
+        mainViewModel.deleteAllStuff()
+        mainViewModel.deleteParties()
     }
 
     private fun createSampleMatchData(): Party = Party(

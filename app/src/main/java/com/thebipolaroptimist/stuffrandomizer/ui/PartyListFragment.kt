@@ -19,12 +19,12 @@ import dagger.hilt.android.AndroidEntryPoint
 /**
  * A [RecyclerView.Adapter] for displaying [Party]s.
  */
-class PartyListAdapter(private val dataSet: ArrayList<Party>) :
+class PartyListAdapter(private val partyList: ArrayList<Party>) :
     RecyclerView.Adapter<PartyListAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val titleView: TextView = view.findViewById(R.id.matchsetTitle)
-        val previewView: TextView = view.findViewById(R.id.matchAssigneesPreview)
+        val partyName: TextView = view.findViewById(R.id.partyName)
+        val assigneePreview: TextView = view.findViewById(R.id.partyAssigneesPreview)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
@@ -36,20 +36,20 @@ class PartyListAdapter(private val dataSet: ArrayList<Party>) :
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         logger.atInfo().log("Binding view")
-        viewHolder.titleView.text = dataSet[position].partyName
-        viewHolder.previewView.text =
-            dataSet[position].members.joinToString { match -> match.assignee }
-        viewHolder.titleView.setOnClickListener { v ->
+        viewHolder.partyName.text = partyList[position].partyName
+        viewHolder.assigneePreview.text =
+            partyList[position].members.joinToString { member -> member.assignee }
+        viewHolder.partyName.setOnClickListener { v ->
             val bundle = Bundle()
             bundle.putString(v.resources.getString(R.string.key_uuid),
-                dataSet[position].uid.toString())
+                partyList[position].uid.toString())
             v.findNavController()
                 .navigate(R.id.action_PartyListFragment_to_PartyEditFragment,
                     bundle)
         }
     }
 
-    override fun getItemCount() = dataSet.size
+    override fun getItemCount() = partyList.size
 
     companion object {
         private val logger: FluentLogger = FluentLogger.forEnclosingClass()
@@ -68,8 +68,8 @@ class PartyListFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private var matchList = arrayListOf<Party>()
-    private val customAdapter = PartyListAdapter(matchList)
+    private var partyList = arrayListOf<Party>()
+    private val partyAdapter = PartyListAdapter(partyList)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,9 +77,9 @@ class PartyListFragment : Fragment() {
     ): View {
         _binding = FragmentPartyListBinding.inflate(inflater, container, false)
 
-        val recyclerView: RecyclerView = binding.matchSetList
+        val recyclerView: RecyclerView = binding.partyList
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = customAdapter
+        recyclerView.adapter = partyAdapter
 
         return binding.root
     }
@@ -87,11 +87,11 @@ class PartyListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.matches.observe(viewLifecycleOwner) { matches ->
-            matchList.clear()
-            logger.atInfo().log("Setting Matches size %d", matches.size)
-            matchList.addAll(matches)
-            customAdapter.notifyDataSetChanged()
+        mainViewModel.parties.observe(viewLifecycleOwner) { parties ->
+            partyList.clear()
+            logger.atInfo().log("Setting Parties size %d", parties.size)
+            partyList.addAll(parties)
+            partyAdapter.notifyDataSetChanged()
         }
     }
 

@@ -9,13 +9,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <TextView
-            android:id="@+id/item_name_view"
+            android:id="@+id/thingNameView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible"/>
 
         <EditText
-            android:id="@+id/item_name_edit"
+            android:id="@+id/thingNameEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:importantForAutofill="no"
@@ -24,13 +24,13 @@
     </FrameLayout>
 
     <ImageButton
-        android:id="@+id/item_edit_button"
+        android:id="@+id/thingEditButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/edit"
         app:srcCompat="@android:drawable/ic_menu_edit"/>
     <ImageButton
-        android:id="@+id/item_delete_button"
+        android:id="@+id/thingDeleteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/delete"

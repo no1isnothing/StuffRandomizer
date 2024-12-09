@@ -22,11 +22,11 @@ import java.util.UUID
 /**
  * A [RecyclerView.Adapter] for displaying [Member]s that can be edited.
  */
-class EditableMemberAdapter(private val members: List<Member>) :
+class EditableMemberAdapter(private val memberList: List<Member>) :
     RecyclerView.Adapter<EditableMemberAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val assigneeView: TextView = view.findViewById(R.id.matchAssignee)
-        val assignmentView: TextView = view.findViewById(R.id.matchAssignments)
+        val assignee: TextView = view.findViewById(R.id.memberAssignee)
+        val assignment: TextView = view.findViewById(R.id.memberAssignments)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,12 +35,12 @@ class EditableMemberAdapter(private val members: List<Member>) :
         return ViewHolder(view)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.assigneeView.text = members[position].assignee
-        holder.assignmentView.text = members[position].assignments
+        holder.assignee.text = memberList[position].assignee
+        holder.assignment.text = memberList[position].assignments
             .map { assignment -> assignment.key + ": " + assignment.value }.joinToString()
     }
 
-    override fun getItemCount() = members.size
+    override fun getItemCount() = memberList.size
 
     companion object {
         private val logger: FluentLogger = FluentLogger.forEnclosingClass()
@@ -57,9 +57,9 @@ class PartyEditFragment : Fragment() {
 
     private val binding get() = _binding!!
     private var memberList = arrayListOf<Member>()
-    private val matchesAdapter = EditableMemberAdapter(memberList)
+    private val memberAdapter = EditableMemberAdapter(memberList)
 
-    private var matchSetUuid = TEMP_UUID
+    private var partyUuid = TEMP_UUID
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,16 +67,16 @@ class PartyEditFragment : Fragment() {
     ): View {
         _binding = FragmentPartyEditBinding.inflate(inflater, container, false)
 
-        matchSetUuid = UUID.fromString(arguments?.getString(resources.getString(R.string.key_uuid)))
-        mainViewModel.matches
-            .value?.filter { matchSet -> matchSet.uid == matchSetUuid }?.get(0)?.let {
-                logger.atInfo().log("matches size " + it.members.size)
+        partyUuid = UUID.fromString(arguments?.getString(resources.getString(R.string.key_uuid)))
+        mainViewModel.parties
+            .value?.filter { parties -> parties.uid == partyUuid }?.get(0)?.let {
+                logger.atInfo().log("Members size " + it.members.size)
                 memberList.addAll(it.members)
-                binding.matchSetNameText.setText(it.partyName)
+                binding.partyNameText.setText(it.partyName)
             }
-        binding.matchList.apply {
+        binding.memberList.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = matchesAdapter
+            adapter = memberAdapter
         }
 
         return binding.root

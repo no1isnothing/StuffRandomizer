@@ -20,23 +20,23 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
 
 /**
- * A [RecyclerView.Adapter] for displaying strings to be used in newly created [Stuff].
+ * A [RecyclerView.Adapter] for displaying things to be used in newly created [Stuff].
  */
-class NewStuffAdapter(private val dataSet: List<String>) :
-    RecyclerView.Adapter<NewStuffAdapter.ViewHolder>() {
+class NewThingAdapter(private val thingList: List<String>) :
+    RecyclerView.Adapter<NewThingAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val textView: TextView = view.findViewById(R.id.newItem)
+        val thing: TextView = view.findViewById(R.id.newThing)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.stuff_item_new, parent, false)
+            .inflate(R.layout.thing_item_new, parent, false)
         return ViewHolder(view)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.textView.text = dataSet[position]
+        holder.thing.text = thingList[position]
     }
-    override fun getItemCount() = dataSet.size
+    override fun getItemCount() = thingList.size
 }
 
 /**
@@ -47,8 +47,8 @@ class StuffCreationFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentStuffCreationBinding? = null
 
-    private var newStuffList = arrayListOf<String>()
-    private val adapter = NewStuffAdapter(newStuffList)
+    private var newThingList = arrayListOf<String>()
+    private val thingAdapter = NewThingAdapter(newThingList)
 
     private val binding get() = _binding!!
 
@@ -60,48 +60,48 @@ class StuffCreationFragment : Fragment() {
         _binding = FragmentStuffCreationBinding.inflate(inflater, container, false)
 
         if(mainViewModel.inProgressStuff != null) {
-            newStuffList.addAll(mainViewModel.inProgressStuff!!.items)
-            binding.nameText.setText(mainViewModel.inProgressStuff!!.name)
+            newThingList.addAll(mainViewModel.inProgressStuff!!.things)
+            binding.newStuffName.setText(mainViewModel.inProgressStuff!!.name)
             mainViewModel.inProgressStuff = null
         }
-        val recyclerView = binding.newItemList
+        val recyclerView = binding.newStuffList
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = adapter
+        recyclerView.adapter = thingAdapter
 
-        binding.addItem.setOnClickListener {
-            logger.atInfo().log("Add item clicked")
-            val newItemText = binding.itemText.text.toString()
-            if (newItemText.isEmpty()) {
+        binding.addThing.setOnClickListener {
+            logger.atInfo().log("Add Thing clicked")
+            val newThingText = binding.thingText.text.toString()
+            if (newThingText.isEmpty()) {
                 Toast.makeText(context, getString(R.string.warning_empty_item), Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
             }
-            if (newStuffList.contains(newItemText)) {
+            if (newThingList.contains(newThingText)) {
                 Toast.makeText(context, getString(R.string.warning_duplicate_item), Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
             }
-            newStuffList.add(binding.itemText.text.toString())
-            adapter.notifyDataSetChanged()
-            binding.itemText.text.clear()
+            newThingList.add(binding.thingText.text.toString())
+            thingAdapter.notifyDataSetChanged()
+            binding.thingText.text.clear()
         }
-        binding.saveItemList.setOnClickListener {
-            val nameText = binding.nameText.text.toString()
+        binding.saveStuff.setOnClickListener {
+            val nameText = binding.newStuffName.text.toString()
             if (nameText.isEmpty()) {
                 Toast.makeText(context, getString(R.string.warning_list_name_empty), Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
             }
-            if (newStuffList.isEmpty()) {
+            if (newThingList.isEmpty()) {
                 Toast.makeText(context, getString(R.string.warning_empty_item_list), Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
             }
-            mainViewModel.insertItemList(Stuff(UUID.randomUUID(), nameText, newStuffList))
+            mainViewModel.insertStuff(Stuff(UUID.randomUUID(), nameText, newThingList))
             findNavController().popBackStack()
         }
 
-        binding.cancelItemListCreation.setOnClickListener {
+        binding.cancelStuffCreation.setOnClickListener {
             launchDiscardDialog()
         }
 
@@ -111,8 +111,8 @@ class StuffCreationFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         logger.atInfo().log("On stop")
-        if(binding.nameText.text.isNotEmpty() || newStuffList.isNotEmpty()) {
-            val stuff = Stuff(TEMP_UUID, binding.nameText.text.toString(), newStuffList)
+        if(binding.newStuffName.text.isNotEmpty() || newThingList.isNotEmpty()) {
+            val stuff = Stuff(TEMP_UUID, binding.newStuffName.text.toString(), newThingList)
             mainViewModel.inProgressStuff = stuff
 
             logger.atInfo().log(mainViewModel.inProgressStuff!!.name)

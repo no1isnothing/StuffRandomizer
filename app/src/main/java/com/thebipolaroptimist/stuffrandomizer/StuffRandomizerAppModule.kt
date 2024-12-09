@@ -16,19 +16,19 @@ object StuffRandomizerAppModule {
 
     @Singleton
     @Provides
-    fun provideMatchDatabase(
+    fun provideMainDatabase(
         @ApplicationContext context: Context
     ) = Room.databaseBuilder(
         context.applicationContext,
         MainDatabase::class.java,
-        "match_database"
+        "main_database"
     ).build()
 
     @Singleton
     @Provides
-    fun provideMatchSetDao(database: MainDatabase) = database.pairingGroupDao()
+    fun providePartyDao(database: MainDatabase) = database.partyDao()
 
     @Singleton
     @Provides
-    fun provideItemListDao(database: MainDatabase) = database.itemListDao()
+    fun provideStuffDao(database: MainDatabase) = database.stuffDao()
 }

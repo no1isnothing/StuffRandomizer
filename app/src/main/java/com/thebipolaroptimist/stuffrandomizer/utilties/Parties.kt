@@ -12,7 +12,7 @@ object Parties {
     fun create(name : String, assigneeList: Stuff, assignmentLists: List<Stuff>) : Party {
         val assignmentListNames = assignmentLists.joinToString{ it -> it.name }
         logger.atInfo().log("Assignee List %s Assignment Lists %s", assigneeList.name, assignmentListNames )
-        val shuffledAssignees = assigneeList.items.shuffled()
+        val shuffledAssignees = assigneeList.things.shuffled()
         assignmentLists.size
 
         val members = ArrayList<Member>()
@@ -20,13 +20,13 @@ object Parties {
             members.add(Member(assignee, HashMap()))
         }
         for(assignmentList in assignmentLists) {
-            val shuffledAssignmentList = assignmentList.items
+            val shuffledAssignmentList = assignmentList.things
 
-            for((index, match) in members.withIndex()) {
+            for((index, member) in members.withIndex()) {
                 val quotient = index/shuffledAssignmentList.size
                 val correctedIndex = index - (quotient * shuffledAssignmentList.size)
 
-                match.assignments.put(assignmentList.name, shuffledAssignmentList[correctedIndex])
+                member.assignments.put(assignmentList.name, shuffledAssignmentList[correctedIndex])
             }
         }
         logger.atInfo().log(members.toString())

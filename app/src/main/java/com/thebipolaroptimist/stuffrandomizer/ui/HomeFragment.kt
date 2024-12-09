@@ -41,7 +41,7 @@ class HomeFragment : Fragment() {
         }
 
 
-        mainViewModel.matches.observe(viewLifecycleOwner) { matches ->
+        mainViewModel.parties.observe(viewLifecycleOwner) { matches ->
             if(matches.isNotEmpty()) {
                 binding.matchesTextPreview.text = matches[0].partyName
             }

@@ -10,6 +10,6 @@ import androidx.room.TypeConverters
 @Database(entities = [Party::class, Stuff::class], version = 1)
 @TypeConverters(MainConverter::class)
 abstract class MainDatabase : RoomDatabase()  {
-    abstract fun pairingGroupDao(): PartyDao
-    abstract fun itemListDao(): StuffDao
+    abstract fun partyDao(): PartyDao
+    abstract fun stuffDao(): StuffDao
 }

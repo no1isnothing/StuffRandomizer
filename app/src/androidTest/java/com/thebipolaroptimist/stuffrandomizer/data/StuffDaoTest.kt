@@ -31,7 +31,7 @@ class StuffDaoTest {
         fun setup() {
             val context = ApplicationProvider.getApplicationContext<Context>()
             database = Room.inMemoryDatabaseBuilder(context, MainDatabase::class.java).build()
-            dao = database.itemListDao()
+            dao = database.stuffDao()
         }
 
         @JvmStatic

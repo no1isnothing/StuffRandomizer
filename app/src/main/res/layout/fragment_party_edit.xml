@@ -8,12 +8,12 @@
 
     <!--TODO #12: Change to Framelayout with edit text -->
     <TextView
-        android:id="@+id/matchSetNameText"
+        android:id="@+id/party_name_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/matchList"
+        android:id="@+id/member_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
