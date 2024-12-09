@@ -34,21 +34,21 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonItems.setOnClickListener {
-            findNavController().navigate(R.id.action_HomeFragment_to_ItemListsFragment)
+            findNavController().navigate(R.id.action_HomeFragment_to_StuffListFragment)
         }
         binding.buttonMatches.setOnClickListener {
-            findNavController().navigate(R.id.action_HomeFragment_to_MatchListsFragment)
+            findNavController().navigate(R.id.action_HomeFragment_to_PartyListFragment)
         }
 
 
         mainViewModel.matches.observe(viewLifecycleOwner) { matches ->
             if(matches.isNotEmpty()) {
-                binding.matchesTextPreview.text = matches[0].matchName
+                binding.matchesTextPreview.text = matches[0].partyName
             }
         }
 
         binding.homeFab.setOnClickListener { v ->
-            findNavController().navigate(R.id.action_HomeFragment_to_MatchCreationFragment)
+            findNavController().navigate(R.id.action_HomeFragment_to_PartyCreationFragment)
         }
     }
 

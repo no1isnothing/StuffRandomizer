@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.MatchCreationFragment">
+    tools:context=".ui.PartyCreationFragment">
 
     <TextView
         android:layout_width="match_parent"

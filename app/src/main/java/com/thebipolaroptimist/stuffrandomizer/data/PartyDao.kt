@@ -7,18 +7,18 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 /**
- * A dao for interacting with [MatchSet]s stored in [MatchDatabase].
+ * A dao for interacting with [Party]s stored in [MainDatabase].
  */
 @Dao
-interface MatchSetDao {
-    //TODO #4: Determine order for MatchSet retrieval.
-    @Query("SELECT * FROM matchset")
-    fun getAllMatchSets(): Flow<List<MatchSet>>
+interface PartyDao {
+    //TODO #4: Determine order for Party retrieval.
+    @Query("SELECT * FROM party")
+    fun getAllParties(): Flow<List<Party>>
 
     //TODO #1: decide on conflict strategy
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(matchSet: MatchSet)
+    suspend fun insert(party: Party)
 
-    @Query("DELETE FROM matchset")
+    @Query("DELETE FROM party")
     suspend fun deleteAll()
 }

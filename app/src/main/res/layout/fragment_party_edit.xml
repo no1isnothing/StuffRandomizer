@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.MatchEditFragment">
+    tools:context=".ui.PartyEditFragment">
 
     <!--TODO #12: Change to Framelayout with edit text -->
     <TextView

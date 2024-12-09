@@ -2,7 +2,7 @@ package com.thebipolaroptimist.stuffrandomizer
 
 import android.content.Context
 import androidx.room.Room
-import com.thebipolaroptimist.stuffrandomizer.data.MatchDatabase
+import com.thebipolaroptimist.stuffrandomizer.data.MainDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,15 +20,15 @@ object StuffRandomizerAppModule {
         @ApplicationContext context: Context
     ) = Room.databaseBuilder(
         context.applicationContext,
-        MatchDatabase::class.java,
+        MainDatabase::class.java,
         "match_database"
     ).build()
 
     @Singleton
     @Provides
-    fun provideMatchSetDao(database: MatchDatabase) = database.matchSetDao()
+    fun provideMatchSetDao(database: MainDatabase) = database.pairingGroupDao()
 
     @Singleton
     @Provides
-    fun provideItemListDao(database: MatchDatabase) = database.itemListDao()
+    fun provideItemListDao(database: MainDatabase) = database.itemListDao()
 }

@@ -16,17 +16,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.flogger.FluentLogger
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.data.ItemList
-import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentItemListEditBinding
-import com.thebipolaroptimist.stuffrandomizer.ui.ItemListCreationFragment.Companion.TEMP_UUID
+import com.thebipolaroptimist.stuffrandomizer.data.Stuff
+import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentStuffEditBinding
+import com.thebipolaroptimist.stuffrandomizer.ui.StuffCreationFragment.Companion.TEMP_UUID
 import java.util.UUID
 
 
 /**
- * A [RecyclerView.Adapter] for displaying strings to be used for displaying and editing [ItemList].
+ * A [RecyclerView.Adapter] for displaying strings to be used for displaying and editing [Stuff].
  */
-class EditItemListAdapter(private val items: ArrayList<String>) :
-    RecyclerView.Adapter<EditItemListAdapter.ViewHolder>() {
+class EditableStuffAdapter(private val items: ArrayList<String>) :
+    RecyclerView.Adapter<EditableStuffAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val textView: TextView = view.findViewById(R.id.item_name_view)
         val editText: EditText = view.findViewById((R.id.item_name_edit))
@@ -36,7 +36,7 @@ class EditItemListAdapter(private val items: ArrayList<String>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.itemlist_item_edit, parent, false)
+            .inflate(R.layout.stuff_item_edit, parent, false)
         return ViewHolder(view)
     }
 
@@ -67,14 +67,14 @@ class EditItemListAdapter(private val items: ArrayList<String>) :
 }
 
 /**
- * A simple [Fragment] to edit [ItemList]s.
+ * A simple [Fragment] to edit [Stuff]s.
  */
-class ItemListEditFragment : Fragment() {
+class StuffEditFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var _binding: FragmentItemListEditBinding? = null
+    private var _binding: FragmentStuffEditBinding? = null
 
-    private val editItemList = arrayListOf<String>()
-    private val adapter = EditItemListAdapter(editItemList)
+    private val editStuffList = arrayListOf<String>()
+    private val adapter = EditableStuffAdapter(editStuffList)
 
     private val binding get() = _binding!!
     private var uuid = TEMP_UUID
@@ -83,7 +83,7 @@ class ItemListEditFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentItemListEditBinding.inflate(inflater, container, false)
+        _binding = FragmentStuffEditBinding.inflate(inflater, container, false)
 
         uuid = UUID.fromString(arguments?.getString(resources.getString(R.string.key_uuid)))
 
@@ -91,8 +91,8 @@ class ItemListEditFragment : Fragment() {
             mainViewModel.itemLists
                 .value?.filter { itemList -> itemList.uid == uuid }
         listWithId?.get(0)?.let {
-            editItemList.addAll(it.items)
-            binding.editItemListName.setText(it.listName)
+            editStuffList.addAll(it.items)
+            binding.editItemListName.setText(it.name)
         }
 
         val recyclerView = binding.editItemList
@@ -100,16 +100,16 @@ class ItemListEditFragment : Fragment() {
         recyclerView.adapter = adapter
 
         binding.editAddItem.setOnClickListener {
-            editItemList.add("")
+            editStuffList.add("")
             adapter.notifyDataSetChanged()
         }
 
         binding.editItemDiscard.setOnClickListener {
-            editItemList.clear()
+            editStuffList.clear()
             listWithId?.get(0)?.let {
-                editItemList.addAll(it.items)
+                editStuffList.addAll(it.items)
                 adapter.notifyDataSetChanged()
-                binding.editItemListName.setText(it.listName)
+                binding.editItemListName.setText(it.name)
             }
         }
 
@@ -119,9 +119,9 @@ class ItemListEditFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         logger.atInfo().log("On stop")
-        if(binding.editItemListName.text.isNotEmpty() || editItemList.isNotEmpty()) {
-            val itemList = ItemList(uuid, binding.editItemListName.text.toString(), editItemList)
-            mainViewModel.insertItemList(itemList)
+        if(binding.editItemListName.text.isNotEmpty() || editStuffList.isNotEmpty()) {
+            val stuff = Stuff(uuid, binding.editItemListName.text.toString(), editStuffList)
+            mainViewModel.insertItemList(stuff)
         }
     }
 

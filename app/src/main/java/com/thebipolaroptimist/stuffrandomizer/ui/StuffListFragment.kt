@@ -12,16 +12,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.data.ItemList
-import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentItemListsBinding
+import com.thebipolaroptimist.stuffrandomizer.data.Stuff
+import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentStuffListBinding
 import com.google.common.flogger.FluentLogger
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * A [RecyclerView.Adapter] for displaying [ItemList]s.
+ * A [RecyclerView.Adapter] for displaying [Stuff]s.
  */
-class ItemListListsAdapter(private val dataSet: List<ItemList>) :
-    RecyclerView.Adapter<ItemListListsAdapter.ViewHolder>() {
+class StuffListAdapter(private val dataSet: List<Stuff>) :
+    RecyclerView.Adapter<StuffListAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleView: TextView = view.findViewById(R.id.itemListTitle)
         val previewView: TextView = view.findViewById(R.id.itemListPreview)
@@ -29,11 +29,11 @@ class ItemListListsAdapter(private val dataSet: List<ItemList>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.itemlists_item, parent, false)
+            .inflate(R.layout.stuff_item, parent, false)
         return ViewHolder(view)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.titleView.text = dataSet[position].listName
+        holder.titleView.text = dataSet[position].name
         holder.previewView.text = dataSet[position].items.joinToString()
 
         holder.titleView.setOnClickListener { v ->
@@ -44,7 +44,7 @@ class ItemListListsAdapter(private val dataSet: List<ItemList>) :
             )
             v.findNavController()
                 .navigate(
-                    R.id.action_ItemListsFragment_to_ItemListEditFragment,
+                    R.id.action_StuffListFragment_to_StuffEditFragment,
                     bundle
                 )
         }
@@ -58,15 +58,15 @@ class ItemListListsAdapter(private val dataSet: List<ItemList>) :
 }
 
 /**
- * A simple [Fragment] for displaying [ItemList]s.
+ * A simple [Fragment] for displaying [Stuff]s.
  */
 @AndroidEntryPoint
-class ItemListsFragment : Fragment() {
+class StuffListFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var _binding: FragmentItemListsBinding? = null
+    private var _binding: FragmentStuffListBinding? = null
 
-    private var itemList = arrayListOf<ItemList>()
-    private val adapter = ItemListListsAdapter(itemList)
+    private var stuff = arrayListOf<Stuff>()
+    private val adapter = StuffListAdapter(stuff)
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -76,14 +76,14 @@ class ItemListsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentItemListsBinding.inflate(inflater, container, false)
+        _binding = FragmentStuffListBinding.inflate(inflater, container, false)
 
         val recyclerView: RecyclerView = binding.itemlist
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
         binding.itemListFab.setOnClickListener { _ ->
-            findNavController().navigate(R.id.action_ItemListsFragment_to_ItemListCreationFragment)
+            findNavController().navigate(R.id.action_StuffListFragment_to_StuffCreationFragment)
         }
 
         return binding.root
@@ -93,9 +93,9 @@ class ItemListsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mainViewModel.itemLists.observe(viewLifecycleOwner) { itemLists ->
-            itemList.clear()
+            stuff.clear()
             logger.atInfo().log("Setting item list size %d", itemLists.size)
-            itemList.addAll(itemLists)
+            stuff.addAll(itemLists)
             adapter.notifyDataSetChanged()
         }
     }

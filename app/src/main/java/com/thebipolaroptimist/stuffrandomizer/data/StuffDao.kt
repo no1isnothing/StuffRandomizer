@@ -7,16 +7,16 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 /**
- * A dao for interacting with [ItemList]s stored in [MatchDatabase].
+ * A dao for interacting with [Stuff]s stored in [MainDatabase].
  */
 @Dao
-interface ItemListDao {
-    @Query("SELECT * FROM itemlist")
-    fun getAllItemLists(): Flow<List<ItemList>>
+interface StuffDao {
+    @Query("SELECT * FROM stuff")
+    fun getAllItemLists(): Flow<List<Stuff>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(itemList: ItemList)
+    suspend fun insert(stuff: Stuff)
 
-    @Query("DELETE FROM itemlist")
+    @Query("DELETE FROM stuff")
     suspend fun deleteAll()
 }

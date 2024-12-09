@@ -12,76 +12,76 @@
         tools:layout="@layout/fragment_home">
 
         <action
-            android:id="@+id/action_HomeFragment_to_ItemListsFragment"
-            app:destination="@id/ItemListsFragment" />
+            android:id="@+id/action_HomeFragment_to_StuffListFragment"
+            app:destination="@id/StuffListFragment" />
         <action
-            android:id="@+id/action_HomeFragment_to_MatchListsFragment"
-            app:destination="@id/MatchListsFragment" />
+            android:id="@+id/action_HomeFragment_to_PartyListFragment"
+            app:destination="@id/PartyListFragment" />
         <action
-            android:id="@+id/action_HomeFragment_to_MatchCreationFragment"
-            app:destination="@id/MatchCreationFragment" />
+            android:id="@+id/action_HomeFragment_to_PartyCreationFragment"
+            app:destination="@id/PartyCreationFragment" />
     </fragment>
     <fragment
-        android:id="@+id/ItemListsFragment"
-        android:name="com.thebipolaroptimist.stuffrandomizer.ui.ItemListsFragment"
-        android:label="@string/item_lists_fragment_label"
-        tools:layout="@layout/fragment_item_lists">
+        android:id="@+id/StuffListFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.StuffListFragment"
+        android:label="@string/stuff_list_fragment_label"
+        tools:layout="@layout/fragment_stuff_list">
 
         <action
-            android:id="@+id/action_ItemListsFragment_to_HomeFragment"
+            android:id="@+id/action_StuffListFragment_to_HomeFragment"
             app:destination="@id/HomeFragment" />
         <action
-            android:id="@+id/action_ItemListsFragment_to_ItemListCreationFragment"
-            app:destination="@+id/ItemListCreationFragment"/>
+            android:id="@+id/action_StuffListFragment_to_StuffCreationFragment"
+            app:destination="@+id/StuffCreationFragment"/>
         <action
-            android:id="@+id/action_ItemListsFragment_to_ItemListEditFragment"
-            app:destination="@id/ItemListEditFragment"/>
+            android:id="@+id/action_StuffListFragment_to_StuffEditFragment"
+            app:destination="@id/StuffEditFragment"/>
     </fragment>
     <fragment
-        android:id="@+id/MatchListsFragment"
-        android:name="com.thebipolaroptimist.stuffrandomizer.ui.MatchListsFragment"
-        android:label="@string/match_lists_fragment_label"
-        tools:layout="@layout/fragment_match_lists">
+        android:id="@+id/PartyListFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.PartyListFragment"
+        android:label="@string/party_list_fragment_label"
+        tools:layout="@layout/fragment_party_list">
 
         <action
-            android:id="@+id/action_MatchListsFragment_to_HomeFragment"
+            android:id="@+id/action_PartyListFragment_to_HomeFragment"
             app:destination="@id/HomeFragment" />
         <action
-            android:id="@+id/action_MatchListsFragment_to_MatchEditFragment"
-            app:destination="@id/MatchEditFragment" />
+            android:id="@+id/action_PartyListFragment_to_PartyEditFragment"
+            app:destination="@id/PartyEditFragment" />
     </fragment>
     <fragment
-        android:id="@+id/MatchCreationFragment"
-        android:name="com.thebipolaroptimist.stuffrandomizer.ui.MatchCreationFragment"
-        android:label="@string/match_creation_fragment_label"
-        tools:layout="@layout/fragment_match_creation">
+        android:id="@+id/PartyCreationFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.PartyCreationFragment"
+        android:label="@string/party_creation_fragment_label"
+        tools:layout="@layout/fragment_party_creation">
 
         <action
-            android:id="@+id/action_MatchCreationFragment_to_HomeFragment"
+            android:id="@+id/action_PartyCreationFragment_to_HomeFragment"
             app:destination="@id/HomeFragment" />
         <action
-            android:id="@+id/action_MatchCreationFragment_to_MatchEditFragment"
-            app:destination="@id/MatchEditFragment" />
+            android:id="@+id/action_PartyCreationFragment_to_PartyEditFragment"
+            app:destination="@id/PartyEditFragment" />
         <action
-            android:id="@+id/action_MatchCreationFragment_to_MatchListsFragment"
-            app:destination="@id/MatchListsFragment" />
+            android:id="@+id/action_PartyCreationFragment_to_PartyListFragment"
+            app:destination="@id/PartyListFragment" />
     </fragment>
     <fragment
-        android:id="@+id/ItemListCreationFragment"
-        android:name="com.thebipolaroptimist.stuffrandomizer.ui.ItemListCreationFragment"
-        android:label="@string/item_lists_creation_fragment_label"
-        tools:layout="@layout/fragment_item_list_creation">
+        android:id="@+id/StuffCreationFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.StuffCreationFragment"
+        android:label="@string/stuff_creation_fragment_label"
+        tools:layout="@layout/fragment_stuff_creation">
     </fragment>
     <fragment
-        android:id="@+id/MatchEditFragment"
-        android:name="com.thebipolaroptimist.stuffrandomizer.ui.MatchEditFragment"
-        android:label="@string/match_edit_fragment_label"
-        tools:layout="@layout/fragment_match_edit">
+        android:id="@+id/PartyEditFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.PartyEditFragment"
+        android:label="@string/party_edit_fragment_label"
+        tools:layout="@layout/fragment_party_edit">
     </fragment>
     <fragment
-        android:id="@+id/ItemListEditFragment"
-        android:name="com.thebipolaroptimist.stuffrandomizer.ui.ItemListEditFragment"
-        android:label="@string/item_lists_edit_fragment_label"
-        tools:layout="@layout/fragment_item_list_edit">
+        android:id="@+id/StuffEditFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.StuffEditFragment"
+        android:label="@string/stuff_edit_fragment_label"
+        tools:layout="@layout/fragment_stuff_edit">
     </fragment>
 </navigation>

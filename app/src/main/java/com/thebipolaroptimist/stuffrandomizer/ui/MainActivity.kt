@@ -10,9 +10,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.data.ItemList
-import com.thebipolaroptimist.stuffrandomizer.data.Match
-import com.thebipolaroptimist.stuffrandomizer.data.MatchSet
+import com.thebipolaroptimist.stuffrandomizer.data.Stuff
+import com.thebipolaroptimist.stuffrandomizer.data.Member
+import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
@@ -79,19 +79,19 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.deleteMatchSets()
     }
 
-    private fun createSampleMatchData(): MatchSet = MatchSet(
+    private fun createSampleMatchData(): Party = Party(
         UUID.randomUUID(),
         "Skyrim 2024",
         listOf(
-            Match("Jane", hashMapOf(Pair("Aedra", "Talos"), Pair("Daedra", "Clavicus Vile"))),
-            Match("Bear", hashMapOf(Pair("Aedra", "Mara"), Pair("Daedra", "Peryite"))),
-            Match("The Tooth Fairy", hashMapOf(Pair("Aedra", "Julianos"), Pair("Daedra", "Vaermina"))),
-            Match("Gifty", hashMapOf(Pair("Aedra", "Stendar"), Pair("Daedra", "Merida"))),
+            Member("Jane", hashMapOf(Pair("Aedra", "Talos"), Pair("Daedra", "Clavicus Vile"))),
+            Member("Bear", hashMapOf(Pair("Aedra", "Mara"), Pair("Daedra", "Peryite"))),
+            Member("The Tooth Fairy", hashMapOf(Pair("Aedra", "Julianos"), Pair("Daedra", "Vaermina"))),
+            Member("Gifty", hashMapOf(Pair("Aedra", "Stendar"), Pair("Daedra", "Merida"))),
         ),
         "Friends"
     )
 
-    private fun createSampleItemListData(): ItemList = ItemList(
+    private fun createSampleItemListData(): Stuff = Stuff(
         UUID.randomUUID(),
         "Aedra",
         listOf(

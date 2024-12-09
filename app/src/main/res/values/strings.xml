@@ -29,12 +29,12 @@
 
     <!-- Strings used for fragments for navigation -->
     <string name="home_fragment_label">Home</string>
-    <string name="item_lists_fragment_label">Item Lists</string>
-    <string name="item_lists_creation_fragment_label">Item Lists Creation</string>
-    <string name="item_lists_edit_fragment_label">Item Lists Edit</string>
-    <string name="match_lists_fragment_label">Match Lists</string>
-    <string name="match_creation_fragment_label">Match Creation</string>
-    <string name="match_edit_fragment_label">Match Edit</string>
+    <string name="stuff_list_fragment_label">Item Lists</string>
+    <string name="stuff_creation_fragment_label">Item Lists Creation</string>
+    <string name="stuff_edit_fragment_label">Item Lists Edit</string>
+    <string name="party_list_fragment_label">Match Lists</string>
+    <string name="party_creation_fragment_label">Match Creation</string>
+    <string name="party_edit_fragment_label">Match Edit</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 

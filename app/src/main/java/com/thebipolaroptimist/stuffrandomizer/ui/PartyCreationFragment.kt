@@ -14,19 +14,19 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.flogger.FluentLogger
-import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentMatchCreationBinding
+import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentPartyCreationBinding
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.data.ItemList
-import com.thebipolaroptimist.stuffrandomizer.data.MatchSet
-import com.thebipolaroptimist.stuffrandomizer.utilties.MatchSets
+import com.thebipolaroptimist.stuffrandomizer.data.Stuff
+import com.thebipolaroptimist.stuffrandomizer.data.Party
+import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * A [RecyclerView.Adapter] for displaying selectable [ItemList]s to be used to create the [MatchSet]
+ * A [RecyclerView.Adapter] for displaying selectable [Stuff]s to be used to create the [Party]
  */
-class SelectableItemListsAdapter(private val itemLists: List<ItemList>,
-                                 private val checkboxState: ArrayList<Boolean>) :
-RecyclerView.Adapter<SelectableItemListsAdapter.ViewHolder>(){
+class SelectableStuffAdapter(private val stuffs: List<Stuff>,
+                             private val checkboxState: ArrayList<Boolean>) :
+RecyclerView.Adapter<SelectableStuffAdapter.ViewHolder>(){
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val listName = view.findViewById<TextView>(R.id.itemlist_checkbox_name)
@@ -35,34 +35,34 @@ RecyclerView.Adapter<SelectableItemListsAdapter.ViewHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.itemlist_checkbox_item, parent, false)
+            .inflate(R.layout.stuff_item_select, parent, false)
         return ViewHolder(view)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.listName.text = itemLists[position].listName
+        holder.listName.text = stuffs[position].name
         holder.checkBox.isChecked = checkboxState[position]
 
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
             checkboxState[position] = isChecked
         }
     }
-    override fun getItemCount() = itemLists.size
+    override fun getItemCount() = stuffs.size
 
 }
 
 /**
- * A [Fragment] for creating [MatchSet]s.
+ * A [Fragment] for creating [Party]s.
  */
 @AndroidEntryPoint
-class MatchCreationFragment : Fragment() {
+class PartyCreationFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var _binding: FragmentMatchCreationBinding? = null
+    private var _binding: FragmentPartyCreationBinding? = null
 
-    private var itemLists = arrayListOf<ItemList>()
+    private var stuffs = arrayListOf<Stuff>()
     private var checkboxStates = arrayListOf<Boolean>()
     private var listNames = arrayListOf<String>()
 
-    private var adapter = SelectableItemListsAdapter(itemLists, checkboxStates)
+    private var adapter = SelectableStuffAdapter(stuffs, checkboxStates)
     private var matchSaved = false
 
     private val binding get() = _binding!!
@@ -72,7 +72,7 @@ class MatchCreationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        _binding = FragmentMatchCreationBinding.inflate(inflater, container, false)
+        _binding = FragmentPartyCreationBinding.inflate(inflater, container, false)
         val recyclerView : RecyclerView = binding.assignmentsList
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
@@ -91,11 +91,11 @@ class MatchCreationFragment : Fragment() {
         }
 
         mainViewModel.itemLists.observe(viewLifecycleOwner) { itemsList ->
-            itemLists.clear()
+            stuffs.clear()
             listNames.clear()
 
-            itemLists.addAll(itemsList)
-            listNames.addAll(itemLists.map { itemList -> itemList.listName })
+            stuffs.addAll(itemsList)
+            listNames.addAll(stuffs.map { itemList -> itemList.name })
             val arrayAdapter = (binding.assigneeSpinner.adapter as ArrayAdapter<String>)
             if(mainViewModel.inProgressCheckBoxState != null) {
                 checkboxStates.addAll(mainViewModel.inProgressCheckBoxState!!)
@@ -106,7 +106,7 @@ class MatchCreationFragment : Fragment() {
                     .setSelection(arrayAdapter.getPosition(mainViewModel.inProgressAssigneeSelection))
                 mainViewModel.inProgressAssigneeSelection = null
             }
-            if(itemLists.size > checkboxStates.size) {
+            if(stuffs.size > checkboxStates.size) {
                 val diff = itemsList.size - checkboxStates.size
                 checkboxStates.addAll(Array(diff) { false })
             }
@@ -119,13 +119,13 @@ class MatchCreationFragment : Fragment() {
             logger.atInfo().log("Check box state %s", checkboxStates.joinToString())
             logger.atInfo().log("Spinner selection %s", binding.assigneeSpinner.selectedItem.toString())
 
-            if(createMatchSets()) {
-                findNavController().navigate(R.id.action_MatchCreationFragment_to_MatchListsFragment)
+            if(createParty()) {
+                findNavController().navigate(R.id.action_PartyCreationFragment_to_PartyListFragment)
             }
         }
     }
 
-    private fun createMatchSets(): Boolean {
+    private fun createParty(): Boolean {
         val name = binding.matchNameText.text.toString()
 
         if(name.isEmpty()) {
@@ -134,16 +134,16 @@ class MatchCreationFragment : Fragment() {
             return false
         }
 
-        val selectedLists = ArrayList<ItemList>()
-        var assigneeList: ItemList? = null
+        val selectedLists = ArrayList<Stuff>()
+        var assigneeList: Stuff? = null
         val assigneeListName = binding.assigneeSpinner.selectedItem.toString()
 
         for((index, checkBoxState) in checkboxStates.withIndex()){
             if(checkBoxState) {
-                selectedLists.add(itemLists[index])
+                selectedLists.add(stuffs[index])
             }
-            if(itemLists[index].listName == assigneeListName) {
-                assigneeList = itemLists[index]
+            if(stuffs[index].name == assigneeListName) {
+                assigneeList = stuffs[index]
             }
         }
         if(selectedLists.isEmpty()) {
@@ -152,7 +152,7 @@ class MatchCreationFragment : Fragment() {
                 return false
         }
         assigneeList?.let {
-            val matchSet = MatchSets.create(name, it, selectedLists)
+            val matchSet = Parties.create(name, it, selectedLists)
             mainViewModel.insertMatchSet(matchSet)
             matchSaved = true
         }
