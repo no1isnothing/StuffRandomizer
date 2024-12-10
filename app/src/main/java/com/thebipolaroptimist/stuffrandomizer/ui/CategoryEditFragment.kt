@@ -16,19 +16,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.flogger.FluentLogger
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.data.Stuff
-import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentStuffEditBinding
-import com.thebipolaroptimist.stuffrandomizer.ui.StuffCreationFragment.Companion.TEMP_UUID
+import com.thebipolaroptimist.stuffrandomizer.data.Category
+import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentCategoryEditBinding
+import com.thebipolaroptimist.stuffrandomizer.ui.CategoryCreationFragment.Companion.TEMP_UUID
 import java.util.UUID
 
 
 /**
- * A [RecyclerView.Adapter] for displaying strings to be used for displaying and editing [Stuff].
+ * A [RecyclerView.Adapter] for displaying strings to be used for displaying and editing [Category].
  */
 class EditableThingAdapter(private val thingList: ArrayList<String>) :
     RecyclerView.Adapter<EditableThingAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val name: TextView = view.findViewById(R.id.thingNameView)
+        val name: TextView = view.findViewById(R.id.thingName)
         val nameEdit: EditText = view.findViewById((R.id.thingNameEdit))
         val editButton: ImageButton = view.findViewById(R.id.thingEditButton)
         val deleteButton: ImageButton = view.findViewById(R.id.thingDeleteButton)
@@ -36,7 +36,7 @@ class EditableThingAdapter(private val thingList: ArrayList<String>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.thing_item_edit, parent, false)
+            .inflate(R.layout.item_thing_edit, parent, false)
         return ViewHolder(view)
     }
 
@@ -67,11 +67,11 @@ class EditableThingAdapter(private val thingList: ArrayList<String>) :
 }
 
 /**
- * A simple [Fragment] to edit [Stuff]s.
+ * A simple [Fragment] to edit [Category]s.
  */
-class StuffEditFragment : Fragment() {
+class CategoryEditFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var _binding: FragmentStuffEditBinding? = null
+    private var _binding: FragmentCategoryEditBinding? = null
 
     private val editThingList = arrayListOf<String>()
     private val thingAdapter = EditableThingAdapter(editThingList)
@@ -83,13 +83,13 @@ class StuffEditFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentStuffEditBinding.inflate(inflater, container, false)
+        _binding = FragmentCategoryEditBinding.inflate(inflater, container, false)
 
         uuid = UUID.fromString(arguments?.getString(resources.getString(R.string.key_uuid)))
 
         val listWithId =
-            mainViewModel.stuffs
-                .value?.filter { stuff -> stuff.uid == uuid }
+            mainViewModel.categories
+                .value?.filter { category -> category.uid == uuid }
         listWithId?.get(0)?.let {
             editThingList.addAll(it.things)
             binding.editItemListName.setText(it.name)
@@ -120,8 +120,8 @@ class StuffEditFragment : Fragment() {
         super.onStop()
         logger.atInfo().log("On stop")
         if(binding.editItemListName.text.isNotEmpty() || editThingList.isNotEmpty()) {
-            val stuff = Stuff(uuid, binding.editItemListName.text.toString(), editThingList)
-            mainViewModel.insertStuff(stuff)
+            val category = Category(uuid, binding.editItemListName.text.toString(), editThingList)
+            mainViewModel.insertCategory(category)
         }
     }
 

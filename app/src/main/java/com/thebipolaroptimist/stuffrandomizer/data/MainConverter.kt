@@ -18,10 +18,10 @@ class MainConverter {
         Gson().fromJson(pairings, object : TypeToken<List<Member>>() {}.type)
 
     @TypeConverter
-    fun stuffListToString(stuff: List<String>): String =
-        Gson().toJson(stuff).toString()
+    fun listToString(list: List<String>): String =
+        Gson().toJson(list).toString()
 
     @TypeConverter
-    fun stringToStuffList(stuff: String): List<String> =
-        Gson().fromJson(stuff, object : TypeToken<List<String>>() {}.type)
+    fun stringToList(s: String): List<String> =
+        Gson().fromJson(s, object : TypeToken<List<String>>() {}.type)
 }

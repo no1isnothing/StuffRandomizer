@@ -11,25 +11,25 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class StuffDaoTest {
+class CategoryDaoTest {
 
     @Test
     fun insertTest_success() = runTest {
-        val stuff = Stuff(UUID.randomUUID(), "List1", listOf("item1", "item2"))
-        dao.insert(stuff)
-        assertEquals(stuff, dao.getAllStuff().first().first())
+        val category = Category(UUID.randomUUID(), "List1", listOf("item1", "item2"))
+        dao.insert(category)
+        assertEquals(category, dao.getAllCategories().first().first())
     }
 
     companion object {
         private lateinit var database: MainDatabase
-        private lateinit var dao: StuffDao
+        private lateinit var dao: CategoryDao
 
         @JvmStatic
         @BeforeAll
         fun setup() {
             val context = ApplicationProvider.getApplicationContext<Context>()
             database = Room.inMemoryDatabaseBuilder(context, MainDatabase::class.java).build()
-            dao = database.stuffDao()
+            dao = database.categoryDao()
         }
 
         @JvmStatic

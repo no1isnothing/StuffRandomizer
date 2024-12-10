@@ -14,7 +14,7 @@ import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Member
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentPartyEditBinding
-import com.thebipolaroptimist.stuffrandomizer.ui.StuffCreationFragment.Companion.TEMP_UUID
+import com.thebipolaroptimist.stuffrandomizer.ui.CategoryCreationFragment.Companion.TEMP_UUID
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
 
@@ -31,7 +31,7 @@ class EditableMemberAdapter(private val memberList: List<Member>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.member_item_edit, parent, false)
+            .inflate(R.layout.item_member_edit, parent, false)
         return ViewHolder(view)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -56,7 +56,7 @@ class PartyEditFragment : Fragment() {
     private var _binding: FragmentPartyEditBinding? = null
 
     private val binding get() = _binding!!
-    private var memberList = arrayListOf<Member>()
+    private val memberList = arrayListOf<Member>()
     private val memberAdapter = EditableMemberAdapter(memberList)
 
     private var partyUuid = TEMP_UUID

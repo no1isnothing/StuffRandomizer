@@ -7,16 +7,16 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 /**
- * A dao for interacting with [Stuff]s stored in [MainDatabase].
+ * A dao for interacting with [Category]s stored in [MainDatabase].
  */
 @Dao
-interface StuffDao {
-    @Query("SELECT * FROM stuff")
-    fun getAllStuff(): Flow<List<Stuff>>
+interface CategoryDao {
+    @Query("SELECT * FROM category")
+    fun getAllCategories(): Flow<List<Category>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(stuff: Stuff)
+    suspend fun insert(category: Category)
 
-    @Query("DELETE FROM stuff")
+    @Query("DELETE FROM category")
     suspend fun deleteAll()
 }

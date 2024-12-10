@@ -14,13 +14,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.flogger.FluentLogger
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.data.Stuff
-import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentStuffCreationBinding
+import com.thebipolaroptimist.stuffrandomizer.data.Category
+import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentCategoryCreationBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
 
 /**
- * A [RecyclerView.Adapter] for displaying things to be used in newly created [Stuff].
+ * A [RecyclerView.Adapter] for displaying things to be used in newly created [Category].
  */
 class NewThingAdapter(private val thingList: List<String>) :
     RecyclerView.Adapter<NewThingAdapter.ViewHolder>() {
@@ -30,7 +30,7 @@ class NewThingAdapter(private val thingList: List<String>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.thing_item_new, parent, false)
+            .inflate(R.layout.item_thing_new, parent, false)
         return ViewHolder(view)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -40,14 +40,14 @@ class NewThingAdapter(private val thingList: List<String>) :
 }
 
 /**
- * A [Fragment] to create [Stuff]s.
+ * A [Fragment] to create [Category]s.
  */
 @AndroidEntryPoint
-class StuffCreationFragment : Fragment() {
+class CategoryCreationFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var _binding: FragmentStuffCreationBinding? = null
+    private var _binding: FragmentCategoryCreationBinding? = null
 
-    private var newThingList = arrayListOf<String>()
+    private val newThingList = arrayListOf<String>()
     private val thingAdapter = NewThingAdapter(newThingList)
 
     private val binding get() = _binding!!
@@ -57,12 +57,12 @@ class StuffCreationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         logger.atInfo().log("on create view")
-        _binding = FragmentStuffCreationBinding.inflate(inflater, container, false)
+        _binding = FragmentCategoryCreationBinding.inflate(inflater, container, false)
 
-        if(mainViewModel.inProgressStuff != null) {
-            newThingList.addAll(mainViewModel.inProgressStuff!!.things)
-            binding.newStuffName.setText(mainViewModel.inProgressStuff!!.name)
-            mainViewModel.inProgressStuff = null
+        if(mainViewModel.inProgressCategory != null) {
+            newThingList.addAll(mainViewModel.inProgressCategory!!.things)
+            binding.newStuffName.setText(mainViewModel.inProgressCategory!!.name)
+            mainViewModel.inProgressCategory = null
         }
         val recyclerView = binding.newStuffList
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -97,7 +97,7 @@ class StuffCreationFragment : Fragment() {
                     .show()
                 return@setOnClickListener
             }
-            mainViewModel.insertStuff(Stuff(UUID.randomUUID(), nameText, newThingList))
+            mainViewModel.insertCategory(Category(UUID.randomUUID(), nameText, newThingList))
             findNavController().popBackStack()
         }
 
@@ -112,10 +112,10 @@ class StuffCreationFragment : Fragment() {
         super.onStop()
         logger.atInfo().log("On stop")
         if(binding.newStuffName.text.isNotEmpty() || newThingList.isNotEmpty()) {
-            val stuff = Stuff(TEMP_UUID, binding.newStuffName.text.toString(), newThingList)
-            mainViewModel.inProgressStuff = stuff
+            val category = Category(TEMP_UUID, binding.newStuffName.text.toString(), newThingList)
+            mainViewModel.inProgressCategory = category
 
-            logger.atInfo().log(mainViewModel.inProgressStuff!!.name)
+            logger.atInfo().log(mainViewModel.inProgressCategory!!.name)
         }
     }
 

@@ -16,37 +16,37 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.common.flogger.FluentLogger
 import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentPartyCreationBinding
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.data.Stuff
+import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * A [RecyclerView.Adapter] for displaying selectable [Stuff]s to be used to create the [Party]
+ * A [RecyclerView.Adapter] for displaying selectable [Category]s to be used to create the [Party]
  */
-class SelectableStuffAdapter(private val stuffList: List<Stuff>,
-                             private val checkboxStateList: ArrayList<Boolean>) :
-RecyclerView.Adapter<SelectableStuffAdapter.ViewHolder>(){
+class SelectableCategoryAdapter(private val categoryList: List<Category>,
+                                private val checkboxStateList: ArrayList<Boolean>) :
+RecyclerView.Adapter<SelectableCategoryAdapter.ViewHolder>(){
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val name: TextView = view.findViewById(R.id.selectableStuffName)
-        val checkBox: CheckBox = view.findViewById(R.id.stuffCheckbox)
+        val name: TextView = view.findViewById(R.id.selectableCategoryName)
+        val checkBox: CheckBox = view.findViewById(R.id.categoryCheckbox)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.stuff_item_select, parent, false)
+            .inflate(R.layout.item_category_select, parent, false)
         return ViewHolder(view)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.name.text = stuffList[position].name
+        holder.name.text = categoryList[position].name
         holder.checkBox.isChecked = checkboxStateList[position]
 
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
             checkboxStateList[position] = isChecked
         }
     }
-    override fun getItemCount() = stuffList.size
+    override fun getItemCount() = categoryList.size
 
 }
 
@@ -58,11 +58,11 @@ class PartyCreationFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentPartyCreationBinding? = null
 
-    private var stuffList = arrayListOf<Stuff>()
-    private var checkboxStateList = arrayListOf<Boolean>()
-    private var stuffNamesList = arrayListOf<String>()
+    private val categoryList = arrayListOf<Category>()
+    private val checkboxStateList = arrayListOf<Boolean>()
+    private val categoryNamesList = arrayListOf<String>()
 
-    private var stuffAdapter = SelectableStuffAdapter(stuffList, checkboxStateList)
+    private val categoryAdapter = SelectableCategoryAdapter(categoryList, checkboxStateList)
     private var partySaved = false
 
     private val binding get() = _binding!!
@@ -75,9 +75,9 @@ class PartyCreationFragment : Fragment() {
         _binding = FragmentPartyCreationBinding.inflate(inflater, container, false)
         val recyclerView : RecyclerView = binding.assignmentsList
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = stuffAdapter
+        recyclerView.adapter = categoryAdapter
 
-        binding.assigneeSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, stuffNamesList)
+        binding.assigneeSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoryNamesList)
 
         return binding.root
     }
@@ -90,12 +90,12 @@ class PartyCreationFragment : Fragment() {
             mainViewModel.inProgressPartyName = null
         }
 
-        mainViewModel.stuffs.observe(viewLifecycleOwner) { stuffs ->
-            stuffList.clear()
-            stuffNamesList.clear()
+        mainViewModel.categories.observe(viewLifecycleOwner) { categories ->
+            categoryList.clear()
+            categoryNamesList.clear()
 
-            stuffList.addAll(stuffs)
-            stuffNamesList.addAll(stuffList.map { stuffs -> stuffs.name })
+            categoryList.addAll(categories)
+            categoryNamesList.addAll(categoryList.map { category -> category.name })
             val arrayAdapter = (binding.assigneeSpinner.adapter as ArrayAdapter<String>)
             if(mainViewModel.inProgressCheckBoxState != null) {
                 checkboxStateList.addAll(mainViewModel.inProgressCheckBoxState!!)
@@ -106,19 +106,16 @@ class PartyCreationFragment : Fragment() {
                     .setSelection(arrayAdapter.getPosition(mainViewModel.inProgressAssigneeSelection))
                 mainViewModel.inProgressAssigneeSelection = null
             }
-            if(stuffList.size > checkboxStateList.size) {
-                val diff = stuffs.size - checkboxStateList.size
+            if(categoryList.size > checkboxStateList.size) {
+                val diff = categories.size - checkboxStateList.size
                 checkboxStateList.addAll(Array(diff) { false })
             }
             // TODO #15: Use DiffUtil to update lists.
-            stuffAdapter.notifyDataSetChanged()
+            categoryAdapter.notifyDataSetChanged()
             arrayAdapter.notifyDataSetChanged()
         }
 
         binding.buttonRoll.setOnClickListener {
-            logger.atInfo().log("Check box state %s", checkboxStateList.joinToString())
-            logger.atInfo().log("Spinner selection %s", binding.assigneeSpinner.selectedItem.toString())
-
             if(createParty()) {
                 findNavController().navigate(R.id.action_PartyCreationFragment_to_PartyListFragment)
             }
@@ -134,25 +131,25 @@ class PartyCreationFragment : Fragment() {
             return false
         }
 
-        val selectedStuffList = ArrayList<Stuff>()
-        var assigneeList: Stuff? = null
+        val selectedCategoryList = ArrayList<Category>()
+        var assigneeList: Category? = null
         val assigneeListName = binding.assigneeSpinner.selectedItem.toString()
 
         for((index, checkBoxState) in checkboxStateList.withIndex()){
             if(checkBoxState) {
-                selectedStuffList.add(stuffList[index])
+                selectedCategoryList.add(categoryList[index])
             }
-            if(stuffList[index].name == assigneeListName) {
-                assigneeList = stuffList[index]
+            if(categoryList[index].name == assigneeListName) {
+                assigneeList = categoryList[index]
             }
         }
-        if(selectedStuffList.isEmpty()) {
+        if(selectedCategoryList.isEmpty()) {
                 Toast.makeText(context, getString(R.string.warning_match_assignments_empty), Toast.LENGTH_SHORT)
                     .show()
                 return false
         }
         assigneeList?.let {
-            val party = Parties.create(name, it, selectedStuffList)
+            val party = Parties.create(name, it, selectedCategoryList)
             mainViewModel.insertParty(party)
             partySaved = true
         }

@@ -1,7 +1,7 @@
 package com.thebipolaroptimist.stuffrandomizer.utilties
 
 import com.google.common.flogger.FluentLogger
-import com.thebipolaroptimist.stuffrandomizer.data.Stuff
+import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.Member
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import java.util.UUID
@@ -9,7 +9,7 @@ import java.util.UUID
 object Parties {
     private val logger: FluentLogger = FluentLogger.forEnclosingClass()
 
-    fun create(name : String, assigneeList: Stuff, assignmentLists: List<Stuff>) : Party {
+    fun create(name : String, assigneeList: Category, assignmentLists: List<Category>) : Party {
         val assignmentListNames = assignmentLists.joinToString{ it -> it.name }
         logger.atInfo().log("Assignee List %s Assignment Lists %s", assigneeList.name, assignmentListNames )
         val shuffledAssignees = assigneeList.things.shuffled()

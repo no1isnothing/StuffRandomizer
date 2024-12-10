@@ -5,11 +5,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 /**
- * A Room database for storing [Party]s and the [Stuff] to create them.
+ * A Room database for storing [Party]s and the [Category]s to create them.
  */
-@Database(entities = [Party::class, Stuff::class], version = 1)
+@Database(entities = [Party::class, Category::class], version = 1)
 @TypeConverters(MainConverter::class)
 abstract class MainDatabase : RoomDatabase()  {
     abstract fun partyDao(): PartyDao
-    abstract fun stuffDao(): StuffDao
+    abstract fun categoryDao(): CategoryDao
 }

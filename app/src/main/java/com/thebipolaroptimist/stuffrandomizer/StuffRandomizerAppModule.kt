@@ -30,5 +30,5 @@ object StuffRandomizerAppModule {
 
     @Singleton
     @Provides
-    fun provideStuffDao(database: MainDatabase) = database.stuffDao()
+    fun provideCategoryDao(database: MainDatabase) = database.categoryDao()
 }

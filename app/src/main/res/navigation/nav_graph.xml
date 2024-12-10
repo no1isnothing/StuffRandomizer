@@ -12,8 +12,8 @@
         tools:layout="@layout/fragment_home">
 
         <action
-            android:id="@+id/action_HomeFragment_to_StuffListFragment"
-            app:destination="@id/StuffListFragment" />
+            android:id="@+id/action_HomeFragment_to_CategoryListFragment"
+            app:destination="@id/CategoryListFragment" />
         <action
             android:id="@+id/action_HomeFragment_to_PartyListFragment"
             app:destination="@id/PartyListFragment" />
@@ -22,20 +22,20 @@
             app:destination="@id/PartyCreationFragment" />
     </fragment>
     <fragment
-        android:id="@+id/StuffListFragment"
-        android:name="com.thebipolaroptimist.stuffrandomizer.ui.StuffListFragment"
-        android:label="@string/stuff_list_fragment_label"
-        tools:layout="@layout/fragment_stuff_list">
+        android:id="@+id/CategoryListFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.CategoryListFragment"
+        android:label="@string/category_list_fragment_label"
+        tools:layout="@layout/fragment_category_list">
 
         <action
-            android:id="@+id/action_StuffListFragment_to_HomeFragment"
+            android:id="@+id/action_CategoryListFragment_to_HomeFragment"
             app:destination="@id/HomeFragment" />
         <action
-            android:id="@+id/action_StuffListFragment_to_StuffCreationFragment"
-            app:destination="@+id/StuffCreationFragment"/>
+            android:id="@+id/action_CategoryListFragment_to_CategoryCreationFragment"
+            app:destination="@+id/CategoryCreationFragment"/>
         <action
-            android:id="@+id/action_StuffListFragment_to_StuffEditFragment"
-            app:destination="@id/StuffEditFragment"/>
+            android:id="@+id/action_CategoryListFragment_to_CategoryEditFragment"
+            app:destination="@id/CategoryEditFragment"/>
     </fragment>
     <fragment
         android:id="@+id/PartyListFragment"
@@ -67,10 +67,10 @@
             app:destination="@id/PartyListFragment" />
     </fragment>
     <fragment
-        android:id="@+id/StuffCreationFragment"
-        android:name="com.thebipolaroptimist.stuffrandomizer.ui.StuffCreationFragment"
-        android:label="@string/stuff_creation_fragment_label"
-        tools:layout="@layout/fragment_stuff_creation">
+        android:id="@+id/CategoryCreationFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.CategoryCreationFragment"
+        android:label="@string/category_creation_fragment_label"
+        tools:layout="@layout/fragment_category_creation">
     </fragment>
     <fragment
         android:id="@+id/PartyEditFragment"
@@ -79,9 +79,9 @@
         tools:layout="@layout/fragment_party_edit">
     </fragment>
     <fragment
-        android:id="@+id/StuffEditFragment"
-        android:name="com.thebipolaroptimist.stuffrandomizer.ui.StuffEditFragment"
-        android:label="@string/stuff_edit_fragment_label"
-        tools:layout="@layout/fragment_stuff_edit">
+        android:id="@+id/CategoryEditFragment"
+        android:name="com.thebipolaroptimist.stuffrandomizer.ui.CategoryEditFragment"
+        android:label="@string/category_edit_fragment_label"
+        tools:layout="@layout/fragment_category_edit">
     </fragment>
 </navigation>

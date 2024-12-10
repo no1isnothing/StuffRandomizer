@@ -29,7 +29,7 @@ class PartyListAdapter(private val partyList: ArrayList<Party>) :
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(viewGroup.context)
-            .inflate(R.layout.party_item, viewGroup, false)
+            .inflate(R.layout.item_party, viewGroup, false)
 
         return ViewHolder(view)
     }
@@ -68,7 +68,7 @@ class PartyListFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private var partyList = arrayListOf<Party>()
+    private val partyList = arrayListOf<Party>()
     private val partyAdapter = PartyListAdapter(partyList)
 
     override fun onCreateView(

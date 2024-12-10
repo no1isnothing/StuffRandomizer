@@ -10,7 +10,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.data.Stuff
+import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.Member
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.databinding.ActivityMainBinding
@@ -70,16 +70,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addSampleData() {
-        mainViewModel.insertParty(createSampleMatchData())
-        mainViewModel.insertStuff(createSampleItemListData())
+        mainViewModel.insertParty(createSamplePartyData())
+        mainViewModel.insertCategory(createSampleItemListData())
     }
 
     private fun clearAllData() {
-        mainViewModel.deleteAllStuff()
+        mainViewModel.deleteAllCategories()
         mainViewModel.deleteParties()
     }
 
-    private fun createSampleMatchData(): Party = Party(
+    private fun createSamplePartyData(): Party = Party(
         UUID.randomUUID(),
         "Skyrim 2024",
         listOf(
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         "Friends"
     )
 
-    private fun createSampleItemListData(): Stuff = Stuff(
+    private fun createSampleItemListData(): Category = Category(
         UUID.randomUUID(),
         "Aedra",
         listOf(

@@ -34,7 +34,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonItems.setOnClickListener {
-            findNavController().navigate(R.id.action_HomeFragment_to_StuffListFragment)
+            findNavController().navigate(R.id.action_HomeFragment_to_CategoryListFragment)
         }
         binding.buttonMatches.setOnClickListener {
             findNavController().navigate(R.id.action_HomeFragment_to_PartyListFragment)

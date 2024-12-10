@@ -3,7 +3,7 @@ package com.thebipolaroptimist.stuffrandomizer.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.thebipolaroptimist.stuffrandomizer.data.Stuff
+import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.MainRepository
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.google.common.flogger.FluentLogger
@@ -20,8 +20,8 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     private val logger: FluentLogger = FluentLogger.forEnclosingClass()
 
     val parties = mainRepository.getAllParties().asLiveData()
-    val stuffs = mainRepository.getAllStuff().asLiveData()
-    var inProgressStuff: Stuff? = null
+    val categories = mainRepository.getAllCategories().asLiveData()
+    var inProgressCategory: Category? = null
     var inProgressPartyName: String? = null
     var inProgressCheckBoxState: List<Boolean>? = null
     var inProgressAssigneeSelection: String? = null
@@ -38,17 +38,17 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
         }
     }
 
-    fun insertStuff(stuff: Stuff) {
+    fun insertCategory(category: Category) {
         viewModelScope.launch {
             clearInProgressMatchState()
-            mainRepository.insertStuff(stuff)
+            mainRepository.insertCategory(category)
         }
     }
 
-    fun deleteAllStuff() {
+    fun deleteAllCategories() {
         viewModelScope.launch {
             clearInProgressMatchState()
-            mainRepository.deleteAllStuff()
+            mainRepository.deleteAllCategories()
         }
     }
 
