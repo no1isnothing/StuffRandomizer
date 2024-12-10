@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:importantForAutofill="no"
             android:inputType="text"
+            android:hint="@string/hint_item"
             android:visibility="gone"/>
     </FrameLayout>
 
