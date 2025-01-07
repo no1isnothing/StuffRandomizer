@@ -45,6 +45,19 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
         }
     }
 
+    fun insertCategories(categories: List<Category>) {
+        viewModelScope.launch {
+            clearInProgressMatchState()
+            mainRepository.insertCategories(categories)
+        }
+    }
+
+    suspend fun getCategoriesByName(categoryNames: List<String>): List<Category> =
+        mainRepository.getCategoriesByName(categoryNames)
+
+    suspend fun getCategoryByName(categoryName: String) =
+        mainRepository.getCategoryByName(categoryName)
+
     fun deleteAllCategories() {
         viewModelScope.launch {
             clearInProgressMatchState()

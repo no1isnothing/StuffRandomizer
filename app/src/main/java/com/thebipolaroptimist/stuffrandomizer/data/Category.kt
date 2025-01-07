@@ -7,6 +7,10 @@ import java.util.UUID
 /**
  * A data class representing a list that can be used to create a [Member].
  *
+ * @property uid The unique identified for this [Category]
+ * @property name The name of this [Category]
+ * @property things The things that make up this [Category]
+ *
  * For example, a [Category] representing Aedra would be:
  * (name: "Aedra", things: ["Talos", "Julianos", ..., "Arkay", "Akatosh"])
  */

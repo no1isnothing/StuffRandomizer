@@ -21,12 +21,24 @@ class MainRepository @Inject constructor(private val partyDao: PartyDao,
         return categoryDao.getAllCategories()
     }
 
+    suspend fun getCategoriesByName(names : List<String>): List<Category> {
+        return categoryDao.getCategoriesByName(names)
+    }
+
+    suspend fun getCategoryByName(name: String): Category {
+        return categoryDao.getCategoryByName(name)
+    }
+
     suspend fun insertParty(party: Party) {
-        partyDao.insert(party)
+        partyDao.insertOrUpdate(party)
     }
 
     suspend fun insertCategory(category: Category) {
         categoryDao.insert(category)
+    }
+
+    suspend fun insertCategories(categories: List<Category>) {
+        categoryDao.insert(categories)
     }
 
     suspend fun deleteAllParties() {

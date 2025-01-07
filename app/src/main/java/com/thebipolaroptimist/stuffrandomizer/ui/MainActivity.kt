@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun addSampleData() {
         mainViewModel.insertParty(createSamplePartyData())
-        mainViewModel.insertCategory(createSampleItemListData())
+        mainViewModel.insertCategories(createSampleCategoryData())
     }
 
     private fun clearAllData() {
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         "Friends"
     )
 
-    private fun createSampleItemListData(): Category = Category(
+    private fun createSampleCategoryData(): List<Category> = listOf(Category(
         UUID.randomUUID(),
         "Aedra",
         listOf(
@@ -104,6 +104,31 @@ class MainActivity : AppCompatActivity() {
             "Dibella",
             "Kynareth",
             "Zenithar"
+        )
+    ),
+        Category(
+            UUID.randomUUID(),
+            "Daedra",
+            listOf(
+                "Clavicus Vile",
+                "Meridia",
+                "Peryite",
+                "Azura",
+                "Molag Bal",
+                "Hermaus Mora",
+                "Vaermina",
+                "Nocturnal"
+            )
+        ),
+        Category(
+            UUID.randomUUID(),
+            "Friends",
+            listOf(
+                "Jane",
+                "Bear",
+                "Gift",
+                "The Tooth Fairy"
+            )
         )
     )
 }

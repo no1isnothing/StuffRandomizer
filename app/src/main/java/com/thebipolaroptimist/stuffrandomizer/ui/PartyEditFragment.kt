@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.flogger.FluentLogger
@@ -15,7 +17,9 @@ import com.thebipolaroptimist.stuffrandomizer.data.Member
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentPartyEditBinding
 import com.thebipolaroptimist.stuffrandomizer.ui.CategoryCreationFragment.Companion.TEMP_UUID
+import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 
@@ -60,6 +64,7 @@ class PartyEditFragment : Fragment() {
     private val memberAdapter = EditableMemberAdapter(memberList)
 
     private var partyUuid = TEMP_UUID
+    private var party: Party? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,11 +73,13 @@ class PartyEditFragment : Fragment() {
         _binding = FragmentPartyEditBinding.inflate(inflater, container, false)
 
         partyUuid = UUID.fromString(arguments?.getString(resources.getString(R.string.key_uuid)))
-        mainViewModel.parties
-            .value?.filter { parties -> parties.uid == partyUuid }?.get(0)?.let {
+        party = mainViewModel.parties
+            .value?.filter { parties -> parties.uid == partyUuid }?.get(0)
+
+        party?.let {
                 logger.atInfo().log("Members size " + it.members.size)
                 memberList.addAll(it.members)
-                binding.partyNameText.setText(it.partyName)
+                binding.partyNameEdit.setText(it.partyName)
             }
         binding.memberList.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -80,6 +87,31 @@ class PartyEditFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+         binding.rerollButton.setOnClickListener {
+             party?.let {
+                lifecycleScope.launch {
+                     val categoryNames = it.getAllCategoryNames()
+                     logger.atInfo()
+                         .log("Category names %s", mainViewModel.categories.value?.joinToString())
+                     val categories = mainViewModel.getCategoriesByName(categoryNames)
+                     val assignees = mainViewModel.getCategoryByName(it.assigneeList)
+
+                     it.members = Parties.roll(assignees.things, categories)
+
+                     memberList.clear()
+                     memberList.addAll(it.members)
+                     memberAdapter.notifyDataSetChanged()
+                 }
+             }
+         }
+        binding.saveButton.setOnClickListener {
+            party?.let { mainViewModel.insertParty(it) }
+            findNavController().navigate(R.id.action_PartyEditFragment_to_PartyListFragment)
+        }
     }
 
     companion object {

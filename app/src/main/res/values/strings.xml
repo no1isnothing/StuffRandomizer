@@ -37,5 +37,6 @@
     <string name="party_edit_fragment_label">Match Edit</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="reroll">Reroll</string>
 
 </resources>

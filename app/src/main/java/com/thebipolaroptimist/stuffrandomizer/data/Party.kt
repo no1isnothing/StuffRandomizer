@@ -6,14 +6,26 @@ import java.util.UUID
 
 /**
  * A data class representing a group of [Member]s that make up a [Party]
- * partyName - The name of this party
- * members - The members of this party with their assignments
- * assigneeList - The name of the stuff used as assignees for creating the [Member]s of this [Party]
+ * @property partyName The name of this party
+ * @property members The members of this party with their assignments
+ * @property assigneeList The name of the [Category] used as assignees for [Member]s
  */
 @Entity
 data class Party(
     @PrimaryKey val uid : UUID,
     val partyName: String,
-    val members: List<Member>,
-    val assigneeList: String,
-)
+    var members: List<Member>,
+    val assigneeList: String) {
+
+    /**
+     * A function to return all [Category] names used as assignments for this [Party]
+     * @return list of [Category] names
+     */
+    fun getAllCategoryNames(): List<String> {
+        val categories = arrayListOf<String>()
+        members.get(0).assignments.forEach { categoryName, _ ->
+          categories.add(categoryName)
+        }
+        return categories
+    }
+}
