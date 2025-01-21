@@ -100,6 +100,11 @@ class PartyEditFragment : Fragment() {
                      val categories = mainViewModel.getCategoriesByName(categoryNames)
                      val assignees = mainViewModel.getCategoryByName(it.assigneeList)
 
+                    if(assignees == null) {
+                        logger.atWarning().log("Category %s not found", it.assigneeList)
+                        return@launch
+                    }
+
                      it.members = Parties.roll(assignees.things, categories)
 
                      memberList.clear()

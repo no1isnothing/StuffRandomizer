@@ -5,13 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ItemListDaoTest">
+      <SelectionState runConfigName="CategoryDaoTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="insertTest_success()">
+      <SelectionState runConfigName="insert_singleCategory_success()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="StuffDaoTest">
+      <SelectionState runConfigName="insert_updateCategory_success()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="insert_multipleCategories_success()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="getCategoryByName_categoryNotPresent_()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

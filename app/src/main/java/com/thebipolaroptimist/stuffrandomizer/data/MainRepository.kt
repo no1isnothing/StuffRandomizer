@@ -25,7 +25,7 @@ class MainRepository @Inject constructor(private val partyDao: PartyDao,
         return categoryDao.getCategoriesByName(names)
     }
 
-    suspend fun getCategoryByName(name: String): Category {
+    suspend fun getCategoryByName(name: String): Category? {
         return categoryDao.getCategoryByName(name)
     }
 

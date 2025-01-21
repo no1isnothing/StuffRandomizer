@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 /**
  * A dao for interacting with [Category]s stored in [MainDatabase].
@@ -18,7 +19,7 @@ interface CategoryDao {
     suspend fun getCategoriesByName(names: List<String>) : List<Category>
 
     @Query("SELECT * FROM category WHERE name is (:name)")
-    suspend fun getCategoryByName(name: String) : Category
+    suspend fun getCategoryByName(name: String) : Category?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(category: Category)
@@ -28,4 +29,10 @@ interface CategoryDao {
 
     @Query("DELETE FROM category")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM category WHERE uid is (:uid)")
+    suspend fun getById(uid: UUID) : Category
+
+    @Query("SELECT * FROM category WHERE uid in (:uids)")
+    suspend fun getByIds(uids: List<UUID>) : List<Category>
 }
