@@ -38,5 +38,6 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="reroll">Reroll</string>
+    <string name="add_match">Add match</string>
 
 </resources>

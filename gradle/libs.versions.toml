@@ -23,6 +23,11 @@ androidLifecycle = "2.8.5"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidLifecycle"}
+androidx-material3 = { module = "androidx.compose.material3:material3" }
+androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -48,3 +53,4 @@ jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = 
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion"}
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion"}
 mannodermaus-junit5-android = { id = "de.mannodermaus.android-junit5", version.ref = "mannodermausVersion" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
