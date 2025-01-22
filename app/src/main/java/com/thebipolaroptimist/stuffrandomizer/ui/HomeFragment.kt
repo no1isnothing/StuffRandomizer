@@ -23,6 +23,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -42,7 +44,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private val mainViewModel: MainViewModel by viewModels()
-    private var previewText = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,18 +57,11 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        mainViewModel.parties.observe(viewLifecycleOwner) { matches ->
-            if (matches.isNotEmpty()) {
-                previewText = matches[0].partyName
-            }
-        }
-    }
-
     @Preview
     @Composable
     fun HomeScreen() {
+        val parties by mainViewModel.parties.observeAsState(listOf())
+
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(
@@ -101,11 +95,13 @@ class HomeFragment : Fragment() {
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(16.dp),
-                            text = previewText
-                        )
+                        if(parties.isNotEmpty()) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(16.dp),
+                                text = parties[0].partyName
+                            )
+                        }
                         Box(
                             modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.Center
