@@ -1,5 +1,8 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -9,6 +12,7 @@ import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.google.common.flogger.FluentLogger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 /**
@@ -21,7 +25,9 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
 
     val parties = mainRepository.getAllParties().asLiveData()
     val categories = mainRepository.getAllCategories().asLiveData()
-    var inProgressCategory: Category? = null
+    var categoryName by mutableStateOf("")
+    var thing by mutableStateOf("")
+    var things = arrayListOf<String>()
     var inProgressPartyName: String? = null
     var inProgressCheckBoxState: List<Boolean>? = null
     var inProgressAssigneeSelection: String? = null
@@ -30,6 +36,12 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
         inProgressPartyName = null
         inProgressCheckBoxState = null
         inProgressAssigneeSelection = null
+    }
+
+    fun resetCategoryState() {
+        categoryName = ""
+        thing = ""
+        things.clear()
     }
 
     fun insertParty(party: Party) {
@@ -49,6 +61,16 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
         viewModelScope.launch {
             clearInProgressMatchState()
             mainRepository.insertCategories(categories)
+        }
+    }
+
+    fun saveCategory() {
+        viewModelScope.launch {
+            mainRepository.insertCategory(Category(UUID.randomUUID(),
+                categoryName,
+                things))
+            resetCategoryState()
+            clearInProgressMatchState()
         }
     }
 
