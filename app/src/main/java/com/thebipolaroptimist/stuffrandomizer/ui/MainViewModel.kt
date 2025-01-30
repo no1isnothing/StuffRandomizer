@@ -1,6 +1,7 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -25,9 +26,11 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
 
     val parties = mainRepository.getAllParties().asLiveData()
     val categories = mainRepository.getAllCategories().asLiveData()
-    var categoryName by mutableStateOf("")
-    var thing by mutableStateOf("")
-    var things = arrayListOf<String>()
+    var newCategoryName by mutableStateOf("")
+    var newThing by mutableStateOf("")
+    var newThings = arrayListOf<String>()
+    var editCategoryName by mutableStateOf("")
+    var editThings = mutableStateListOf<String>()
     var inProgressPartyName: String? = null
     var inProgressCheckBoxState: List<Boolean>? = null
     var inProgressAssigneeSelection: String? = null
@@ -39,9 +42,9 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     }
 
     fun resetCategoryState() {
-        categoryName = ""
-        thing = ""
-        things.clear()
+        newCategoryName = ""
+        newThing = ""
+        newThings.clear()
     }
 
     fun insertParty(party: Party) {
@@ -67,8 +70,8 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     fun saveCategory() {
         viewModelScope.launch {
             mainRepository.insertCategory(Category(UUID.randomUUID(),
-                categoryName,
-                things))
+                newCategoryName,
+                newThings))
             resetCategoryState()
             clearInProgressMatchState()
         }

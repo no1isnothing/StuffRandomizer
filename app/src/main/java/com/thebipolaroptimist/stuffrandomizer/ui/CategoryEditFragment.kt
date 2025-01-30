@@ -3,129 +3,161 @@ package com.thebipolaroptimist.stuffrandomizer.ui
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
-import androidx.core.view.isVisible
+import android.widget.Toast
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.common.flogger.FluentLogger
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
-import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentCategoryEditBinding
-import com.thebipolaroptimist.stuffrandomizer.ui.CategoryCreationFragment.Companion.TEMP_UUID
 import java.util.UUID
-
-
-/**
- * A [RecyclerView.Adapter] for displaying strings to be used for displaying and editing [Category].
- */
-class EditableThingAdapter(private val thingList: ArrayList<String>) :
-    RecyclerView.Adapter<EditableThingAdapter.ViewHolder>() {
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val name: TextView = view.findViewById(R.id.thingName)
-        val nameEdit: EditText = view.findViewById((R.id.thingNameEdit))
-        val editButton: ImageButton = view.findViewById(R.id.thingEditButton)
-        val deleteButton: ImageButton = view.findViewById(R.id.thingDeleteButton)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_thing_edit, parent, false)
-        return ViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.name.text = thingList[position]
-        holder.editButton.setOnClickListener {
-            if (holder.name.isVisible) {
-                holder.name.visibility = GONE
-                holder.nameEdit.setText(holder.name.text)
-                holder.nameEdit.visibility = VISIBLE
-                holder.editButton.setImageResource(android.R.drawable.ic_menu_save)
-            } else {
-                holder.name.text = holder.nameEdit.text
-                thingList[position] = holder.nameEdit.text.toString()
-                holder.name.visibility = VISIBLE
-                holder.nameEdit.visibility = GONE
-                holder.editButton.setImageResource(android.R.drawable.ic_menu_edit)
-            }
-        }
-
-        holder.deleteButton.setOnClickListener {
-            thingList.removeAt(position)
-            this.notifyDataSetChanged()
-        }
-    }
-
-    override fun getItemCount() = thingList.size
-}
 
 /**
  * A simple [Fragment] to edit [Category]s.
  */
 class CategoryEditFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var _binding: FragmentCategoryEditBinding? = null
 
-    private val editThingList = arrayListOf<String>()
-    private val thingAdapter = EditableThingAdapter(editThingList)
-
-    private val binding get() = _binding!!
     private var uuid = TEMP_UUID
+    var category : Category? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentCategoryEditBinding.inflate(inflater, container, false)
-
         uuid = UUID.fromString(arguments?.getString(resources.getString(R.string.key_uuid)))
 
-        val listWithId =
+        category =
             mainViewModel.categories
-                .value?.filter { category -> category.uid == uuid }
-        listWithId?.get(0)?.let {
-            editThingList.addAll(it.things)
-            binding.editItemListName.setText(it.name)
-        }
+                .value?.first { category -> category.uid == uuid }
 
-        val recyclerView = binding.editItemList
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = thingAdapter
+        mainViewModel.editThings.clear()
+        category?.let { mainViewModel.editThings.addAll(it.things)
+        mainViewModel.editCategoryName = it.name}
 
-        binding.editAddItem.setOnClickListener {
-            editThingList.add("")
-            thingAdapter.notifyDataSetChanged()
-        }
-
-        binding.editItemDiscard.setOnClickListener {
-            editThingList.clear()
-            listWithId?.get(0)?.let {
-                editThingList.addAll(it.things)
-                thingAdapter.notifyDataSetChanged()
-                binding.editItemListName.setText(it.name)
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                CategoryEditScreen()
             }
         }
-
-        return binding.root
     }
+
+    @Composable
+    fun CategoryEditScreen() {
+        Column {
+            TextField(
+                value = mainViewModel.editCategoryName,
+                onValueChange = { mainViewModel.editCategoryName = it },
+                label = { Text(resources.getString(R.string.hint_list_name)) })
+            LazyColumn(Modifier.weight(1f)) {
+                itemsIndexed(mainViewModel.editThings,
+                    key = { _, string -> string }) { index, item ->
+                    CategoryEditItem(item = item, position = index)
+                }
+            }
+            Button(modifier = Modifier.wrapContentSize(),
+                onClick = {
+                    if(mainViewModel.editThings.contains("")) {
+                        Toast.makeText(context, getString(R.string.warning_duplicate_item), Toast.LENGTH_SHORT)
+                            .show()
+                    } else {
+                        mainViewModel.editThings.add("")
+                    }
+                }){
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = resources.getString(R.string.add)
+                )
+            }
+            Button(modifier = Modifier.wrapContentSize(),
+                onClick = {
+                    mainViewModel.editThings.clear()
+                    category?.let {
+                        mainViewModel.editCategoryName = it.name
+                        mainViewModel.editThings.addAll(it.things)
+                    }
+                }) {
+                Icon(
+                    Icons.Default.Clear,
+                    contentDescription = resources.getString(R.string.clear)
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun CategoryEditItem(item: String, position: Int) {
+        var editing by rememberSaveable {
+            mutableStateOf(false)
+        }
+        var editedItem by rememberSaveable {
+            mutableStateOf(item)
+        }
+        Row(Modifier.wrapContentSize()) {
+            if (editing) {
+                TextField(
+                    value = editedItem,
+                    onValueChange = { editedItem = it },
+                    label = { Text(resources.getString(R.string.hint_list_name)) })
+            } else {
+                mainViewModel.editThings[position] = editedItem
+                Text(editedItem)
+            }
+            Button(onClick = {
+                editing = !editing
+            }) {
+                Icon(
+                    Icons.Default.Edit,
+                    contentDescription = resources.getString(R.string.edit)
+                )
+            }
+            Button(onClick = {
+                mainViewModel.editThings.remove(editedItem)
+            }) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = resources.getString(R.string.delete)
+                )
+            }
+        }
+    }
+
 
     override fun onStop() {
         super.onStop()
         logger.atInfo().log("On stop")
-        if(binding.editItemListName.text.isNotEmpty() || editThingList.isNotEmpty()) {
-            val category = Category(uuid, binding.editItemListName.text.toString(), editThingList)
-            mainViewModel.insertCategory(category)
+        category?.let {
+          it.things = mainViewModel.editThings
+          it.name = mainViewModel.editCategoryName
+          mainViewModel.insertCategory(it)
         }
     }
 
     companion object {
+        val TEMP_UUID = UUID(0,0)
         private val logger: FluentLogger = FluentLogger.forEnclosingClass()
     }
 }

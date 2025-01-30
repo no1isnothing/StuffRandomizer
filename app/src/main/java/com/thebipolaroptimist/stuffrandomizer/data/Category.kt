@@ -17,6 +17,6 @@ import java.util.UUID
 @Entity
 data class Category(
     @PrimaryKey val uid : UUID,
-    val name: String,
+    var name: String,
     var things: List<String>
 )

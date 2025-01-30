@@ -16,7 +16,7 @@ import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Member
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentPartyEditBinding
-import com.thebipolaroptimist.stuffrandomizer.ui.CategoryCreationFragment.Companion.TEMP_UUID
+import com.thebipolaroptimist.stuffrandomizer.ui.CategoryEditFragment.Companion.TEMP_UUID
 import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

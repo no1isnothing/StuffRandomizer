@@ -62,45 +62,45 @@ class CategoryCreationFragment : Fragment() {
     fun CategoryCreationScreen() {
         Column {
             TextField(
-                value =  mainViewModel.categoryName,
-                onValueChange = {  mainViewModel.categoryName = it },
+                value =  mainViewModel.newCategoryName,
+                onValueChange = {  mainViewModel.newCategoryName = it },
                 label = { Text(resources.getString(R.string.hint_list_name)) },
             )
             TextField(
-                value = mainViewModel.thing,
-                onValueChange = { mainViewModel.thing = it },
+                value = mainViewModel.newThing,
+                onValueChange = { mainViewModel.newThing = it },
                 label = { Text(resources.getString(R.string.hint_item))}
             )
             Button(onClick = {
-                if(mainViewModel.thing.isBlank()) {
+                if(mainViewModel.newThing.isBlank()) {
                     Toast.makeText(context, getString(R.string.warning_empty_item), Toast.LENGTH_SHORT)
                         .show()
                     return@Button
                 }
-                if(mainViewModel.things.contains(mainViewModel.thing)) {
+                if(mainViewModel.newThings.contains(mainViewModel.newThing)) {
                     Toast.makeText(context, getString(R.string.warning_duplicate_item), Toast.LENGTH_SHORT)
                         .show()
                     return@Button
                 }
 
-                mainViewModel.things.add(mainViewModel.thing)
-                mainViewModel.thing = ""
+                mainViewModel.newThings.add(mainViewModel.newThing)
+                mainViewModel.newThing = ""
             }) {
                 Text(resources.getString(R.string.add))
             }
 
             LazyColumn(Modifier.wrapContentSize()) {
-                items(mainViewModel.things) {
+                items(mainViewModel.newThings) {
                     item -> Text(item)
                 }
             }
             Button(onClick = {
-                if (mainViewModel.categoryName.isEmpty()) {
+                if (mainViewModel.newCategoryName.isEmpty()) {
                     Toast.makeText(context, getString(R.string.warning_list_name_empty), Toast.LENGTH_SHORT)
                         .show()
                     return@Button
                 }
-                if (mainViewModel.things.isEmpty()) {
+                if (mainViewModel.newThings.isEmpty()) {
                     Toast.makeText(context, getString(R.string.warning_empty_item_list), Toast.LENGTH_SHORT)
                         .show()
                     return@Button
@@ -118,7 +118,6 @@ class CategoryCreationFragment : Fragment() {
     }
 
     companion object {
-        val TEMP_UUID = UUID(0,0)
         private val logger: FluentLogger = FluentLogger.forEnclosingClass()
     }
 }
