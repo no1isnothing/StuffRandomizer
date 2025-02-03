@@ -13,8 +13,8 @@ import java.util.UUID
 @Entity
 data class Party(
     @PrimaryKey val uid : UUID,
-    val partyName: String,
-    var members: List<Member>,
+    var partyName: String,
+    var members: ArrayList<Member>,
     val assigneeList: String) {
 
     /**

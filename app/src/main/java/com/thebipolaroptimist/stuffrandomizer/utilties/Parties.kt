@@ -17,7 +17,7 @@ object Parties {
      *
      * @return [Member]s with provided [Category]s assigned.
      */
-    fun roll(assignees: List<String>, assignmentLists: List<Category>): List<Member> {
+    fun roll(assignees: List<String>, assignmentLists: List<Category>): ArrayList<Member> {
         val members = ArrayList<Member>()
         for(assignee in assignees) {
             members.add(Member(assignee, HashMap()))

@@ -11,6 +11,7 @@ import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.MainRepository
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.google.common.flogger.FluentLogger
+import com.thebipolaroptimist.stuffrandomizer.data.Member
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -31,6 +32,9 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     var newThings = arrayListOf<String>()
     var editCategoryName by mutableStateOf("")
     var editThings = mutableStateListOf<String>()
+    var editPartyName by mutableStateOf("")
+    var editPartyMembers = mutableStateListOf<Member>()
+    var editPartyUuid by mutableStateOf("")
     var inProgressPartyName: String? = null
     var inProgressCheckBoxState: List<Boolean>? = null
     var inProgressAssigneeSelection: String? = null

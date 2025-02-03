@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
     private fun createSamplePartyData(): Party = Party(
         UUID.randomUUID(),
         "Skyrim 2024",
-        listOf(
+        arrayListOf(
             Member("Jane", hashMapOf(Pair("Aedra", "Talos"), Pair("Daedra", "Clavicus Vile"))),
             Member("Bear", hashMapOf(Pair("Aedra", "Mara"), Pair("Daedra", "Peryite"))),
             Member("The Tooth Fairy", hashMapOf(Pair("Aedra", "Julianos"), Pair("Daedra", "Vaermina"))),

@@ -9,13 +9,13 @@ import com.google.gson.reflect.TypeToken
  */
 class MainConverter {
     @TypeConverter
-    fun memberListToString(members: List<Member>): String =
+    fun memberListToString(members: ArrayList<Member>): String =
         Gson().toJson(members).toString()
 
 
     @TypeConverter
-    fun stringToMemberList(pairings: String): List<Member> =
-        Gson().fromJson(pairings, object : TypeToken<List<Member>>() {}.type)
+    fun stringToMemberList(pairings: String): ArrayList<Member> =
+        Gson().fromJson(pairings, object : TypeToken<ArrayList<Member>>() {}.type)
 
     @TypeConverter
     fun listToString(list: List<String>): String =
