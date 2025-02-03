@@ -49,6 +49,9 @@
         <action
             android:id="@+id/action_PartyListFragment_to_PartyEditFragment"
             app:destination="@id/PartyEditFragment" />
+        <action
+            android:id="@+id/action_PartyListFragment_to_PartyCreationFragment"
+            app:destination="@id/PartyCreationFragment" />
     </fragment>
     <fragment
         android:id="@+id/PartyCreationFragment"
