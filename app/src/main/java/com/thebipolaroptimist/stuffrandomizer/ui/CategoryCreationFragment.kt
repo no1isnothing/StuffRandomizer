@@ -24,7 +24,6 @@ import com.google.common.flogger.FluentLogger
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.UUID
 
 /**
  * A [Fragment] to create [Category]s.
@@ -52,7 +51,7 @@ class CategoryCreationFragment : Fragment() {
             .setMessage(resources.getString(R.string.discard_draft))
             .setNegativeButton(resources.getString(R.string.cancel)) {_,_ ->}
             .setPositiveButton(resources.getString(R.string.discard)) { _,_ ->
-                mainViewModel.resetCategoryState()
+                mainViewModel.clearNewCategory()
                 findNavController().popBackStack()
             }
             .show()

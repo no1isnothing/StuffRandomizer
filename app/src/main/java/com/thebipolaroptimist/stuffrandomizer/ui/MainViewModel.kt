@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.MainRepository
@@ -27,6 +28,7 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
 
     val parties = mainRepository.getAllParties().asLiveData()
     val categories = mainRepository.getAllCategories().asLiveData()
+    val categoryNames = categories.map { list -> list.map { category -> category.name } }
     var newCategoryName by mutableStateOf("")
     var newThing by mutableStateOf("")
     var newThings = arrayListOf<String>()
@@ -35,17 +37,17 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     var editPartyName by mutableStateOf("")
     var editPartyMembers = mutableStateListOf<Member>()
     var editPartyUuid by mutableStateOf("")
-    var inProgressPartyName: String? = null
-    var inProgressCheckBoxState: List<Boolean>? = null
-    var inProgressAssigneeSelection: String? = null
+    var newPartyName by mutableStateOf("")
+    var newPartyCheckedSate = mutableStateListOf<Boolean>()
+    var newAssigneeSelection: String? = null
 
-    private fun clearInProgressMatchState() {
-        inProgressPartyName = null
-        inProgressCheckBoxState = null
-        inProgressAssigneeSelection = null
+    private fun clearNewParty() {
+        newPartyName = ""
+        newPartyCheckedSate.clear()
+        newAssigneeSelection = null
     }
 
-    fun resetCategoryState() {
+    fun clearNewCategory() {
         newCategoryName = ""
         newThing = ""
         newThings.clear()
@@ -59,25 +61,29 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
 
     fun insertCategory(category: Category) {
         viewModelScope.launch {
-            clearInProgressMatchState()
+            clearNewParty()
             mainRepository.insertCategory(category)
         }
     }
 
     fun insertCategories(categories: List<Category>) {
         viewModelScope.launch {
-            clearInProgressMatchState()
+            clearNewParty()
             mainRepository.insertCategories(categories)
         }
     }
 
     fun saveCategory() {
         viewModelScope.launch {
-            mainRepository.insertCategory(Category(UUID.randomUUID(),
-                newCategoryName,
-                newThings))
-            resetCategoryState()
-            clearInProgressMatchState()
+            mainRepository.insertCategory(
+                Category(
+                    UUID.randomUUID(),
+                    newCategoryName,
+                    newThings
+                )
+            )
+            clearNewCategory()
+            clearNewParty()
         }
     }
 
@@ -89,7 +95,7 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
 
     fun deleteAllCategories() {
         viewModelScope.launch {
-            clearInProgressMatchState()
+            clearNewParty()
             mainRepository.deleteAllCategories()
         }
     }

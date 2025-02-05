@@ -4,17 +4,36 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.CheckBox
-import android.widget.TextView
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.common.flogger.FluentLogger
-import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentPartyCreationBinding
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.Party
@@ -22,110 +41,24 @@ import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * A [RecyclerView.Adapter] for displaying selectable [Category]s to be used to create the [Party]
- */
-class SelectableCategoryAdapter(private val categoryList: List<Category>,
-                                private val checkboxStateList: ArrayList<Boolean>) :
-RecyclerView.Adapter<SelectableCategoryAdapter.ViewHolder>(){
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val name: TextView = view.findViewById(R.id.selectableCategoryName)
-        val checkBox: CheckBox = view.findViewById(R.id.categoryCheckbox)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_category_select, parent, false)
-        return ViewHolder(view)
-    }
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.name.text = categoryList[position].name
-        holder.checkBox.isChecked = checkboxStateList[position]
-
-        holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
-            checkboxStateList[position] = isChecked
-        }
-    }
-    override fun getItemCount() = categoryList.size
-
-}
-
-/**
  * A [Fragment] for creating [Party]s.
  */
 @AndroidEntryPoint
 class PartyCreationFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var _binding: FragmentPartyCreationBinding? = null
-
-    private val categoryList = arrayListOf<Category>()
-    private val checkboxStateList = arrayListOf<Boolean>()
-    private val categoryNamesList = arrayListOf<String>()
-
-    private val categoryAdapter = SelectableCategoryAdapter(categoryList, checkboxStateList)
-    private var partySaved = false
-
-    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
-        _binding = FragmentPartyCreationBinding.inflate(inflater, container, false)
-        val recyclerView : RecyclerView = binding.assignmentsList
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = categoryAdapter
-
-        binding.assigneeSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoryNamesList)
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        // set values from viewmodel
-        if(mainViewModel.inProgressPartyName != null) {
-            binding.partyNameText.setText(mainViewModel.inProgressPartyName)
-            mainViewModel.inProgressPartyName = null
-        }
-
-        mainViewModel.categories.observe(viewLifecycleOwner) { categories ->
-            categoryList.clear()
-            categoryNamesList.clear()
-
-            categoryList.addAll(categories)
-            categoryNamesList.addAll(categoryList.map { category -> category.name })
-            val arrayAdapter = (binding.assigneeSpinner.adapter as ArrayAdapter<String>)
-            if(mainViewModel.inProgressCheckBoxState != null) {
-                checkboxStateList.addAll(mainViewModel.inProgressCheckBoxState!!)
-                mainViewModel.inProgressCheckBoxState = null
-            }
-            if(mainViewModel.inProgressAssigneeSelection != null) {
-                binding.assigneeSpinner
-                    .setSelection(arrayAdapter.getPosition(mainViewModel.inProgressAssigneeSelection))
-                mainViewModel.inProgressAssigneeSelection = null
-            }
-            if(categoryList.size > checkboxStateList.size) {
-                val diff = categories.size - checkboxStateList.size
-                checkboxStateList.addAll(Array(diff) { false })
-            }
-            // TODO #15: Use DiffUtil to update lists.
-            categoryAdapter.notifyDataSetChanged()
-            arrayAdapter.notifyDataSetChanged()
-        }
-
-        binding.buttonRoll.setOnClickListener {
-            if(createParty()) {
-                findNavController().navigate(R.id.action_PartyCreationFragment_to_PartyListFragment)
-            }
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { PartyCreationScreen() }
         }
     }
 
-    private fun createParty(): Boolean {
-        val name = binding.partyNameText.text.toString()
-
-        if(name.isEmpty()) {
+    private fun createParty(categoryList: List<Category>): Boolean {
+        if(mainViewModel.newPartyName.isEmpty()) {
             Toast.makeText(context, getString(R.string.warning_match_name_empty), Toast.LENGTH_SHORT)
                 .show()
             return false
@@ -133,9 +66,9 @@ class PartyCreationFragment : Fragment() {
 
         val selectedCategoryList = ArrayList<Category>()
         var assigneeList: Category? = null
-        val assigneeListName = binding.assigneeSpinner.selectedItem.toString()
+        val assigneeListName = mainViewModel.newAssigneeSelection
 
-        for((index, checkBoxState) in checkboxStateList.withIndex()){
+        for((index, checkBoxState) in mainViewModel.newPartyCheckedSate.withIndex()){
             if(checkBoxState) {
                 selectedCategoryList.add(categoryList[index])
             }
@@ -149,24 +82,106 @@ class PartyCreationFragment : Fragment() {
                 return false
         }
         assigneeList?.let {
-            val party = Parties.create(name, it, selectedCategoryList)
+            val party = Parties.create(mainViewModel.newPartyName, it, selectedCategoryList)
             mainViewModel.insertParty(party)
-            partySaved = true
+            return true
         }
-        return true
+        Toast.makeText(context, getString(R.string.warning_match_assignments_empty), Toast.LENGTH_SHORT)
+            .show()
+        return false
     }
 
-    override fun onStop() {
-        super.onStop()
-        if(partySaved) {
-            return
+    @Composable
+    private fun PartyCreationScreen() {
+        val categoryList by mainViewModel.categories.observeAsState(listOf())
+
+        // look into a better way to do this
+        if(mainViewModel.newPartyCheckedSate.size == 0 ) {
+            mainViewModel.newPartyCheckedSate.addAll(Array(categoryList.size) { false })
         }
 
-        if(binding.partyNameText.text.isNotEmpty()) {
-            mainViewModel.inProgressPartyName = binding.partyNameText.text.toString()
+        Column {
+            TextField(
+                value = mainViewModel.newPartyName,
+                onValueChange = { mainViewModel.newPartyName = it},
+                label = { Text(resources.getString(R.string.hint_match_name)) }
+            )
+            Text(resources.getString(R.string.assignees))
+            DropDownText()
+            Text(resources.getString(R.string.assignments))
+            LazyColumn(Modifier.weight(1f)) {
+                itemsIndexed(categoryList)
+                    {index, category -> CategorySelectItem(index = index,
+                        categoryName = category.name)}
+            }
+            Button(onClick = {
+                if (createParty(categoryList)) {
+                    mainViewModel.newPartyName = ""
+                    mainViewModel.newPartyCheckedSate.clear()
+                    findNavController().navigate(R.id.action_PartyCreationFragment_to_PartyListFragment)
+                }
+            }) {
+                Text(resources.getString(R.string.roll))
+            }
         }
-        mainViewModel.inProgressCheckBoxState = checkboxStateList
-        mainViewModel.inProgressAssigneeSelection = binding.assigneeSpinner.selectedItem.toString()
+
+    }
+
+    @Composable
+    private fun CategorySelectItem(index: Int, categoryName: String) {
+        Row() {
+            Checkbox(
+                checked = mainViewModel.newPartyCheckedSate[index],
+                onCheckedChange = { isChecked ->
+                    mainViewModel.newPartyCheckedSate[index] = isChecked
+                }
+            )
+            Text(categoryName)
+        }
+    }
+
+
+    @Composable
+    private fun DropDownText() {
+        val categoryNames by mainViewModel.categoryNames.observeAsState(listOf())
+
+        var expanded by remember {
+            mutableStateOf(false)
+        }
+
+        var selectedPosition by remember {
+            mutableStateOf(0)
+        }
+
+        Box(Modifier.wrapContentSize()) {
+            Row(Modifier.clickable { expanded = true }) {
+                if(categoryNames.size > selectedPosition) {
+                    mainViewModel.newAssigneeSelection = categoryNames[selectedPosition]
+                    Text(categoryNames[selectedPosition])
+                }
+                Image(
+                    Icons.Default.KeyboardArrowDown,
+                    contentDescription = resources.getString(R.string.expand)
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                }) {
+                categoryNames.forEachIndexed { index, username ->
+                    DropdownMenuItem(text = {
+                        Text(text = username)
+                    },
+                        onClick = {
+                            expanded = false
+                            selectedPosition = index
+                        })
+                }
+            }
+
+        }
+
     }
 
     companion object {
