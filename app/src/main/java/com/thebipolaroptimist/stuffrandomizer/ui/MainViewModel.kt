@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.MainRepository
@@ -28,7 +27,6 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
 
     val parties = mainRepository.getAllParties().asLiveData()
     val categories = mainRepository.getAllCategories().asLiveData()
-    val categoryNames = categories.map { list -> list.map { category -> category.name } }
     var newCategoryName by mutableStateOf("")
     var newThing by mutableStateOf("")
     var newThings = arrayListOf<String>()
@@ -39,12 +37,12 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     var editPartyUuid by mutableStateOf("")
     var newPartyName by mutableStateOf("")
     var newPartyCheckedSate = mutableStateListOf<Boolean>()
-    var newAssigneeSelection: String? = null
+    var newAssigneeSelection by mutableStateOf(0)
 
-    private fun clearNewParty() {
+    fun clearNewParty() {
         newPartyName = ""
         newPartyCheckedSate.clear()
-        newAssigneeSelection = null
+        newAssigneeSelection = 0
     }
 
     fun clearNewCategory() {

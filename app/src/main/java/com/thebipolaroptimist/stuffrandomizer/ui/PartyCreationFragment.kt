@@ -58,37 +58,37 @@ class PartyCreationFragment : Fragment() {
     }
 
     private fun createParty(categoryList: List<Category>): Boolean {
-        if(mainViewModel.newPartyName.isEmpty()) {
-            Toast.makeText(context, getString(R.string.warning_match_name_empty), Toast.LENGTH_SHORT)
+        if (mainViewModel.newPartyName.isEmpty()) {
+            Toast.makeText(
+                context,
+                getString(R.string.warning_match_name_empty),
+                Toast.LENGTH_SHORT
+            )
                 .show()
             return false
         }
 
         val selectedCategoryList = ArrayList<Category>()
-        var assigneeList: Category? = null
-        val assigneeListName = mainViewModel.newAssigneeSelection
+        val assigneeList = categoryList[mainViewModel.newAssigneeSelection]
 
-        for((index, checkBoxState) in mainViewModel.newPartyCheckedSate.withIndex()){
-            if(checkBoxState) {
+        for ((index, checkBoxState) in mainViewModel.newPartyCheckedSate.withIndex()) {
+            if (checkBoxState) {
                 selectedCategoryList.add(categoryList[index])
             }
-            if(categoryList[index].name == assigneeListName) {
-                assigneeList = categoryList[index]
-            }
         }
-        if(selectedCategoryList.isEmpty()) {
-                Toast.makeText(context, getString(R.string.warning_match_assignments_empty), Toast.LENGTH_SHORT)
-                    .show()
-                return false
+        if (selectedCategoryList.isEmpty()) {
+            Toast.makeText(
+                context,
+                getString(R.string.warning_match_assignments_empty),
+                Toast.LENGTH_SHORT
+            )
+                .show()
+            return false
         }
-        assigneeList?.let {
-            val party = Parties.create(mainViewModel.newPartyName, it, selectedCategoryList)
-            mainViewModel.insertParty(party)
-            return true
-        }
-        Toast.makeText(context, getString(R.string.warning_match_assignments_empty), Toast.LENGTH_SHORT)
-            .show()
-        return false
+
+        val party = Parties.create(mainViewModel.newPartyName, assigneeList, selectedCategoryList)
+        mainViewModel.insertParty(party)
+        return true
     }
 
     @Composable
@@ -96,28 +96,31 @@ class PartyCreationFragment : Fragment() {
         val categoryList by mainViewModel.categories.observeAsState(listOf())
 
         // look into a better way to do this
-        if(mainViewModel.newPartyCheckedSate.size == 0 ) {
+        if (mainViewModel.newPartyCheckedSate.size == 0) {
             mainViewModel.newPartyCheckedSate.addAll(Array(categoryList.size) { false })
         }
 
         Column {
             TextField(
                 value = mainViewModel.newPartyName,
-                onValueChange = { mainViewModel.newPartyName = it},
+                onValueChange = { mainViewModel.newPartyName = it },
                 label = { Text(resources.getString(R.string.hint_match_name)) }
             )
             Text(resources.getString(R.string.assignees))
-            DropDownText()
+            DropDownText(categoryList)
             Text(resources.getString(R.string.assignments))
             LazyColumn(Modifier.weight(1f)) {
                 itemsIndexed(categoryList)
-                    {index, category -> CategorySelectItem(index = index,
-                        categoryName = category.name)}
+                { index, category ->
+                    CategorySelectItem(
+                        index = index,
+                        categoryName = category.name
+                    )
+                }
             }
             Button(onClick = {
                 if (createParty(categoryList)) {
-                    mainViewModel.newPartyName = ""
-                    mainViewModel.newPartyCheckedSate.clear()
+                    mainViewModel.clearNewParty()
                     findNavController().navigate(R.id.action_PartyCreationFragment_to_PartyListFragment)
                 }
             }) {
@@ -142,22 +145,15 @@ class PartyCreationFragment : Fragment() {
 
 
     @Composable
-    private fun DropDownText() {
-        val categoryNames by mainViewModel.categoryNames.observeAsState(listOf())
-
+    private fun DropDownText(categories: List<Category>) {
         var expanded by remember {
             mutableStateOf(false)
         }
 
-        var selectedPosition by remember {
-            mutableStateOf(0)
-        }
-
         Box(Modifier.wrapContentSize()) {
             Row(Modifier.clickable { expanded = true }) {
-                if(categoryNames.size > selectedPosition) {
-                    mainViewModel.newAssigneeSelection = categoryNames[selectedPosition]
-                    Text(categoryNames[selectedPosition])
+                if (categories.size > mainViewModel.newAssigneeSelection) {
+                    Text(categories[mainViewModel.newAssigneeSelection].name)
                 }
                 Image(
                     Icons.Default.KeyboardArrowDown,
@@ -169,13 +165,13 @@ class PartyCreationFragment : Fragment() {
                 onDismissRequest = {
                     expanded = false
                 }) {
-                categoryNames.forEachIndexed { index, username ->
+                categories.forEachIndexed { index, category ->
                     DropdownMenuItem(text = {
-                        Text(text = username)
+                        Text(text = category.name)
                     },
                         onClick = {
                             expanded = false
-                            selectedPosition = index
+                            mainViewModel.newAssigneeSelection = index
                         })
                 }
             }
