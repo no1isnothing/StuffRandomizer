@@ -34,6 +34,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
 import com.thebipolaroptimist.stuffrandomizer.R
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,87 +58,89 @@ class HomeFragment : Fragment() {
             }
         }
     }
+}
+@Preview
+@Composable
+fun HomeScreen(mainViewModel: MainViewModel = hiltViewModel(),
+               toPartyCreation: () -> Unit = {},
+               toPartyList: () -> Unit = {},
+               toCategoryList: () -> Unit = {},) {
+    val parties by mainViewModel.parties.observeAsState(listOf())
 
-    @Preview
-    @Composable
-    fun HomeScreen() {
-        val parties by mainViewModel.parties.observeAsState(listOf())
-
-        Scaffold(
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { findNavController().navigate(R.id.action_HomeFragment_to_PartyCreationFragment) },
-                ) {
-                    Icon(Icons.Filled.Add, stringResource(R.string.add_match))
-                }
-            })
-        { padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                horizontalAlignment = Alignment.CenterHorizontally,
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { toPartyCreation() },
             ) {
-                ElevatedCard(
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 6.dp
-                    ),
-                    shape = RoundedCornerShape(50),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    ),
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .weight(1f),
+                Icon(Icons.Filled.Add, stringResource(R.string.add_match))
+            }
+        })
+    { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            ElevatedCard(
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 6.dp
+                ),
+                shape = RoundedCornerShape(50),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                ),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .weight(1f),
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.CenterStart
                 ) {
+                    if(parties.isNotEmpty()) {
+                        Text(
+                            modifier = Modifier
+                                .padding(16.dp),
+                            text = parties[0].partyName
+                        )
+                    }
                     Box(
                         modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.CenterStart
+                        contentAlignment = Alignment.Center
                     ) {
-                        if(parties.isNotEmpty()) {
-                            Text(
-                                modifier = Modifier
-                                    .padding(16.dp),
-                                text = parties[0].partyName
-                            )
-                        }
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Button(
-                                onClick = { findNavController().navigate(R.id.action_HomeFragment_to_PartyListFragment) },
-                            )
-                            {
-                                Text(text = stringResource(R.string.matches))
-                            }
+                        Button(
+                            onClick = { toPartyList() },
+                        )
+                        {
+                            Text(text = stringResource(R.string.matches))
                         }
                     }
                 }
-                ElevatedCard(
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 6.dp
-                    ),
-                    shape = RoundedCornerShape(50),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    ),
+            }
+            ElevatedCard(
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 6.dp
+                ),
+                shape = RoundedCornerShape(50),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                ),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .weight(1f),
+            ) {
+                Button(
+                    onClick = { toCategoryList() },
                     modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .weight(1f),
+                        .wrapContentSize(align = Alignment.Center)
+                        .align(alignment = Alignment.CenterHorizontally),
                 ) {
-                    Button(
-                        onClick = { findNavController().navigate(R.id.action_HomeFragment_to_CategoryListFragment) },
-                        modifier = Modifier
-                            .wrapContentSize(align = Alignment.Center)
-                            .align(alignment = Alignment.CenterHorizontally),
-                    ) {
-                        Text(text = stringResource(R.string.items))
-                    }
+                    Text(text = stringResource(R.string.items))
                 }
             }
         }

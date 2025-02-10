@@ -28,79 +28,53 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.fragment.findNavController
 import com.google.common.flogger.FluentLogger
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.UUID
 
 /**
- * A simple [Fragment] for displaying [Category]s.
+ * A simple [Composable] for displaying [Category]s.
  */
-@AndroidEntryPoint
-class CategoryListFragment : Fragment() {
-    private val mainViewModel: MainViewModel by activityViewModels()
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                CategoryListScreen()
+@Composable
+fun CategoryListScreen(mainViewModel: MainViewModel = hiltViewModel(),
+                       toCategoryCreation: () -> Unit = {},
+                       toCategoryEdit: (uuid: String) -> Unit) {
+    val categoryList by mainViewModel.categories.observeAsState(listOf())
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { toCategoryCreation() },
+            ) {
+                Icon(Icons.Filled.Add, stringResource(R.string.add_match))
             }
-        }
-    }
-
-    @Preview
-    @Composable
-    fun CategoryListScreen() {
-        val categoryList by mainViewModel.categories.observeAsState(listOf())
-        Scaffold(
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { findNavController().navigate(R.id.action_CategoryListFragment_to_CategoryCreationFragment) },
-                ) {
-                    Icon(Icons.Filled.Add, stringResource(R.string.add_match))
-                }
-            }) {
+        }) {
             padding ->
-            LazyColumn(Modifier.fillMaxSize()
-                .padding(padding)) {
-                items(categoryList) { item ->
-                    CategoryItem(item)
-                }
+        LazyColumn(Modifier.fillMaxSize()
+            .padding(padding)) {
+            items(categoryList) { item ->
+                CategoryItem(item, toCategoryEdit)
             }
         }
     }
+}
 
-    @Composable
-    fun CategoryItem(category: Category) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .clickable {
-                    val bundle = Bundle()
-                    bundle.putString(
-                        resources.getString(R.string.key_uuid),
-                        category.uid.toString()
-                    )
-                    findNavController()
-                        .navigate(
-                            R.id.action_CategoryListFragment_to_CategoryEditFragment,
-                            bundle
-                        )
-                }) {
-            Column {
-                Text(category.name)
-                Text(text = category.things.joinToString())
-            }
-
+@Composable
+fun CategoryItem(category: Category,
+                 toCategoryEdit: (uuid: String) -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clickable {
+                toCategoryEdit(category.uid.toString())
+            }) {
+        Column {
+            Text(category.name)
+            Text(text = category.things.joinToString())
         }
-    }
 
-    companion object {
-        private val logger: FluentLogger = FluentLogger.forEnclosingClass()
     }
 }

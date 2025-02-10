@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.mannodermaus.junit5.android)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -83,6 +84,9 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.flogger)
     implementation(libs.flogger.backend)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     testImplementation(libs.junit.jupiter)
 

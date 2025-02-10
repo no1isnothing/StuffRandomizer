@@ -15,9 +15,12 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.flogger.FluentLogger
@@ -46,38 +49,36 @@ class CategoryCreationFragment : Fragment() {
         }
     }
 
-    private fun launchDiscardDialog() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setMessage(resources.getString(R.string.discard_draft))
-            .setNegativeButton(resources.getString(R.string.cancel)) {_,_ ->}
-            .setPositiveButton(resources.getString(R.string.discard)) { _,_ ->
-                mainViewModel.clearNewCategory()
-                findNavController().popBackStack()
-            }
-            .show()
+    private
+    companion object {
+        private val logger: FluentLogger = FluentLogger.forEnclosingClass()
     }
+}
+
 
     @Composable
-    fun CategoryCreationScreen() {
+    fun CategoryCreationScreen(mainViewModel: MainViewModel = hiltViewModel(),
+                               toCategoryList: () -> Unit = {}) {
+        val context = LocalContext.current
         Column {
             TextField(
                 value =  mainViewModel.newCategoryName,
                 onValueChange = {  mainViewModel.newCategoryName = it },
-                label = { Text(resources.getString(R.string.hint_list_name)) },
+                label = { Text(stringResource(R.string.hint_list_name)) },
             )
             TextField(
                 value = mainViewModel.newThing,
                 onValueChange = { mainViewModel.newThing = it },
-                label = { Text(resources.getString(R.string.hint_item))}
+                label = { Text(stringResource(R.string.hint_item))}
             )
             Button(onClick = {
                 if(mainViewModel.newThing.isBlank()) {
-                    Toast.makeText(context, getString(R.string.warning_empty_item), Toast.LENGTH_SHORT)
+                    Toast.makeText(context, context.getString(R.string.warning_empty_item), Toast.LENGTH_SHORT)
                         .show()
                     return@Button
                 }
                 if(mainViewModel.newThings.contains(mainViewModel.newThing)) {
-                    Toast.makeText(context, getString(R.string.warning_duplicate_item), Toast.LENGTH_SHORT)
+                    Toast.makeText(context, context.getString(R.string.warning_duplicate_item), Toast.LENGTH_SHORT)
                         .show()
                     return@Button
                 }
@@ -85,38 +86,43 @@ class CategoryCreationFragment : Fragment() {
                 mainViewModel.newThings.add(mainViewModel.newThing)
                 mainViewModel.newThing = ""
             }) {
-                Text(resources.getString(R.string.add))
+                Text(stringResource(R.string.add))
             }
 
             LazyColumn(Modifier.wrapContentSize()) {
                 items(mainViewModel.newThings) {
-                    item -> Text(item)
+                        item -> Text(item)
                 }
             }
             Button(onClick = {
                 if (mainViewModel.newCategoryName.isEmpty()) {
-                    Toast.makeText(context, getString(R.string.warning_list_name_empty), Toast.LENGTH_SHORT)
+                    Toast.makeText(context, context.getString(R.string.warning_list_name_empty), Toast.LENGTH_SHORT)
                         .show()
                     return@Button
                 }
                 if (mainViewModel.newThings.isEmpty()) {
-                    Toast.makeText(context, getString(R.string.warning_empty_item_list), Toast.LENGTH_SHORT)
+                    Toast.makeText(context, context.getString(R.string.warning_empty_item_list), Toast.LENGTH_SHORT)
                         .show()
                     return@Button
                 }
                 mainViewModel.saveCategory()
-                findNavController().popBackStack()
+                toCategoryList()
             }) {
-                Text(resources.getString(R.string.save))
+                Text(stringResource(R.string.save))
             }
-            Button(onClick = { launchDiscardDialog() }) {
-                Text(resources.getString(R.string.cancel))
+            Button(onClick = {
+                MaterialAlertDialogBuilder(context)
+                    .setMessage(context.getString(R.string.discard_draft))
+                    .setNegativeButton(context.getString(R.string.cancel)) { _, _ -> }
+                    .setPositiveButton(context.getString(R.string.discard)) { _, _ ->
+                        mainViewModel.clearNewCategory()
+                        toCategoryList()
+                    }
+                    .show()
+            }) {
+                Text(stringResource(R.string.cancel))
             }
         }
 
     }
 
-    companion object {
-        private val logger: FluentLogger = FluentLogger.forEnclosingClass()
-    }
-}

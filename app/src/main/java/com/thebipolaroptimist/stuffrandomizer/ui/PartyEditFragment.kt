@@ -11,11 +11,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.common.flogger.FluentLogger
@@ -25,123 +28,89 @@ import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.ui.CategoryEditFragment.Companion.TEMP_UUID
 import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+//private val logger: FluentLogger = FluentLogger.forEnclosingClass()
 
-/**
- * A [Fragment] for editing a [Party].
- */
-@AndroidEntryPoint
-class PartyEditFragment : Fragment() {
-    private val mainViewModel: MainViewModel by activityViewModels()
+private fun reroll(mainViewModel: MainViewModel, scope: CoroutineScope, party: Party?) {
+    party?.let {
+        scope.launch {
+            val categoryNames = it.getAllCategoryNames()
 
-    private var partyUuid = TEMP_UUID
-    var party: Party? = null
+            val categories = mainViewModel.getCategoriesByName(categoryNames)
+            val assignees = mainViewModel.getCategoryByName(it.assigneeList)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val uuidString = arguments?.getString(resources.getString(R.string.key_uuid))
-        partyUuid = UUID.fromString(uuidString)
-
-        party = mainViewModel.parties.value
-            ?.first { parties -> parties.uid == partyUuid }
-
-        if(uuidString == mainViewModel.editPartyUuid) {
-            return ComposeView(requireContext()).apply {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                setContent {
-                    PartyEditScreen()
-                }
+            if (assignees == null) {
+                logger.atWarning().log("Category %s not found", it.assigneeList)
+                return@launch
             }
-        }
 
+            mainViewModel.editPartyMembers.clear()
+            mainViewModel.editPartyMembers.addAll(Parties.roll(assignees.things, categories))
+        }
+    }
+}
+
+@Composable
+fun PartyEditScreen(mainViewModel: MainViewModel = hiltViewModel(),
+                    id: String,
+                    toPartyList: () -> Unit = {}) {
+    var party = mainViewModel.parties.value
+        ?.first { parties -> parties.uid == UUID.fromString(id) }
+    val coroutineScope = rememberCoroutineScope()
+
+    if(id != mainViewModel.editPartyUuid) {
         party?.let {
-            logger.atInfo().log("Members size " + it.members.size)
             mainViewModel.editPartyMembers.clear()
             mainViewModel.editPartyMembers.addAll(it.members)
             mainViewModel.editPartyName = it.partyName
             mainViewModel.editPartyUuid = it.uid.toString()
         }
-
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                PartyEditScreen()
-            }
-        }
     }
 
+    Column {
+        TextField(value = mainViewModel.editPartyName,
+            onValueChange = { mainViewModel.editPartyName = it },
+            label = { Text(stringResource(R.string.hint_match_name)) }
+        )
+        LazyColumn(Modifier.weight(1f)) {
+            items(mainViewModel.editPartyMembers) { item ->
+                MemberEditItem(member = item)
+            }
+        }
+        Button(onClick = { reroll(mainViewModel, coroutineScope, party) }) {
+            Text(text = stringResource(R.string.reroll))
+        }
+        Button(onClick = {
+            party?.let {
+                it.partyName = mainViewModel.editPartyName
+                it.members.clear()
+                it.members.addAll(mainViewModel.editPartyMembers)
 
-    private fun reroll() {
-        party?.let {
-            lifecycleScope.launch {
-                val categoryNames = it.getAllCategoryNames()
-
-                val categories = mainViewModel.getCategoriesByName(categoryNames)
-                val assignees = mainViewModel.getCategoryByName(it.assigneeList)
-
-                if (assignees == null) {
-                    logger.atWarning().log("Category %s not found", it.assigneeList)
-                    return@launch
-                }
+                logger.atInfo().log("Inserting party %s", it)
+                mainViewModel.insertParty(it)
 
                 mainViewModel.editPartyMembers.clear()
-                mainViewModel.editPartyMembers.addAll(Parties.roll(assignees.things, categories))
+                mainViewModel.editPartyName = ""
+                mainViewModel.editPartyUuid = ""
             }
+
+            toPartyList()
+        }) {
+            Text(text = stringResource(R.string.save))
         }
     }
 
-    @Composable
-    fun PartyEditScreen() {
-        Column {
-            TextField(value = mainViewModel.editPartyName,
-                onValueChange = { mainViewModel.editPartyName = it },
-                label = { Text(resources.getString(R.string.hint_match_name)) }
-            )
-            LazyColumn(Modifier.weight(1f)) {
-                items(mainViewModel.editPartyMembers) { item ->
-                    MemberEditItem(member = item)
-                }
-            }
-            Button(onClick = { reroll() }) {
-                Text(text = resources.getString(R.string.reroll))
-            }
-            Button(onClick = {
-                party?.let {
-                    it.partyName = mainViewModel.editPartyName
-                    it.members.clear()
-                    it.members.addAll(mainViewModel.editPartyMembers)
+}
 
-                    logger.atInfo().log("Inserting party %s", it)
-                    mainViewModel.insertParty(it)
-
-                    mainViewModel.editPartyMembers.clear()
-                    mainViewModel.editPartyName = ""
-                    mainViewModel.editPartyUuid = ""
-                }
-
-                findNavController().navigate(R.id.action_PartyEditFragment_to_PartyListFragment)
-            }) {
-                Text(text = resources.getString(R.string.save))
-            }
-        }
-
-    }
-
-    @Composable
-    fun MemberEditItem(member: Member) {
-        Column {
-            Text(member.assignee)
-            Text(member.assignments
-                .map { assignment -> assignment.key + ": " + assignment.value }.joinToString()
-            )
-        }
-    }
-
-    companion object {
-        private val logger: FluentLogger = FluentLogger.forEnclosingClass()
+@Composable
+fun MemberEditItem(member: Member) {
+    Column {
+        Text(member.assignee)
+        Text(member.assignments
+            .map { assignment -> assignment.key + ": " + assignment.value }.joinToString()
+        )
     }
 }
