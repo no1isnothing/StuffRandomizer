@@ -11,6 +11,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -32,7 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-//private val logger: FluentLogger = FluentLogger.forEnclosingClass()
+private val partyEditlogger: FluentLogger = FluentLogger.forEnclosingClass()
 
 private fun reroll(mainViewModel: MainViewModel, scope: CoroutineScope, party: Party?) {
     party?.let {
@@ -57,11 +59,16 @@ private fun reroll(mainViewModel: MainViewModel, scope: CoroutineScope, party: P
 fun PartyEditScreen(mainViewModel: MainViewModel = hiltViewModel(),
                     id: String,
                     toPartyList: () -> Unit = {}) {
-    var party = mainViewModel.parties.value
-        ?.first { parties -> parties.uid == UUID.fromString(id) }
-    val coroutineScope = rememberCoroutineScope()
+    partyEditlogger.atInfo().log("ID %s", id)
+    val partyList by mainViewModel.parties.observeAsState(listOf())
 
-    if(id != mainViewModel.editPartyUuid) {
+    partyEditlogger.atInfo().log("Party size %s", mainViewModel.parties.value?.size)
+    mainViewModel.parties.value?.forEach { logger.atInfo().log("Id %s", it.uid)}
+    //first { parties -> parties.uid.toString() == id  }
+    val coroutineScope = rememberCoroutineScope()
+    var party = partyList.first { parties -> parties.uid.toString() == id }
+    if(!id.equals(mainViewModel.editPartyUuid)) {
+        partyEditlogger.atInfo().log("Loading information for party %s", party)
         party?.let {
             mainViewModel.editPartyMembers.clear()
             mainViewModel.editPartyMembers.addAll(it.members)

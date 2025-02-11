@@ -2,6 +2,8 @@ package com.thebipolaroptimist.stuffrandomizer
 
 import android.app.Application
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,6 +13,7 @@ import com.thebipolaroptimist.stuffrandomizer.ui.CategoryCreationScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.CategoryEditScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.CategoryListScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.HomeScreen
+import com.thebipolaroptimist.stuffrandomizer.ui.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.ui.PartyCreationScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.PartyEditScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.PartyListScreen
@@ -33,35 +36,64 @@ fun StuffRandomizerNavHost(
 ) {
     NavHost(navController = navController, startDestination = HomeNav) {
         composable<HomeNav> {
-            HomeScreen(toPartyCreation = { navController.navigate(PartyCreationNav) },
+            HomeScreen(
+                toPartyCreation = { navController.navigate(PartyCreationNav) },
                 toCategoryList = { navController.navigate(CategoryListNav) },
                 toPartyList = { navController.navigate(PartyListNav) })
         }
         composable<CategoryCreationNav> {
-            CategoryCreationScreen(
+                backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(HomeNav)
+            }
+            val parentViewModel = hiltViewModel<MainViewModel>(parentEntry)
+            CategoryCreationScreen(parentViewModel,
                 toCategoryList = { navController.navigate(CategoryListNav) }
             )
         }
         composable<CategoryEditNav> {
             backStackEntry ->
             val categoryEdit = backStackEntry.toRoute<CategoryEditNav>()
-            CategoryEditScreen(id = categoryEdit.id)
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(HomeNav)
+            }
+            val parentViewModel = hiltViewModel<MainViewModel>(parentEntry)
+            CategoryEditScreen(parentViewModel, id = categoryEdit.id)
 
         }
         composable<CategoryListNav> {
-            CategoryListScreen(toCategoryCreation = { navController.navigate(CategoryCreationNav) },
+                backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(HomeNav)
+            }
+            val parentViewModel = hiltViewModel<MainViewModel>(parentEntry)
+            CategoryListScreen(parentViewModel, toCategoryCreation = { navController.navigate(CategoryCreationNav) },
                 toCategoryEdit = { id -> navController.navigate(CategoryEditNav(id))})
         }
         composable<PartyCreationNav> {
-            PartyCreationScreen( toPartyList = { navController.navigate(PartyListNav)})
+                backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(HomeNav)
+            }
+            val parentViewModel = hiltViewModel<MainViewModel>(parentEntry)
+            PartyCreationScreen(parentViewModel, toPartyList = { navController.navigate(PartyListNav)})
         }
         composable<PartyEditNav> {
             backStackEntry ->
             val partyEdit = backStackEntry.toRoute<PartyEditNav>()
-            PartyEditScreen(id = partyEdit.id)
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(HomeNav)
+            }
+            val parentViewModel = hiltViewModel<MainViewModel>(parentEntry)
+            PartyEditScreen(parentViewModel,id = partyEdit.id)
         }
         composable<PartyListNav> {
-            PartyListScreen(toPartyCreation = { navController.navigate(PartyCreationNav) },
+                backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(HomeNav)
+            }
+            val parentViewModel = hiltViewModel<MainViewModel>(parentEntry)
+            PartyListScreen(parentViewModel, toPartyCreation = { navController.navigate(PartyCreationNav) },
                 toPartyEdit = { uuid ->  navController.navigate(PartyEditNav(uuid)) })
         }
     }

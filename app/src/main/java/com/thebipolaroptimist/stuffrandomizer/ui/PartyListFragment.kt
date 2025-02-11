@@ -69,7 +69,7 @@ fun PartyListScreen(mainViewModel: MainViewModel = hiltViewModel(),
 
 @Composable
 fun PartyItem(party: Party, toPartyEdit: (uuid: String) -> Unit) {
-    logger.atInfo().log("Creating Party %s", party.partyName)
+    logger.atInfo().log("Creating Party %s Id %s", party.partyName, party.uid)
     Row(
         Modifier
             .fillMaxWidth()
