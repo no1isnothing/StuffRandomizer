@@ -26,9 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Party
-import com.google.common.flogger.FluentLogger
-
-private val partyListLogger = FluentLogger.forEnclosingClass()
 
 /**
  * A [Composable] for displaying [Party]s.
@@ -62,8 +59,6 @@ fun PartyListScreen(mainViewModel: MainViewModel = hiltViewModel(),
         LazyColumn(Modifier.fillMaxSize()
             .padding(padding)) {
             items(partyList) { item ->
-
-                partyListLogger.atInfo().log("Creating Party %s Id %s", item.partyName, item.uid)
                 PartyItem(item, toPartyEdit)
             }
         }

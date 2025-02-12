@@ -12,6 +12,7 @@ import com.thebipolaroptimist.stuffrandomizer.data.MainRepository
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.google.common.flogger.FluentLogger
 import com.thebipolaroptimist.stuffrandomizer.data.Member
+import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -49,6 +50,12 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
         newCategoryName = ""
         newThing = ""
         newThings.clear()
+    }
+
+    fun clearEditedParty() {
+        editPartyMembers.clear()
+        editPartyName = ""
+        editPartyUuid = ""
     }
 
     fun insertParty(party: Party) {
@@ -102,5 +109,60 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
         viewModelScope.launch {
             mainRepository.deleteAllParties()
         }
+    }
+
+    fun createAndInsertParty(
+        categoryList: List<Category>,
+    ): Boolean {
+        val selectedCategoryList = ArrayList<Category>()
+        val assigneeList = categoryList[newAssigneeSelection]
+
+        for ((index, checkBoxState) in newPartyCheckedSate.withIndex()) {
+            if (checkBoxState) {
+                selectedCategoryList.add(categoryList[index])
+            }
+        }
+        if (selectedCategoryList.isEmpty()) {
+            return false
+        }
+
+        val party = Parties.create(newPartyName, assigneeList, selectedCategoryList)
+        insertParty(party)
+        return true
+    }
+
+    fun rerollEditPartyMembers(party: Party) {
+        viewModelScope.launch {
+            val categories = getCategoriesByName(party.getAllCategoryNames())
+            val assignees = getCategoryByName(party.assigneeList)
+
+            if (assignees == null) {
+                logger.atWarning().log("Category %s not found", party.assigneeList)
+                return@launch
+            }
+
+            editPartyMembers.clear()
+            editPartyMembers.addAll(Parties.roll(assignees.things, categories))
+        }
+    }
+
+    fun saveEditedParty(party: Party) {
+        party.apply {
+            partyName = editPartyName
+            members.clear()
+            members.addAll(editPartyMembers)
+        }
+        logger.atInfo().log("Inserting edited party %s", party)
+        insertParty(party)
+    }
+
+    fun loadEditParty(party: Party) {
+        logger.atInfo().log("Loading information for party %s", party)
+
+        editPartyMembers.clear()
+        editPartyMembers.addAll(party.members)
+        editPartyName = party.partyName
+        editPartyUuid = party.uid.toString()
+
     }
 }

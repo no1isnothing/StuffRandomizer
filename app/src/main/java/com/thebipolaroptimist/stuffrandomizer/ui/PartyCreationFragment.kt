@@ -1,6 +1,5 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -38,47 +37,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.Party
-import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
-
-
-private fun createParty(
-    categoryList: List<Category>,
-    mainViewModel: MainViewModel,
-    context: Context
-): Boolean {
-    if (mainViewModel.newPartyName.isEmpty()) {
-        Toast.makeText(
-            context,
-            context.getString(R.string.warning_match_name_empty),
-            Toast.LENGTH_SHORT
-        )
-            .show()
-        return false
-    }
-
-    val selectedCategoryList = ArrayList<Category>()
-    val assigneeList = categoryList[mainViewModel.newAssigneeSelection]
-
-    for ((index, checkBoxState) in mainViewModel.newPartyCheckedSate.withIndex()) {
-        if (checkBoxState) {
-            selectedCategoryList.add(categoryList[index])
-        }
-    }
-    if (selectedCategoryList.isEmpty()) {
-        Toast.makeText(
-            context,
-            context.getString(R.string.warning_match_assignments_empty),
-            Toast.LENGTH_SHORT
-        )
-            .show()
-        return false
-    }
-
-    val party = Parties.create(mainViewModel.newPartyName, assigneeList, selectedCategoryList)
-    mainViewModel.insertParty(party)
-    return true
-}
-
 
 /**
  * A [Composable] for creating [Party]s.
@@ -131,9 +89,26 @@ fun PartyCreationScreen(
                 }
             }
             Button(onClick = {
-                if (createParty(categoryList, mainViewModel, context)) {
+                if (mainViewModel.newPartyName.isEmpty()) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.warning_match_name_empty),
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                    return@Button
+                }
+
+                if (mainViewModel.createAndInsertParty(categoryList)) {
                     mainViewModel.clearNewParty()
                     toPartyList()
+                } else {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.warning_match_assignments_empty),
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
                 }
             }) {
                 Text(stringResource(R.string.roll))

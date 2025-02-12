@@ -61,6 +61,11 @@ fun CategoryEditScreen(
                 navigationIcon = {
                     IconButton(onClick = {
                         category?.let {
+                            if(mainViewModel.editThings.isEmpty()) {
+                                Toast.makeText(context, context.getString(R.string.warning_empty_item_list), Toast.LENGTH_SHORT)
+                                    .show()
+                                return@IconButton
+                            }
                             it.things = mainViewModel.editThings
                             it.name = mainViewModel.editCategoryName
                             mainViewModel.insertCategory(it)

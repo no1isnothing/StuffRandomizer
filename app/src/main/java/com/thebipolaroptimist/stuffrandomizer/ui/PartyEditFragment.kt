@@ -17,39 +17,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.common.flogger.FluentLogger
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Member
-import com.thebipolaroptimist.stuffrandomizer.data.Party
-import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-
-
-private fun reroll(mainViewModel: MainViewModel, scope: CoroutineScope, party: Party?) {
-    party?.let {
-        scope.launch {
-            val categoryNames = it.getAllCategoryNames()
-
-            val categories = mainViewModel.getCategoriesByName(categoryNames)
-            val assignees = mainViewModel.getCategoryByName(it.assigneeList)
-
-            if (assignees == null) {
-                partyEditLogger.atWarning().log("Category %s not found", it.assigneeList)
-                return@launch
-            }
-
-            mainViewModel.editPartyMembers.clear()
-            mainViewModel.editPartyMembers.addAll(Parties.roll(assignees.things, categories))
-        }
-    }
-}
-
-val partyEditLogger: FluentLogger = FluentLogger.forEnclosingClass()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,19 +29,13 @@ fun PartyEditScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
     id: String,
     navigateBack: () -> Unit = {},
-    toPartyList: () -> Unit = {}
 ) {
     val partyList by mainViewModel.parties.observeAsState(listOf())
-    val coroutineScope = rememberCoroutineScope()
+
     val party = partyList.firstOrNull { parties -> parties.uid.toString() == id }
-    if (id != mainViewModel.editPartyUuid) {
-        partyEditLogger.atInfo().log("Loading information for party %s", party)
-        party?.let {
-            mainViewModel.editPartyMembers.clear()
-            mainViewModel.editPartyMembers.addAll(it.members)
-            mainViewModel.editPartyName = it.partyName
-            mainViewModel.editPartyUuid = it.uid.toString()
-        }
+
+    if (id != mainViewModel.editPartyUuid && party != null) {
+        mainViewModel.loadEditParty(party)
     }
 
     Scaffold(
@@ -98,24 +64,20 @@ fun PartyEditScreen(
                     MemberEditItem(member = item)
                 }
             }
-            Button(onClick = { reroll(mainViewModel, coroutineScope, party) }) {
+            Button(onClick = {
+                if (party != null) {
+                    mainViewModel.rerollEditPartyMembers(party)
+                }
+            }) {
                 Text(text = stringResource(R.string.reroll))
             }
             Button(onClick = {
-                party?.let {
-                    it.partyName = mainViewModel.editPartyName
-                    it.members.clear()
-                    it.members.addAll(mainViewModel.editPartyMembers)
-
-                    partyEditLogger.atInfo().log("Inserting party %s", it)
-                    mainViewModel.insertParty(it)
-
-                    mainViewModel.editPartyMembers.clear()
-                    mainViewModel.editPartyName = ""
-                    mainViewModel.editPartyUuid = ""
+                if (party != null) {
+                    mainViewModel.saveEditedParty(party)
+                    mainViewModel.clearEditedParty()
                 }
 
-                toPartyList()
+                navigateBack()
             }) {
                 Text(text = stringResource(R.string.save))
             }

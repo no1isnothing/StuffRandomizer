@@ -38,9 +38,7 @@ fun StuffRandomizerNavHost(
                 navigateBack = { navController.popBackStack() },
                 toCategoryList = {
                     navController.navigate(CategoryListNav) {
-                        popUpTo(CategoryCreationNav) {
-                            inclusive = true
-                        }
+                        popUpTo(HomeNav)
                     }
                 }
             )
@@ -77,9 +75,7 @@ fun StuffRandomizerNavHost(
                 navigateBack = { navController.popBackStack() },
                 toPartyList = {
                     navController.navigate(PartyListNav) {
-                        popUpTo(PartyCreationNav) {
-                            inclusive = true
-                        }
+                        popUpTo(HomeNav)
                     }
                 })
         }
@@ -91,8 +87,7 @@ fun StuffRandomizerNavHost(
             val viewModel = hiltViewModel<MainViewModel>(homeEntry)
             PartyEditScreen(viewModel,
                 id = partyEdit.id,
-                navigateBack = { navController.popBackStack() },
-                toPartyList = { navController.navigate(PartyListNav) })
+                navigateBack = { navController.popBackStack() })
         }
         composable<PartyListNav> { backStackEntry ->
             val homeEntry = remember(backStackEntry) {
