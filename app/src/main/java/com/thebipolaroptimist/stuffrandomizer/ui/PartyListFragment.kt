@@ -1,10 +1,5 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,42 +9,48 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Party
-import com.thebipolaroptimist.stuffrandomizer.databinding.FragmentPartyListBinding
 import com.google.common.flogger.FluentLogger
-import dagger.hilt.android.AndroidEntryPoint
-import java.util.UUID
+
+private val partyListLogger = FluentLogger.forEnclosingClass()
 
 /**
  * A [Composable] for displaying [Party]s.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartyListScreen(mainViewModel: MainViewModel = hiltViewModel(),
+                    navigateBack: ()-> Unit = {},
                     toPartyCreation: () -> Unit = {},
                     toPartyEdit: (uuid: String) -> Unit) {
     val partyList by mainViewModel.parties.observeAsState(listOf())
 
     Scaffold(
+        topBar = { TopAppBar(title = { Text(stringResource(id = R.string.party_list_fragment_label)) },
+            navigationIcon = {
+                IconButton(onClick = { navigateBack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(id = R.string.back)
+                    )
+                }
+            }) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { toPartyCreation() },
@@ -61,6 +62,8 @@ fun PartyListScreen(mainViewModel: MainViewModel = hiltViewModel(),
         LazyColumn(Modifier.fillMaxSize()
             .padding(padding)) {
             items(partyList) { item ->
+
+                partyListLogger.atInfo().log("Creating Party %s Id %s", item.partyName, item.uid)
                 PartyItem(item, toPartyEdit)
             }
         }
@@ -69,7 +72,6 @@ fun PartyListScreen(mainViewModel: MainViewModel = hiltViewModel(),
 
 @Composable
 fun PartyItem(party: Party, toPartyEdit: (uuid: String) -> Unit) {
-    logger.atInfo().log("Creating Party %s Id %s", party.partyName, party.uid)
     Row(
         Modifier
             .fillMaxWidth()

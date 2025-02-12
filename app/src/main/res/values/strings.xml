@@ -28,6 +28,7 @@
     <string name="warning_match_name_empty">Can\'t Save Match Without Name</string>
     <string name="warning_match_assignments_empty">Can\'t Create Match Without Selecting Assignment Lists</string>
     <string name="expand">expand</string>
+    <string name="back">back</string>
 
     <!-- Strings used for fragments for navigation -->
     <string name="home_fragment_label">Home</string>

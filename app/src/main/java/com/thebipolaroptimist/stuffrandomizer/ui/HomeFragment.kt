@@ -1,9 +1,5 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,58 +10,54 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.fragment.findNavController
 import com.thebipolaroptimist.stuffrandomizer.R
-import dagger.hilt.android.AndroidEntryPoint
+import com.thebipolaroptimist.stuffrandomizer.data.Category
+import com.thebipolaroptimist.stuffrandomizer.data.Member
+import com.thebipolaroptimist.stuffrandomizer.data.Party
+import java.util.UUID
 
 /**
- * A simple [Fragment] subclass as the default destination in the navigation.
+ * A simple [Composable] as the default destination in the navigation.
  */
-@AndroidEntryPoint
-class HomeFragment : Fragment() {
-    private val mainViewModel: MainViewModel by viewModels()
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                HomeScreen()
-            }
-        }
-    }
-}
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun HomeScreen(mainViewModel: MainViewModel = hiltViewModel(),
-               toPartyCreation: () -> Unit = {},
-               toPartyList: () -> Unit = {},
-               toCategoryList: () -> Unit = {},) {
+fun HomeScreen(
+    mainViewModel: MainViewModel = hiltViewModel(),
+    toPartyCreation: () -> Unit = {},
+    toPartyList: () -> Unit = {},
+    toCategoryList: () -> Unit = {},
+) {
     val parties by mainViewModel.parties.observeAsState(listOf())
+    var menuExpanded by remember {
+        mutableStateOf(false)
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -74,7 +66,30 @@ fun HomeScreen(mainViewModel: MainViewModel = hiltViewModel(),
             ) {
                 Icon(Icons.Filled.Add, stringResource(R.string.add_match))
             }
-        })
+        },
+        topBar = {
+            TopAppBar(title = { stringResource(id = R.string.home_fragment_label) },
+                actions = {
+                    IconButton(onClick = { menuExpanded = !menuExpanded }) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description"
+                        )
+                    }
+                    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                        // TODO #7: Remove, hide behind flag, or update to be 'default data'
+                        DropdownMenuItem(
+                            text = { Text(stringResource(id = R.string.action_add_data)) },
+                            onClick = { addSampleData(mainViewModel) })
+                        // TODO #7: Remove, hide behind flag, or move to advanced settings with a warning
+                        DropdownMenuItem(
+                            text = { Text(stringResource(id = R.string.action_clear_data)) },
+                            onClick = { clearAllData(mainViewModel) })
+                    }
+                }
+            )
+        }
+    )
     { padding ->
         Column(
             modifier = Modifier
@@ -100,7 +115,7 @@ fun HomeScreen(mainViewModel: MainViewModel = hiltViewModel(),
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.CenterStart
                 ) {
-                    if(parties.isNotEmpty()) {
+                    if (parties.isNotEmpty()) {
                         Text(
                             modifier = Modifier
                                 .padding(16.dp),
@@ -146,3 +161,68 @@ fun HomeScreen(mainViewModel: MainViewModel = hiltViewModel(),
         }
     }
 }
+
+
+private fun addSampleData(mainViewModel: MainViewModel) {
+    mainViewModel.insertParty(createSamplePartyData())
+    mainViewModel.insertCategories(createSampleCategoryData())
+}
+
+private fun clearAllData(mainViewModel: MainViewModel) {
+    mainViewModel.deleteAllCategories()
+    mainViewModel.deleteParties()
+}
+
+private fun createSamplePartyData(): Party = Party(
+    UUID.randomUUID(),
+    "Skyrim 2024",
+    arrayListOf(
+        Member("Jane", hashMapOf(Pair("Aedra", "Talos"), Pair("Daedra", "Clavicus Vile"))),
+        Member("Bear", hashMapOf(Pair("Aedra", "Mara"), Pair("Daedra", "Peryite"))),
+        Member("The Tooth Fairy", hashMapOf(Pair("Aedra", "Julianos"), Pair("Daedra", "Vaermina"))),
+        Member("Gifty", hashMapOf(Pair("Aedra", "Stendar"), Pair("Daedra", "Merida"))),
+    ),
+    "Friends"
+)
+
+private fun createSampleCategoryData(): List<Category> = listOf(
+    Category(
+        UUID.randomUUID(),
+        "Aedra",
+        listOf(
+            "Talos",
+            "Julianos",
+            "Arkay",
+            "Akatosh",
+            "Mara",
+            "Stendarr",
+            "Dibella",
+            "Kynareth",
+            "Zenithar"
+        )
+    ),
+    Category(
+        UUID.randomUUID(),
+        "Daedra",
+        listOf(
+            "Clavicus Vile",
+            "Meridia",
+            "Peryite",
+            "Azura",
+            "Molag Bal",
+            "Hermaus Mora",
+            "Vaermina",
+            "Nocturnal"
+        )
+    ),
+    Category(
+        UUID.randomUUID(),
+        "Friends",
+        listOf(
+            "Jane",
+            "Bear",
+            "Gift",
+            "The Tooth Fairy"
+        )
+    )
+)
