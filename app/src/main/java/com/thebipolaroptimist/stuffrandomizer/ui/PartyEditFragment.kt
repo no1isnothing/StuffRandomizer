@@ -74,7 +74,6 @@ fun PartyEditScreen(
             Button(onClick = {
                 if (party != null) {
                     mainViewModel.saveEditedParty(party)
-                    mainViewModel.clearEditedParty()
                 }
 
                 navigateBack()

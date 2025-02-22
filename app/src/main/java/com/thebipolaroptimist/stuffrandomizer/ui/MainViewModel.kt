@@ -19,8 +19,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 /**
- * A [ViewModel] for interactions between the [MainActivity] and it's Fragment
- * and the [MainRepository].
+ * A [ViewModel] for interactions between the [MainActivity], screens, and the [MainRepository].
  */
 @HiltViewModel
 class MainViewModel @Inject constructor(private val mainRepository: MainRepository) : ViewModel() {
@@ -40,45 +39,82 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     var newPartyCheckedSate = mutableStateListOf<Boolean>()
     var newAssigneeSelection by mutableStateOf(0)
 
-    fun clearNewParty() {
+    /**
+     * Reset data for [Party] being created.
+     */
+    fun resetNewParty() {
         newPartyName = ""
         newPartyCheckedSate.clear()
         newAssigneeSelection = 0
     }
 
-    fun clearNewCategory() {
+    /**
+     * Reset data for [Category] being created.
+     */
+    fun resetNewCategory() {
         newCategoryName = ""
         newThing = ""
         newThings.clear()
     }
 
-    fun clearEditedParty() {
+    /**
+     * Reset data for [Party] being edited.
+     */
+    fun resetEditedParty() {
         editPartyMembers.clear()
         editPartyName = ""
         editPartyUuid = ""
     }
 
+    /**
+     * Insert a [Party] into the [MainRepository].
+     *
+     * @param party The party to insert
+     */
     fun insertParty(party: Party) {
         viewModelScope.launch {
             mainRepository.insertParty(party)
         }
     }
 
+    /**
+     * Insert a [Category] into the [MainRepository].
+     *
+     * @param category The category to insert.
+     */
     fun insertCategory(category: Category) {
         viewModelScope.launch {
-            clearNewParty()
+            resetNewParty()
             mainRepository.insertCategory(category)
         }
     }
 
+    /**
+     * Insert [List] of [Category]s into [MainRepository].
+     *
+     * @param categories List of categories to insert.
+     */
     fun insertCategories(categories: List<Category>) {
         viewModelScope.launch {
-            clearNewParty()
+            resetNewParty()
             mainRepository.insertCategories(categories)
         }
     }
 
-    fun saveCategory() {
+    /**
+     * Create and save [Category] using new category variables.
+     *
+     * This functions uses the [newCategoryName] and [newThings]
+     * to create a new [Category] object. Then inserts the [Category]
+     * into the [MainRepository] and resets the new category and new party variables.
+     *
+     * @return false if [newCategoryName] or [newThings] is empty and insert isn't attempted,
+     *         true otherwise.
+     */
+    fun saveNewCategory(): Boolean {
+        if(newCategoryName.isEmpty() || newThings.isEmpty()) {
+            return false
+        }
         viewModelScope.launch {
             mainRepository.insertCategory(
                 Category(
@@ -87,31 +123,39 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
                     newThings
                 )
             )
-            clearNewCategory()
-            clearNewParty()
+            resetNewCategory()
+            resetNewParty()
         }
+        return true
     }
 
-    suspend fun getCategoriesByName(categoryNames: List<String>): List<Category> =
-        mainRepository.getCategoriesByName(categoryNames)
-
-    suspend fun getCategoryByName(categoryName: String) =
-        mainRepository.getCategoryByName(categoryName)
-
+    /**
+     * Delete all [Category]s from [MainRepository].
+     */
     fun deleteAllCategories() {
         viewModelScope.launch {
-            clearNewParty()
+            resetNewParty()
             mainRepository.deleteAllCategories()
         }
     }
 
-    fun deleteParties() {
+    /**
+     * Delete all [Party]s from [MainRepository]/
+     */
+    fun deleteAllParties() {
         viewModelScope.launch {
             mainRepository.deleteAllParties()
         }
     }
 
-    fun createAndInsertParty(
+    /**
+     * Create and save [Party] with new party variables.
+     *
+     * Use the [newAssigneeSelection] and [newPartyCheckedSate] to gather data for making a new
+     * [Party]. Then make the new [Party] and insert into [MainRepository].
+     *
+     */
+    fun createAndSaveNewParty(
         categoryList: List<Category>,
     ): Boolean {
         val selectedCategoryList = ArrayList<Category>()
@@ -128,9 +172,13 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
 
         val party = Parties.create(newPartyName, assigneeList, selectedCategoryList)
         insertParty(party)
+        resetNewParty()
         return true
     }
 
+    /**
+     *  Redo the randomization for things in [Category]s assigned to [editPartyMembers].
+     */
     fun rerollEditPartyMembers(party: Party) {
         viewModelScope.launch {
             val categories = getCategoriesByName(party.getAllCategoryNames())
@@ -146,6 +194,11 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
         }
     }
 
+    /**
+     * Save [party] with [editPartyMembers] and [editPartyName].
+     *
+     * @param party Party to save with edit variables.
+     */
     fun saveEditedParty(party: Party) {
         party.apply {
             partyName = editPartyName
@@ -154,8 +207,14 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
         }
         logger.atInfo().log("Inserting edited party %s", party)
         insertParty(party)
+        resetEditedParty()
     }
 
+    /**
+     *  Set edit party variables from [party]
+     *
+     *  @param party Party to use to set edit variables.
+     */
     fun loadEditParty(party: Party) {
         logger.atInfo().log("Loading information for party %s", party)
 
@@ -165,4 +224,10 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
         editPartyUuid = party.uid.toString()
 
     }
+
+    private suspend fun getCategoriesByName(categoryNames: List<String>): List<Category> =
+        mainRepository.getCategoriesByName(categoryNames)
+
+    private suspend fun getCategoryByName(categoryName: String) =
+        mainRepository.getCategoryByName(categoryName)
 }

@@ -170,7 +170,7 @@ private fun addSampleData(mainViewModel: MainViewModel) {
 
 private fun clearAllData(mainViewModel: MainViewModel) {
     mainViewModel.deleteAllCategories()
-    mainViewModel.deleteParties()
+    mainViewModel.deleteAllParties()
 }
 
 private fun createSamplePartyData(): Party = Party(

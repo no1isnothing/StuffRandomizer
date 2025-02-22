@@ -99,8 +99,7 @@ fun PartyCreationScreen(
                     return@Button
                 }
 
-                if (mainViewModel.createAndInsertParty(categoryList)) {
-                    mainViewModel.clearNewParty()
+                if (mainViewModel.createAndSaveNewParty(categoryList)) {
                     toPartyList()
                 } else {
                     Toast.makeText(

@@ -92,7 +92,7 @@ import com.thebipolaroptimist.stuffrandomizer.data.Category
                             .show()
                         return@Button
                     }
-                    mainViewModel.saveCategory()
+                    mainViewModel.saveNewCategory()
                     toCategoryList()
                 }) {
                     Text(stringResource(R.string.save))
@@ -102,7 +102,7 @@ import com.thebipolaroptimist.stuffrandomizer.data.Category
                         .setMessage(context.getString(R.string.discard_draft))
                         .setNegativeButton(context.getString(R.string.cancel)) { _, _ -> }
                         .setPositiveButton(context.getString(R.string.discard)) { _, _ ->
-                            mainViewModel.clearNewCategory()
+                            mainViewModel.resetNewCategory()
                             toCategoryList()
                         }
                         .show()
