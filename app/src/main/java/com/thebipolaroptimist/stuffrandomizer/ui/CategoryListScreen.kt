@@ -1,10 +1,6 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -53,27 +49,11 @@ fun CategoryListScreen(
                 .padding(padding)
         ) {
             items(categoryList) { item ->
-                CategoryItem(item, toCategoryEdit)
+                ClickableTwoLineItem(item.name,
+                    item.things.joinToString(),
+                    item.uid.toString(),
+                    toCategoryEdit)
             }
         }
-    }
-}
-
-@Composable
-fun CategoryItem(
-    category: Category,
-    toCategoryEdit: (uuid: String) -> Unit
-) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .clickable {
-                toCategoryEdit(category.uid.toString())
-            }) {
-        Column {
-            Text(category.name)
-            Text(text = category.things.joinToString())
-        }
-
     }
 }
