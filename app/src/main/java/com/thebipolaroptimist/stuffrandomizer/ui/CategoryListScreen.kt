@@ -11,8 +11,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -38,14 +38,14 @@ fun CategoryListScreen(
     val categoryList by mainViewModel.categories.observeAsState(listOf())
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(id = R.string.category_list_fragment_label)) })
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { toCategoryCreation() },
-            ) {
-                Icon(Icons.Filled.Add, stringResource(R.string.add_match))
-            }
+            TopAppBar(title = { Text(stringResource(id = R.string.category_list_fragment_label)) },
+                actions = {
+                    IconButton(
+                        onClick = { toCategoryCreation() },
+                    ) {
+                        Icon(Icons.Filled.Add, stringResource(R.string.add_match))
+                    }
+                } )
         }) { padding ->
         LazyColumn(
             Modifier

@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -32,24 +30,30 @@ import com.thebipolaroptimist.stuffrandomizer.data.Party
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PartyListScreen(mainViewModel: MainViewModel = hiltViewModel(),
-                    toPartyCreation: () -> Unit = {},
-                    toPartyEdit: (uuid: String) -> Unit) {
+fun PartyListScreen(
+    mainViewModel: MainViewModel = hiltViewModel(),
+    toPartyCreation: () -> Unit = {},
+    toPartyEdit: (uuid: String) -> Unit
+) {
     val partyList by mainViewModel.parties.observeAsState(listOf())
 
     Scaffold(
-       topBar = { TopAppBar(title = { Text(stringResource(id = R.string.party_list_fragment_label)) }
-           ) },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { toPartyCreation() },
-            ) {
-                Icon(Icons.Filled.Add, stringResource(R.string.add_match))
-            }
-        }) {
-            padding ->
-        LazyColumn(Modifier.fillMaxSize()
-            .padding(padding)) {
+        topBar = {
+            TopAppBar(title = { Text(stringResource(id = R.string.party_list_fragment_label)) },
+                actions = {
+                    IconButton(
+                        onClick = { toPartyCreation() },
+                    ) {
+                        Icon(Icons.Filled.Add, stringResource(R.string.add_match))
+                    }
+                }
+            )
+        }) { padding ->
+        LazyColumn(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             items(partyList) { item ->
                 PartyItem(item, toPartyEdit)
             }
