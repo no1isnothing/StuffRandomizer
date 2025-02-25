@@ -33,21 +33,13 @@ import com.thebipolaroptimist.stuffrandomizer.data.Party
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartyListScreen(mainViewModel: MainViewModel = hiltViewModel(),
-                    navigateBack: ()-> Unit = {},
                     toPartyCreation: () -> Unit = {},
                     toPartyEdit: (uuid: String) -> Unit) {
     val partyList by mainViewModel.parties.observeAsState(listOf())
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(id = R.string.party_list_fragment_label)) },
-            navigationIcon = {
-                IconButton(onClick = { navigateBack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(id = R.string.back)
-                    )
-                }
-            }) },
+       topBar = { TopAppBar(title = { Text(stringResource(id = R.string.party_list_fragment_label)) }
+           ) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { toPartyCreation() },
