@@ -35,7 +35,7 @@ import com.thebipolaroptimist.stuffrandomizer.data.Category
                                toCategoryList: () -> Unit = {}) {
         val context = LocalContext.current
         Scaffold(
-            topBar = { TopAppBar(title = { Text(stringResource(id = R.string.category_creation_fragment_label)) },
+            topBar = { TopAppBar(title = { Text(stringResource(id = R.string.category_creation_label)) },
                 navigationIcon = {
                     IconButton(onClick = { navigateBack() }) {
                         Icon(

@@ -1,5 +1,6 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
+import android.icu.text.Transliterator.Position
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.math.log
 
 /**
  * A [ViewModel] for interactions between the [MainActivity], screens, and the [MainRepository].
@@ -99,6 +101,11 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
             resetNewParty()
             mainRepository.insertCategories(categories)
         }
+    }
+
+    fun updateEditThings(position: Int, thing: String) {
+        logger.atInfo().log("Updating %d to %s", position, thing)
+        editThings[position] = thing
     }
 
     /**

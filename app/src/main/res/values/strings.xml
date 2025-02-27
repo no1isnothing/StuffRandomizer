@@ -29,12 +29,13 @@
     <string name="warning_match_assignments_empty">Can\'t Create Match Without Selecting Assignment Lists</string>
     <string name="expand">expand</string>
     <string name="back">back</string>
+    <string name="refresh">refresh</string>
 
     <!-- Strings used for fragments for navigation -->
     <string name="home_fragment_label">Home</string>
     <string name="category_list_fragment_label">Item Lists</string>
-    <string name="category_creation_fragment_label">Item Lists Creation</string>
-    <string name="category_edit_fragment_label">Item Lists Edit</string>
+    <string name="category_creation_label">Item List Creation</string>
+    <string name="category_edit_label">Item List Edit</string>
     <string name="party_list_fragment_label">Match Lists</string>
     <string name="party_creation_fragment_label">Match Creation</string>
     <string name="party_edit_fragment_label">Match Edit</string>
