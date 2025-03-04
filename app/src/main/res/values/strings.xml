@@ -9,6 +9,7 @@
     <string name="warning_empty_item">Can\'t Add Empty Items to List</string>
     <string name="warning_list_name_empty">Can\'t Save List Without Name</string>
     <string name="warning_empty_item_list">Can\'t Save List Without Items</string>
+    <string name="removing_empty_category">Removing Empty Category</string>
     <string name="discard_draft">Discard draft?</string>
     <string name="discard">Discard</string>
     <string name="cancel">Cancel</string>
@@ -34,8 +35,7 @@
     <!-- Strings used for fragments for navigation -->
     <string name="home_fragment_label">Home</string>
     <string name="category_list_fragment_label">Item Lists</string>
-    <string name="category_creation_label">Item List Creation</string>
-    <string name="category_edit_label">Item List Edit</string>
+    <string name="category_details_label">Item List Details</string>
     <string name="party_list_fragment_label">Match Lists</string>
     <string name="party_creation_fragment_label">Match Creation</string>
     <string name="party_edit_fragment_label">Match Edit</string>

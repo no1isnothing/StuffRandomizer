@@ -92,6 +92,17 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     }
 
     /**
+     *  Remove [Category] from [MainRepository]
+     *
+     *  @param category The category to delete.
+     */
+    fun deleteCategory(category: Category) {
+        viewModelScope.launch {
+            mainRepository.deleteCategory(category)
+        }
+    }
+
+    /**
      * Insert [List] of [Category]s into [MainRepository].
      *
      * @param categories List of categories to insert.

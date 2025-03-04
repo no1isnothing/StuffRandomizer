@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,31 +32,48 @@ import java.util.UUID
 
 
 /**
- * A simple [Composable] to edit [Category]s.
+ * A simple [Composable] to create/edit [Category]s.
+ *
+ * @param mainViewModel The ViewModel to use for interacting with data.
+ * @param navigateBack A function to handle back navigation.
+ * @param id The UUID for the [Category] to edit, if null create a new category.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoryEditScreen(
+fun CategoryDetailsScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
     navigateBack: () -> Unit = {},
-    id: String
+    id: String?
 ) {
     val context = LocalContext.current
-    val category =
+
+    val category = id?.let {
         mainViewModel.categories
-            .value?.first { category -> category.uid == UUID.fromString(id) }
+            .value?.first { c -> c.uid == UUID.fromString(id) }
+    } ?: Category(UUID.randomUUID(), "", listOf())
 
     mainViewModel.editThings.clear()
-    category?.let {
+    category.let {
         mainViewModel.editThings.addAll(it.things)
         mainViewModel.editCategoryName = it.name
     }
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(id = R.string.category_edit_label)) },
+            TopAppBar(title = { Text(stringResource(id = R.string.category_details_label)) },
                 navigationIcon = {
                     IconButton(onClick = {
-                        category?.let {
+                        category.let {
+                            if(mainViewModel.editCategoryName.isEmpty() && mainViewModel.editThings.isEmpty()) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.removing_empty_category),
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                                mainViewModel.deleteCategory(category)
+                                navigateBack()
+                            }
+
                             if (mainViewModel.editThings.isEmpty()) {
                                 Toast.makeText(
                                     context,
@@ -65,6 +83,17 @@ fun CategoryEditScreen(
                                     .show()
                                 return@IconButton
                             }
+
+                            if (mainViewModel.editCategoryName.isEmpty()) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.warning_list_name_empty),
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                                return@IconButton
+                            }
+
                             it.things =
                                 mainViewModel.editThings.filter { s -> s.isNotEmpty() }.toList()
                             it.name = mainViewModel.editCategoryName
@@ -81,7 +110,7 @@ fun CategoryEditScreen(
                 actions = {
                     IconButton(onClick = {
                         mainViewModel.editThings.clear()
-                        category?.let {
+                        category.let {
                             mainViewModel.editCategoryName = it.name
                             mainViewModel.editThings.addAll(it.things)
                         }
@@ -89,6 +118,16 @@ fun CategoryEditScreen(
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = stringResource(id = R.string.refresh)
+                        )
+                    }
+                    IconButton(onClick = {
+                        mainViewModel.resetEditedParty()
+                        mainViewModel.deleteCategory(category)
+                        navigateBack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(id = R.string.delete)
                         )
                     }
                 }

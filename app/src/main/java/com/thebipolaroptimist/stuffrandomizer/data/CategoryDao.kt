@@ -1,6 +1,7 @@
 package com.thebipolaroptimist.stuffrandomizer.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -23,6 +24,9 @@ interface CategoryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(category: Category)
+
+    @Delete
+    suspend fun delete(category: Category)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(categories: List<Category>)

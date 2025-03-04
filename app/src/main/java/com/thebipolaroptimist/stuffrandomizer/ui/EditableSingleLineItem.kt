@@ -38,7 +38,6 @@ fun EditableSingleLineItem(
                 editedItem = it
                 update(position, editedItem)
             },
-            //label = { Text(stringResource(R.string.hint_item)) },
             trailingIcon = {
                 Icon(Icons.Default.Clear,
                     contentDescription = stringResource(R.string.clear),

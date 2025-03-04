@@ -37,6 +37,10 @@ class MainRepository @Inject constructor(private val partyDao: PartyDao,
         categoryDao.insert(category)
     }
 
+    suspend fun deleteCategory(category: Category) {
+        categoryDao.delete(category)
+    }
+
     suspend fun insertCategories(categories: List<Category>) {
         categoryDao.insert(categories)
     }
