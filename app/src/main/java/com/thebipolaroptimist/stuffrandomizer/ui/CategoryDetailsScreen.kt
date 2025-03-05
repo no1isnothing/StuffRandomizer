@@ -72,6 +72,7 @@ fun CategoryDetailsScreen(
                                     .show()
                                 mainViewModel.deleteCategory(category)
                                 navigateBack()
+                                return@IconButton
                             }
 
                             if (mainViewModel.editThings.isEmpty()) {
@@ -140,11 +141,7 @@ fun CategoryDetailsScreen(
                 value = mainViewModel.editCategoryName,
                 onValueChange = { mainViewModel.editCategoryName = it },
                 label = { Text(stringResource(R.string.hint_list_name)) })
-            Text(
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
-                text = stringResource(id = R.string.items),
-                style = MaterialTheme.typography.titleMedium
-            )
+            LabelText( text = stringResource(id = R.string.items),)
             LazyColumn(Modifier.weight(1f, fill = false)) {
                 itemsIndexed(mainViewModel.editThings) { index, item ->
                     EditableSingleLineItem(text = item, position = index,

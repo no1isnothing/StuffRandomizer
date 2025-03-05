@@ -35,7 +35,7 @@ fun PartyListScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(id = R.string.party_list_fragment_label)) },
+            TopAppBar(title = { Text(stringResource(id = R.string.party_list_label)) },
                 actions = {
                     IconButton(
                         onClick = { toPartyCreation() },

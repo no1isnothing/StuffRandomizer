@@ -44,7 +44,7 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { stringResource(id = R.string.home_fragment_label) },
+            TopAppBar(title = { stringResource(id = R.string.home_label) },
                 actions = {
                     IconButton(onClick = { menuExpanded = !menuExpanded }) {
                         Icon(
@@ -73,7 +73,7 @@ fun HomeScreen(
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(stringResource(id = R.string.home_fragment_label))
+            Text(stringResource(id = R.string.home_label))
         }
     }
 }

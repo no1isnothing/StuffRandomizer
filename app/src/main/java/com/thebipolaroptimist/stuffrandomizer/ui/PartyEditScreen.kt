@@ -40,7 +40,7 @@ fun PartyEditScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(id = R.string.party_edit_fragment_label)) },
+            TopAppBar(title = { Text(stringResource(id = R.string.party_edit_label)) },
                 navigationIcon = {
                     IconButton(onClick = { navigateBack() }) {
                         Icon(

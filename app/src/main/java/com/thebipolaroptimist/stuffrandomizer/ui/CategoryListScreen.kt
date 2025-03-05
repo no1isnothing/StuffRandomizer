@@ -34,7 +34,7 @@ fun CategoryListScreen(
     val categoryList by mainViewModel.categories.observeAsState(listOf())
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(id = R.string.category_list_fragment_label)) },
+            TopAppBar(title = { Text(stringResource(id = R.string.category_list_label)) },
                 actions = {
                     IconButton(
                         onClick = { toCategoryCreation() },

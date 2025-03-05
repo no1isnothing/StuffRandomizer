@@ -14,15 +14,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,11 +31,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.Party
+
+// navigate to match edit after roll
+// show preview of lists for selection?
 
 /**
  * A [Composable] for creating [Party]s.
@@ -58,7 +61,7 @@ fun PartyCreationScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(id = R.string.party_list_fragment_label)) },
+            TopAppBar(title = { Text(stringResource(id = R.string.party_creation_label)) },
                 navigationIcon = {
                     IconButton(onClick = { navigateBack() }) {
                         Icon(
@@ -70,21 +73,28 @@ fun PartyCreationScreen(
         },
     ) { padding ->
         Column(Modifier.padding(padding)) {
-            TextField(
+            OutlinedTextField(
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
                 value = mainViewModel.newPartyName,
                 onValueChange = { mainViewModel.newPartyName = it },
                 label = { Text(stringResource(R.string.hint_match_name)) }
             )
-            Text(stringResource(R.string.assignees))
-            DropDownText(categoryList, mainViewModel)
-            Text(stringResource(R.string.assignments))
+            LabelText(
+                text = stringResource(R.string.assignees),
+            )
+            DropDownText(
+                items = categoryList.map { it.name },
+                onSelect = { index -> mainViewModel.newAssigneeSelection = index})
+            LabelText(
+                text = stringResource(R.string.assignments),
+            )
             LazyColumn(Modifier.weight(1f)) {
                 itemsIndexed(categoryList)
                 { index, category ->
-                    CategorySelectItem(
-                        index = index,
+                    CheckableItem(
                         categoryName = category.name,
-                        mainViewModel
+                        // change to function in view model
+                        onCheck = { checked -> mainViewModel.newPartyCheckedSate[index] = checked }
                     )
                 }
             }
@@ -114,55 +124,4 @@ fun PartyCreationScreen(
             }
         }
     }
-
-}
-
-@Composable
-private fun CategorySelectItem(index: Int, categoryName: String, mainViewModel: MainViewModel) {
-    Row() {
-        Checkbox(
-            checked = mainViewModel.newPartyCheckedSate[index],
-            onCheckedChange = { isChecked ->
-                mainViewModel.newPartyCheckedSate[index] = isChecked
-            }
-        )
-        Text(categoryName)
-    }
-}
-
-
-@Composable
-private fun DropDownText(categories: List<Category>, mainViewModel: MainViewModel) {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-
-    Box(Modifier.wrapContentSize()) {
-        Row(Modifier.clickable { expanded = true }) {
-            if (categories.size > mainViewModel.newAssigneeSelection) {
-                Text(categories[mainViewModel.newAssigneeSelection].name)
-            }
-            Image(
-                Icons.Default.KeyboardArrowDown,
-                contentDescription = stringResource(R.string.expand)
-            )
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-            }) {
-            categories.forEachIndexed { index, category ->
-                DropdownMenuItem(text = {
-                    Text(text = category.name)
-                },
-                    onClick = {
-                        expanded = false
-                        mainViewModel.newAssigneeSelection = index
-                    })
-            }
-        }
-
-    }
-
 }
