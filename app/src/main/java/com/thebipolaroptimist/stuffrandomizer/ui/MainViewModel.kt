@@ -1,7 +1,7 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
-import android.icu.text.Transliterator.Position
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,9 +16,7 @@ import com.thebipolaroptimist.stuffrandomizer.data.Member
 import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
-import kotlin.math.log
 
 /**
  * A [ViewModel] for interactions between the [MainActivity], screens, and the [MainRepository].
@@ -29,34 +27,23 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
 
     val parties = mainRepository.getAllParties().asLiveData()
     val categories = mainRepository.getAllCategories().asLiveData()
-    var newCategoryName by mutableStateOf("")
-    var newThing by mutableStateOf("")
-    var newThings = arrayListOf<String>()
-    var editCategoryName by mutableStateOf("")
-    var editThings = mutableStateListOf<String>()
+    
+    var currentCategoryName by mutableStateOf("")
+    var currentCategoryThings = mutableStateListOf<String>()
     var editPartyName by mutableStateOf("")
     var editPartyMembers = mutableStateListOf<Member>()
     var editPartyUuid by mutableStateOf("")
     var newPartyName by mutableStateOf("")
-    var newPartyCheckedSate = mutableStateListOf<Boolean>()
-    var newAssigneeSelection by mutableStateOf(0)
+    var newPartyCheckedState = mutableStateListOf<Boolean>()
+    var newAssigneeSelection by mutableIntStateOf(0)
 
     /**
      * Reset data for [Party] being created.
      */
-    fun resetNewParty() {
+    private fun resetNewParty() {
         newPartyName = ""
-        newPartyCheckedSate.clear()
+        newPartyCheckedState.clear()
         newAssigneeSelection = 0
-    }
-
-    /**
-     * Reset data for [Category] being created.
-     */
-    fun resetNewCategory() {
-        newCategoryName = ""
-        newThing = ""
-        newThings.clear()
     }
 
     /**
@@ -114,37 +101,29 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
         }
     }
 
-    fun updateEditThings(position: Int, thing: String) {
+    /**
+     * Update [currentCategoryThings] at [position] with [thing].
+     *
+     * @param position The position to update
+     * @param thing The string to put at [position]
+     */
+    fun updateCurrentCategoryThings(position: Int, thing: String) {
         logger.atInfo().log("Updating %d to %s", position, thing)
-        editThings[position] = thing
+        currentCategoryThings[position] = thing
     }
 
     /**
-     * Create and save [Category] using new category variables.
+     * Setup [currentCategoryThings] and [currentCategoryName] using [category]
      *
-     * This functions uses the [newCategoryName] and [newThings]
-     * to create a new [Category] object. Then inserts the [Category]
-     * into the [MainRepository] and resets the new category and new party variables.
-     *
-     * @return false if [newCategoryName] or [newThings] is empty and insert isn't attempted,
-     *         true otherwise.
+     * @param category The [Category] to use to fill out current category variables
      */
-    fun saveNewCategory(): Boolean {
-        if(newCategoryName.isEmpty() || newThings.isEmpty()) {
-            return false
+    fun setupCurrentCategory(category: Category?) {
+        currentCategoryThings.clear()
+
+        category?.let {
+            currentCategoryThings.addAll(it.things)
+            currentCategoryName = it.name
         }
-        viewModelScope.launch {
-            mainRepository.insertCategory(
-                Category(
-                    UUID.randomUUID(),
-                    newCategoryName,
-                    newThings
-                )
-            )
-            resetNewCategory()
-            resetNewParty()
-        }
-        return true
     }
 
     /**
@@ -158,7 +137,7 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     }
 
     /**
-     * Delete all [Party]s from [MainRepository]/
+     * Delete all [Party]s from [MainRepository].
      */
     fun deleteAllParties() {
         viewModelScope.launch {
@@ -167,31 +146,42 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     }
 
     /**
+     * Setup [newPartyCheckedState]
+     *
+     * If it hasn't been initialized, this will make it an array of [size] filled with false.
+     * If it's already initialized, this does nothing.
+     */
+    fun setupNewPartyState(size: Int) {
+        if(newPartyCheckedState.size == 0) {
+            newPartyCheckedState.addAll(Array(size) { false })
+        }
+    }
+    /**
      * Create and save [Party] with new party variables.
      *
-     * Use the [newAssigneeSelection] and [newPartyCheckedSate] to gather data for making a new
+     * Use the [newAssigneeSelection] and [newPartyCheckedState] to gather data for making a new
      * [Party]. Then make the new [Party] and insert into [MainRepository].
      *
      */
     fun createAndSaveNewParty(
         categoryList: List<Category>,
-    ): Boolean {
+    ): Party? {
         val selectedCategoryList = ArrayList<Category>()
         val assigneeList = categoryList[newAssigneeSelection]
 
-        for ((index, checkBoxState) in newPartyCheckedSate.withIndex()) {
+        for ((index, checkBoxState) in newPartyCheckedState.withIndex()) {
             if (checkBoxState) {
                 selectedCategoryList.add(categoryList[index])
             }
         }
         if (selectedCategoryList.isEmpty()) {
-            return false
+            return null
         }
 
         val party = Parties.create(newPartyName, assigneeList, selectedCategoryList)
         insertParty(party)
         resetNewParty()
-        return true
+        return party
     }
 
     /**

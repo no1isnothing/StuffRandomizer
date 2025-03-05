@@ -15,7 +15,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -52,18 +51,15 @@ fun CategoryDetailsScreen(
             .value?.first { c -> c.uid == UUID.fromString(id) }
     } ?: Category(UUID.randomUUID(), "", listOf())
 
-    mainViewModel.editThings.clear()
-    category.let {
-        mainViewModel.editThings.addAll(it.things)
-        mainViewModel.editCategoryName = it.name
-    }
+    mainViewModel.setupCurrentCategory(category)
+
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(id = R.string.category_details_label)) },
                 navigationIcon = {
                     IconButton(onClick = {
                         category.let {
-                            if(mainViewModel.editCategoryName.isEmpty() && mainViewModel.editThings.isEmpty()) {
+                            if(mainViewModel.currentCategoryName.isEmpty() && mainViewModel.currentCategoryThings.isEmpty()) {
                                 Toast.makeText(
                                     context,
                                     context.getString(R.string.removing_empty_category),
@@ -75,7 +71,7 @@ fun CategoryDetailsScreen(
                                 return@IconButton
                             }
 
-                            if (mainViewModel.editThings.isEmpty()) {
+                            if (mainViewModel.currentCategoryThings.isEmpty()) {
                                 Toast.makeText(
                                     context,
                                     context.getString(R.string.warning_empty_item_list),
@@ -85,7 +81,7 @@ fun CategoryDetailsScreen(
                                 return@IconButton
                             }
 
-                            if (mainViewModel.editCategoryName.isEmpty()) {
+                            if (mainViewModel.currentCategoryName.isEmpty()) {
                                 Toast.makeText(
                                     context,
                                     context.getString(R.string.warning_list_name_empty),
@@ -96,8 +92,8 @@ fun CategoryDetailsScreen(
                             }
 
                             it.things =
-                                mainViewModel.editThings.filter { s -> s.isNotEmpty() }.toList()
-                            it.name = mainViewModel.editCategoryName
+                                mainViewModel.currentCategoryThings.filter { s -> s.isNotEmpty() }.toList()
+                            it.name = mainViewModel.currentCategoryName
                             mainViewModel.insertCategory(it)
                         }
                         navigateBack()
@@ -110,10 +106,10 @@ fun CategoryDetailsScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        mainViewModel.editThings.clear()
+                        mainViewModel.currentCategoryThings.clear()
                         category.let {
-                            mainViewModel.editCategoryName = it.name
-                            mainViewModel.editThings.addAll(it.things)
+                            mainViewModel.currentCategoryName = it.name
+                            mainViewModel.currentCategoryThings.addAll(it.things)
                         }
                     }) {
                         Icon(
@@ -138,26 +134,26 @@ fun CategoryDetailsScreen(
         Column(Modifier.padding(padding)) {
             OutlinedTextField(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
-                value = mainViewModel.editCategoryName,
-                onValueChange = { mainViewModel.editCategoryName = it },
+                value = mainViewModel.currentCategoryName,
+                onValueChange = { mainViewModel.currentCategoryName = it },
                 label = { Text(stringResource(R.string.hint_list_name)) })
             LabelText( text = stringResource(id = R.string.items),)
             LazyColumn(Modifier.weight(1f, fill = false)) {
-                itemsIndexed(mainViewModel.editThings) { index, item ->
+                itemsIndexed(mainViewModel.currentCategoryThings) { index, item ->
                     EditableSingleLineItem(text = item, position = index,
                         update = { position, text ->
-                            mainViewModel.updateEditThings(
+                            mainViewModel.updateCurrentCategoryThings(
                                 position,
                                 text
                             )
                         },
-                        remove = { text -> mainViewModel.editThings.remove(text) }
+                        remove = { text -> mainViewModel.currentCategoryThings.remove(text) }
                     )
                 }
             }
             Button(modifier = Modifier.wrapContentSize(),
                 onClick = {
-                    mainViewModel.editThings.add("")
+                    mainViewModel.currentCategoryThings.add("")
                 }) {
                 Icon(
                     Icons.Default.Add,

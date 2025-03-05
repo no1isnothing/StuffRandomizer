@@ -97,8 +97,8 @@ fun StuffRandomizerNavHost(
                 PartyCreationScreen(
                     viewModel,
                     navigateBack = { navController.popBackStack() },
-                    toPartyList = {
-                        navController.navigate(PartyListNav) {
+                    toPartyEdit = { uuid ->
+                        navController.navigate(PartyEditNav(uuid)) {
                             popUpTo(PartyListNav)
                         }
                     })
