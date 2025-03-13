@@ -21,6 +21,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
@@ -51,6 +52,33 @@ fun PartyCreationScreen(
                             contentDescription = stringResource(id = R.string.back)
                         )
                     }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        if (mainViewModel.newPartyName.isEmpty()) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.warning_match_name_empty),
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                            return@IconButton
+                        }
+                        val party = mainViewModel.createAndSaveNewParty(categoryList)
+                        if (party != null) {
+                            toPartyEdit(party.uid.toString())
+                        } else {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.warning_match_assignments_empty),
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        } }) {
+                        Icon(painter = painterResource(id = R.drawable.casino_24px), contentDescription = stringResource(
+                            id = R.string.roll
+                        ))
+                    }
                 })
         },
     ) { padding ->
@@ -70,7 +98,7 @@ fun PartyCreationScreen(
             LabelText(
                 text = stringResource(R.string.assignments),
             )
-            LazyColumn(Modifier.weight(1f)) {
+            LazyColumn(Modifier.weight(1f, fill = false)) {
                 itemsIndexed(categoryList)
                 { index, category ->
                     CheckableItem(
@@ -78,30 +106,6 @@ fun PartyCreationScreen(
                         onCheck = { checked -> mainViewModel.newPartyCheckedState[index] = checked }
                     )
                 }
-            }
-            Button(onClick = {
-                if (mainViewModel.newPartyName.isEmpty()) {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.warning_match_name_empty),
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                    return@Button
-                }
-                val party = mainViewModel.createAndSaveNewParty(categoryList)
-                if (party != null) {
-                    toPartyEdit(party.uid.toString())
-                } else {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.warning_match_assignments_empty),
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                }
-            }) {
-                Text(stringResource(R.string.roll))
             }
         }
     }

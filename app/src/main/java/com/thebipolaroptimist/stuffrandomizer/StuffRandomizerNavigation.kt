@@ -1,9 +1,6 @@
 package com.thebipolaroptimist.stuffrandomizer
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -15,7 +12,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -30,11 +28,12 @@ import com.thebipolaroptimist.stuffrandomizer.ui.PartyEditScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.PartyListScreen
 import kotlinx.serialization.Serializable
 
-data class TopLevelRoute<T : Any>(val name: String, val route: T , val icon: ImageVector)
+data class TopLevelRoute<T : Any>(val nameId: Int, val route: T, val iconId: Int)
+
 val topLevelRoutes = listOf(
-    TopLevelRoute("Home", HomeNav, Icons.Default.Home),
-    TopLevelRoute("Categories", CategoryListNav, Icons.Default.Menu),
-    TopLevelRoute("Matches", PartyListNav, Icons.Default.Menu)
+    TopLevelRoute(R.string.home_label, HomeNav, R.drawable.home_24px),
+    TopLevelRoute(R.string.category_label, CategoryListNav, R.drawable.category_24px),
+    TopLevelRoute(R.string.matches_label, PartyListNav, R.drawable.lists_24px)
 )
 
 @Composable
@@ -49,21 +48,26 @@ fun StuffRandomizerNavHost(
                     NavigationBarItem(
                         icon = {
                             Icon(
-                                item.icon,
-                                contentDescription = item.name
+                                painter = painterResource(id = item.iconId),
+                                contentDescription = stringResource(id = item.nameId)
                             )
                         },
-                        label = { Text(item.name) },
+                        label = { Text(stringResource(id = item.nameId)) },
                         selected = selectedItem == index,
-                        onClick = { selectedItem = index
-                        navController.navigate(item.route)
+                        onClick = {
+                            selectedItem = index
+                            navController.navigate(item.route)
                         }
                     )
                 }
             }
         }
     ) { innerPadding ->
-        NavHost(navController = navController, startDestination = HomeNav, modifier = Modifier.padding(innerPadding)) {
+        NavHost(
+            navController = navController,
+            startDestination = HomeNav,
+            modifier = Modifier.padding(innerPadding)
+        ) {
             composable<HomeNav> {
                 //TODO #16: Make sure this works without the backstack entry
                 HomeScreen()
@@ -123,8 +127,8 @@ fun StuffRandomizerNavHost(
                     toPartyEdit = { uuid -> navController.navigate(PartyEditNav(uuid)) })
             }
         }
-        }
     }
+}
 
 @Serializable
 data object HomeNav
