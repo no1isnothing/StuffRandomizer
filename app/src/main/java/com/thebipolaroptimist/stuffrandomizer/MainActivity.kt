@@ -1,9 +1,8 @@
-package com.thebipolaroptimist.stuffrandomizer.ui
+package com.thebipolaroptimist.stuffrandomizer
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import com.thebipolaroptimist.stuffrandomizer.StuffRandomizerApp
 import dagger.hilt.android.AndroidEntryPoint
 
 /**

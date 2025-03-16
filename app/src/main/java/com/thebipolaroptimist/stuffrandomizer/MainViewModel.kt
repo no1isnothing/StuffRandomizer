@@ -1,4 +1,4 @@
-package com.thebipolaroptimist.stuffrandomizer.ui
+package com.thebipolaroptimist.stuffrandomizer
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -8,11 +8,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.common.flogger.FluentLogger
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.MainRepository
-import com.thebipolaroptimist.stuffrandomizer.data.Party
-import com.google.common.flogger.FluentLogger
 import com.thebipolaroptimist.stuffrandomizer.data.Member
+import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

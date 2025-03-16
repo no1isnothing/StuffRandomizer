@@ -1,4 +1,4 @@
-package com.thebipolaroptimist.stuffrandomizer.ui
+package com.thebipolaroptimist.stuffrandomizer.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import com.thebipolaroptimist.stuffrandomizer.R
 
 /**
@@ -21,12 +22,13 @@ import com.thebipolaroptimist.stuffrandomizer.R
  * @param data A string to be passed to [onClick]
  * @param onClick The function to call when this is clicked
  */
+@Preview(showBackground = true)
 @Composable
 fun ClickableTwoLineItem(
-    label: String,
-    body: String,
-    data: String,
-    onClick: (data: String) -> Unit
+    label: String = "Label",
+    body: String = "Body",
+    data: String = "data",
+    onClick: (data: String) -> Unit = {}
 ) {
     Row(
         Modifier

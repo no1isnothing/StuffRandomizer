@@ -22,7 +22,6 @@ import androidx.navigation.toRoute
 import com.thebipolaroptimist.stuffrandomizer.ui.CategoryDetailsScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.CategoryListScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.HomeScreen
-import com.thebipolaroptimist.stuffrandomizer.ui.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.ui.PartyCreationScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.PartyEditScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.PartyListScreen

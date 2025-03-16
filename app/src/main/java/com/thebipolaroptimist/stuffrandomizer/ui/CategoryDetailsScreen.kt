@@ -27,6 +27,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
+import com.thebipolaroptimist.stuffrandomizer.MainViewModel
+import com.thebipolaroptimist.stuffrandomizer.ui.components.EditableSingleLineItem
+import com.thebipolaroptimist.stuffrandomizer.ui.components.LabelText
 import java.util.UUID
 
 

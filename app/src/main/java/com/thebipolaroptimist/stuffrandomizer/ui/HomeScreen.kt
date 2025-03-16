@@ -20,11 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
+import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.data.Member
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import java.util.UUID
@@ -38,6 +40,10 @@ import java.util.UUID
 fun HomeScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
 ) {
+    val races = stringArrayResource(id = R.array.bg_race)
+    val backgrounds = stringArrayResource(id = R.array.bg_background)
+    val classes = stringArrayResource(id = R.array.bg_char_class)
+
     var menuExpanded by remember {
         mutableStateOf(false)
     }
@@ -56,7 +62,12 @@ fun HomeScreen(
                         // TODO #7: Remove, hide behind flag, or update to be 'default data'
                         DropdownMenuItem(
                             text = { Text(stringResource(id = R.string.action_add_data)) },
-                            onClick = { addSampleData(mainViewModel) })
+                            onClick = {
+                                mainViewModel.insertCategory(Category(UUID.randomUUID(), "BG Backgrounds", backgrounds.toList()))
+                                mainViewModel.insertCategory(Category(UUID.randomUUID(), "BG Races", races.toList()))
+                                mainViewModel.insertCategory(Category(UUID.randomUUID(), "BG Classes", classes.toList()))
+                                addSampleData(mainViewModel) 
+                            })
                         // TODO #7: Remove, hide behind flag, or move to advanced settings with a warning
                         DropdownMenuItem(
                             text = { Text(stringResource(id = R.string.action_clear_data)) },
@@ -104,7 +115,7 @@ private fun createSamplePartyData(): Party = Party(
 private fun createSampleCategoryData(): List<Category> = listOf(
     Category(
         UUID.randomUUID(),
-        "Aedra",
+        "ES Aedra",
         listOf(
             "Talos",
             "Julianos",
@@ -119,7 +130,7 @@ private fun createSampleCategoryData(): List<Category> = listOf(
     ),
     Category(
         UUID.randomUUID(),
-        "Daedra",
+        "ES Daedra",
         listOf(
             "Clavicus Vile",
             "Meridia",
