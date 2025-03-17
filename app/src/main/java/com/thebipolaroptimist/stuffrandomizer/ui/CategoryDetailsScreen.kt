@@ -1,6 +1,5 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -17,20 +16,25 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
-import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.ui.components.EditableSingleLineItem
 import com.thebipolaroptimist.stuffrandomizer.ui.components.LabelText
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 
@@ -49,6 +53,8 @@ fun CategoryDetailsScreen(
     id: String?
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val category = id?.let {
         mainViewModel.categories
@@ -58,45 +64,41 @@ fun CategoryDetailsScreen(
     mainViewModel.setupCurrentCategory(category)
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             TopAppBar(title = { Text(stringResource(id = R.string.category_details_label)) },
                 navigationIcon = {
                     IconButton(onClick = {
                         category.let {
-                            if(mainViewModel.currentCategoryName.isEmpty() && mainViewModel.currentCategoryThings.isEmpty()) {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.removing_empty_category),
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
+                            if (mainViewModel.currentCategoryName.isEmpty() && mainViewModel.currentCategoryThings.isEmpty()) {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(context.getString(R.string.removing_empty_category))
+                                }
+
                                 mainViewModel.deleteCategory(category)
                                 navigateBack()
                                 return@IconButton
                             }
 
                             if (mainViewModel.currentCategoryThings.isEmpty()) {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.warning_empty_item_list),
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(context.getString(R.string.warning_empty_item_list))
+                                }
                                 return@IconButton
                             }
 
                             if (mainViewModel.currentCategoryName.isEmpty()) {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.warning_list_name_empty),
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(context.getString(R.string.warning_list_name_empty))
+                                }
                                 return@IconButton
                             }
 
                             it.things =
-                                mainViewModel.currentCategoryThings.filter { s -> s.isNotEmpty() }.toList()
+                                mainViewModel.currentCategoryThings.filter { s -> s.isNotEmpty() }
+                                    .toList()
                             it.name = mainViewModel.currentCategoryName
                             mainViewModel.insertCategory(it)
                         }
@@ -141,7 +143,7 @@ fun CategoryDetailsScreen(
                 value = mainViewModel.currentCategoryName,
                 onValueChange = { mainViewModel.currentCategoryName = it },
                 label = { Text(stringResource(R.string.hint_list_name)) })
-            LabelText( text = stringResource(id = R.string.items),)
+            LabelText(text = stringResource(id = R.string.items))
             LazyColumn(Modifier.weight(1f, fill = false)) {
                 itemsIndexed(mainViewModel.currentCategoryThings) { index, item ->
                     key(item) {
