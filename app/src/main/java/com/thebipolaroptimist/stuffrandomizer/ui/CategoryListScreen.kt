@@ -52,9 +52,8 @@ fun CategoryListScreen(
         ) {
             items(categoryList) { item ->
                 ClickableTwoLineItem(item.name,
-                    item.things.joinToString(),
-                    item.uid.toString(),
-                    toCategoryEdit)
+                    item.things.joinToString()
+                ) { toCategoryEdit(item.uid.toString()) }
             }
         }
     }

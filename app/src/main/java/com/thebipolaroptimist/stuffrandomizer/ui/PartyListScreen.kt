@@ -54,9 +54,8 @@ fun PartyListScreen(
         ) {
             items(partyList) { item ->
                 ClickableTwoLineItem(item.partyName,
-                    item.members.joinToString { member -> member.assignee },
-                    item.uid.toString(),
-                    toPartyEdit)
+                    item.members.joinToString { member -> member.assignee }
+                ) { toPartyEdit(item.uid.toString()) }
             }
         }
     }

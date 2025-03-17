@@ -19,7 +19,6 @@ import com.thebipolaroptimist.stuffrandomizer.R
  *
  * @param label The top and large text
  * @param body The bottom and smaller text
- * @param data A string to be passed to [onClick]
  * @param onClick The function to call when this is clicked
  */
 @Preview(showBackground = true)
@@ -27,15 +26,14 @@ import com.thebipolaroptimist.stuffrandomizer.R
 fun ClickableTwoLineItem(
     label: String = "Label",
     body: String = "Body",
-    data: String = "data",
-    onClick: (data: String) -> Unit = {}
+    onClick: () -> Unit = {}
 ) {
     Row(
         Modifier
             .padding(dimensionResource(R.dimen.padding_small))
             .fillMaxWidth()
             .clickable {
-                onClick(data)
+                onClick()
             }) {
         Column(Modifier.padding(dimensionResource(R.dimen.padding_text))) {
             Text(

@@ -23,8 +23,6 @@ import com.thebipolaroptimist.stuffrandomizer.R
  * A [Composable] displaying a single editable line of text.
  *
  * @param text The text to display/update
- * @param position The first param to send to update function.
- *        (Likely the index in some external array)
  * @param update The function to call when text is changed
  * @param remove The function to call Clear icon is click
  */
@@ -32,8 +30,7 @@ import com.thebipolaroptimist.stuffrandomizer.R
 @Composable
 fun EditableSingleLineItem(
     text: String = "Text",
-    position: Int = 1,
-    update: (position: Int, item: String) -> Unit = { _, _ -> },
+    update: (item: String) -> Unit = {},
     remove: (item: String) -> Unit = {}
 ) {
     var editedItem by rememberSaveable {
@@ -48,7 +45,7 @@ fun EditableSingleLineItem(
             value = editedItem,
             onValueChange = {
                 editedItem = it
-                update(position, editedItem)
+                update(editedItem)
             },
             trailingIcon = {
                 Icon(Icons.Default.Clear,

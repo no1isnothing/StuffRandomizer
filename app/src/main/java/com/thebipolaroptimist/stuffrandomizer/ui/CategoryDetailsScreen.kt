@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -143,15 +144,17 @@ fun CategoryDetailsScreen(
             LabelText( text = stringResource(id = R.string.items),)
             LazyColumn(Modifier.weight(1f, fill = false)) {
                 itemsIndexed(mainViewModel.currentCategoryThings) { index, item ->
-                    EditableSingleLineItem(text = item, position = index,
-                        update = { position, text ->
-                            mainViewModel.updateCurrentCategoryThings(
-                                position,
-                                text
-                            )
-                        },
-                        remove = { text -> mainViewModel.currentCategoryThings.remove(text) }
-                    )
+                    key(item) {
+                        EditableSingleLineItem(text = item,
+                            update = { text ->
+                                mainViewModel.updateCurrentCategoryThings(
+                                    index,
+                                    text
+                                )
+                            },
+                            remove = { text -> mainViewModel.currentCategoryThings.remove(text) }
+                        )
+                    }
                 }
             }
             Button(modifier = Modifier.wrapContentSize(),
