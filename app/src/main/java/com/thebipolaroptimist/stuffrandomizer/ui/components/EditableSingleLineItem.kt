@@ -1,13 +1,16 @@
 package com.thebipolaroptimist.stuffrandomizer.ui.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,10 +40,12 @@ fun EditableSingleLineItem(
         mutableStateOf(text)
     }
 
-    Row(
+    Card(
         Modifier
             .wrapContentSize()
-            .padding(dimensionResource(id = R.dimen.padding_text))) {
+            .padding(dimensionResource(id = R.dimen.padding_text)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer),) {
         TextField(
             value = editedItem,
             onValueChange = {
@@ -55,7 +60,11 @@ fun EditableSingleLineItem(
                             remove(editedItem)
                         }
                 )
-            }
+            },
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer
+            )
         )
     }
 }

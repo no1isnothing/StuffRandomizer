@@ -29,6 +29,7 @@ import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.data.Member
 import com.thebipolaroptimist.stuffrandomizer.data.Party
+import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
 import java.util.UUID
 
 /**
@@ -73,7 +74,8 @@ fun HomeScreen(
                             text = { Text(stringResource(id = R.string.action_clear_data)) },
                             onClick = { clearAllData(mainViewModel) })
                     }
-                }
+                },
+                colors = mainTopAppBarColors()
             )
         }
     )

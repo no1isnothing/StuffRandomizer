@@ -34,6 +34,8 @@ import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.ui.components.EditableSingleLineItem
 import com.thebipolaroptimist.stuffrandomizer.ui.components.LabelText
+import com.thebipolaroptimist.stuffrandomizer.ui.components.mainOutlinedTextfieldColors
+import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -68,7 +70,8 @@ fun CategoryDetailsScreen(
             SnackbarHost(hostState = snackbarHostState)
         },
         topBar = {
-            TopAppBar(title = { Text(stringResource(id = R.string.category_details_label)) },
+            TopAppBar(
+                title = { Text(stringResource(id = R.string.category_details_label)) },
                 navigationIcon = {
                     IconButton(onClick = {
                         category.let {
@@ -133,7 +136,8 @@ fun CategoryDetailsScreen(
                             contentDescription = stringResource(id = R.string.delete)
                         )
                     }
-                }
+                },
+                colors = mainTopAppBarColors()
             )
         },
     ) { padding ->
@@ -142,7 +146,13 @@ fun CategoryDetailsScreen(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
                 value = mainViewModel.currentCategoryName,
                 onValueChange = { mainViewModel.currentCategoryName = it },
-                label = { Text(stringResource(R.string.hint_list_name)) })
+                label = {
+                    Text(
+                        stringResource(R.string.hint_list_name),
+                    )
+                },
+                colors = mainOutlinedTextfieldColors()
+            )
             LabelText(text = stringResource(id = R.string.items))
             LazyColumn(Modifier.weight(1f, fill = false)) {
                 itemsIndexed(mainViewModel.currentCategoryThings) { index, item ->

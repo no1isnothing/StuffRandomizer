@@ -32,6 +32,8 @@ import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.ui.components.CheckableItem
 import com.thebipolaroptimist.stuffrandomizer.ui.components.DropDownText
 import com.thebipolaroptimist.stuffrandomizer.ui.components.LabelText
+import com.thebipolaroptimist.stuffrandomizer.ui.components.mainOutlinedTextfieldColors
+import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
 import kotlinx.coroutines.launch
 
 /**
@@ -85,7 +87,8 @@ fun PartyCreationScreen(
                             id = R.string.roll
                         ))
                     }
-                })
+                },
+                colors = mainTopAppBarColors())
         },
     ) { padding ->
         Column(Modifier.padding(padding)) {
@@ -93,7 +96,8 @@ fun PartyCreationScreen(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
                 value = mainViewModel.newPartyName,
                 onValueChange = { mainViewModel.newPartyName = it },
-                label = { Text(stringResource(R.string.hint_match_name)) }
+                label = { Text(stringResource(R.string.hint_match_name)) },
+                colors = mainOutlinedTextfieldColors()
             )
             LabelText(
                 text = stringResource(R.string.assignees),

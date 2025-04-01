@@ -2,12 +2,14 @@ package com.thebipolaroptimist.stuffrandomizer.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,18 +30,22 @@ fun ClickableTwoLineItem(
     body: String = "Body",
     onClick: () -> Unit = {}
 ) {
-    Row(
+    Card(
         Modifier
             .padding(dimensionResource(R.dimen.padding_small))
             .fillMaxWidth()
             .clickable {
                 onClick()
-            }) {
-        Column(Modifier.padding(dimensionResource(R.dimen.padding_text))) {
+            },
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer),
+    ) {
+        Column(Modifier.padding(dimensionResource(R.dimen.padding_text)).align(Alignment.CenterHorizontally)) {
             Text(
                 label, style = MaterialTheme.typography.labelLarge,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Text(
                 body, style = MaterialTheme.typography.bodyMedium,

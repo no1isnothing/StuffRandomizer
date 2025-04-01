@@ -25,6 +25,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.ui.components.ClickableTwoLineItem
+import com.thebipolaroptimist.stuffrandomizer.ui.components.mainOutlinedTextfieldColors
+import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +79,8 @@ fun PartyEditScreen(
                             contentDescription = stringResource(R.string.save)
                         )
                     }
-                })
+                },
+                colors = mainTopAppBarColors())
         },
     ) { padding ->
         Column(Modifier.padding(padding)) {
@@ -85,7 +88,8 @@ fun PartyEditScreen(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
                 value = mainViewModel.editPartyName,
                 onValueChange = { mainViewModel.editPartyName = it },
-                label = { Text(stringResource(R.string.hint_match_name)) }
+                label = { Text(stringResource(R.string.hint_match_name)) },
+                colors = mainOutlinedTextfieldColors()
             )
             LazyColumn(
                 Modifier

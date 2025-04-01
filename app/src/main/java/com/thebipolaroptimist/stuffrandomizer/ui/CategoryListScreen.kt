@@ -1,5 +1,6 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +10,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -22,6 +24,7 @@ import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.ui.components.ClickableTwoLineItem
+import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
 
 /**
  * A simple [Composable] for displaying [Category]s.
@@ -43,12 +46,14 @@ fun CategoryListScreen(
                     ) {
                         Icon(Icons.Filled.Add, stringResource(R.string.add_match))
                     }
-                } )
+                },
+                colors = mainTopAppBarColors())
         }) { padding ->
         LazyColumn(
             Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             items(categoryList) { item ->
                 ClickableTwoLineItem(item.name,

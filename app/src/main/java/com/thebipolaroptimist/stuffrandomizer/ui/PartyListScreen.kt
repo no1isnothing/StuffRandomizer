@@ -22,6 +22,7 @@ import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.ui.components.ClickableTwoLineItem
+import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
 
 /**
  * A [Composable] for displaying [Party]s.
@@ -44,7 +45,8 @@ fun PartyListScreen(
                     ) {
                         Icon(Icons.Filled.Add, stringResource(R.string.add_match))
                     }
-                }
+                },
+                colors = mainTopAppBarColors()
             )
         }) { padding ->
         LazyColumn(
