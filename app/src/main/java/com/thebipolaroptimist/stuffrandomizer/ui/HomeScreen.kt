@@ -1,10 +1,21 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -12,23 +23,33 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.data.Member
 import com.thebipolaroptimist.stuffrandomizer.data.Party
+import com.thebipolaroptimist.stuffrandomizer.ui.components.DropDownText
+import com.thebipolaroptimist.stuffrandomizer.ui.components.EditableSingleLineItem
 import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
 import java.util.UUID
 
@@ -41,6 +62,7 @@ import java.util.UUID
 fun HomeScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
 ) {
+    val categoryList by mainViewModel.categories.observeAsState(listOf())
     val races = stringArrayResource(id = R.array.bg_race)
     val backgrounds = stringArrayResource(id = R.array.bg_background)
     val classes = stringArrayResource(id = R.array.bg_char_class)
@@ -48,10 +70,13 @@ fun HomeScreen(
     var menuExpanded by remember {
         mutableStateOf(false)
     }
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { stringResource(id = R.string.home_label) },
+            TopAppBar(title = { Text(stringResource(id = R.string.home_label)) },
                 actions = {
                     IconButton(onClick = { menuExpanded = !menuExpanded }) {
                         Icon(
@@ -86,7 +111,104 @@ fun HomeScreen(
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(stringResource(id = R.string.home_label))
+            Button(onClick = { showDialog = true}) {
+                Text(text = "Show dialog")
+            }
+            if(showDialog) {
+                QuickSelectDialog(onDismiss = {showDialog = false },
+                    categoryList = categoryList)
+            }
+        }
+    }
+}
+
+@Composable
+fun QuickSelectDialog(onDismiss: () -> Unit = {},
+                      categoryList: List<Category>) {
+    var newList = remember {
+        mutableStateListOf("")
+    }
+    var selectedItem by remember {
+        mutableStateOf("")
+    }
+    // TODO change to enum state and when statement
+    var showExistingLists by remember {
+        mutableStateOf(false)
+    }
+    var showNewList by remember {
+        mutableStateOf(false)
+    }
+    var showSelected by remember {
+        mutableStateOf(false)
+    }
+    Dialog(
+        onDismissRequest = { onDismiss() }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(600.dp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(Modifier.align(Alignment.CenterHorizontally)) {
+                if (!showNewList && !showExistingLists && !showSelected) {
+                    Button(onClick = { showExistingLists = true }) {
+                        Text(text = "Select from list")
+                    }
+                    Button(onClick = { showNewList = true }) {
+                        Text(text = "Enter new list")
+                    }
+                }
+                if(showSelected) {
+                    Text(selectedItem)
+                }
+                if (showExistingLists) {
+                    DropDownText(
+                        items = categoryList.map { it.name },
+                        onSelect = {
+                            index -> newList = categoryList[index].things.toMutableStateList()
+                            showExistingLists = false
+                            showNewList = true
+                        }
+                    )
+                }
+                if (showNewList) {
+                    LazyColumn(Modifier.weight(1f, fill = false)) {
+                        itemsIndexed(newList) {index, item ->
+                            EditableSingleLineItem(
+                                text = item,
+                                remove = { newList.remove(it) },
+                                update = { newList[index] = it }
+                            )
+                        }
+                    }
+                    Row {
+                        Button(
+                            modifier = Modifier.wrapContentSize(),
+                            onClick = {
+                                newList.add("")
+                            }) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = stringResource(R.string.add)
+                            )
+                        }
+                        Button(
+                            modifier = Modifier.wrapContentSize(),
+                            onClick = {
+                                selectedItem = newList.random()
+                                showExistingLists = false
+                                showNewList = false
+                                showSelected = true
+                            }) {
+                            Icon(painter = painterResource(id = R.drawable.casino_24px),
+                                contentDescription = stringResource(
+                                id = R.string.roll
+                            ))
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -117,7 +239,7 @@ private fun createSamplePartyData(): Party = Party(
 private fun createSampleCategoryData(): List<Category> = listOf(
     Category(
         UUID.randomUUID(),
-        "ES Aedra",
+        "TES Aedra",
         listOf(
             "Talos",
             "Julianos",
@@ -132,7 +254,7 @@ private fun createSampleCategoryData(): List<Category> = listOf(
     ),
     Category(
         UUID.randomUUID(),
-        "ES Daedra",
+        "TES Daedra",
         listOf(
             "Clavicus Vile",
             "Meridia",
