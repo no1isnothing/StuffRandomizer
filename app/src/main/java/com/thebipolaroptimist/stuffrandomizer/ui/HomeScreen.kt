@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,7 +29,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
@@ -43,9 +40,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
-import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.data.Member
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.ui.components.DropDownText
@@ -92,7 +89,7 @@ fun HomeScreen(
                                 mainViewModel.insertCategory(Category(UUID.randomUUID(), "BG Backgrounds", backgrounds.toList()))
                                 mainViewModel.insertCategory(Category(UUID.randomUUID(), "BG Races", races.toList()))
                                 mainViewModel.insertCategory(Category(UUID.randomUUID(), "BG Classes", classes.toList()))
-                                addSampleData(mainViewModel) 
+                                addSampleData(mainViewModel)
                             })
                         // TODO #7: Remove, hide behind flag, or move to advanced settings with a warning
                         DropdownMenuItem(
@@ -122,6 +119,13 @@ fun HomeScreen(
     }
 }
 
+enum class QuickSelectState {
+    LIST_CREATE,
+    LIST_SELECT,
+    SHOW_SELECTED,
+    DEFAULT,
+}
+
 @Composable
 fun QuickSelectDialog(onDismiss: () -> Unit = {},
                       categoryList: List<Category>) {
@@ -131,88 +135,124 @@ fun QuickSelectDialog(onDismiss: () -> Unit = {},
     var selectedItem by remember {
         mutableStateOf("")
     }
-    // TODO change to enum state and when statement
-    var showExistingLists by remember {
-        mutableStateOf(false)
+    var selectState by remember {
+        mutableStateOf(QuickSelectState.DEFAULT)
     }
-    var showNewList by remember {
-        mutableStateOf(false)
-    }
-    var showSelected by remember {
-        mutableStateOf(false)
-    }
+
     Dialog(
         onDismissRequest = { onDismiss() }) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(600.dp)
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Column(Modifier.align(Alignment.CenterHorizontally)) {
-                if (!showNewList && !showExistingLists && !showSelected) {
-                    Button(onClick = { showExistingLists = true }) {
-                        Text(text = "Select from list")
+                when(selectState) {
+                    QuickSelectState.LIST_CREATE -> {
+                        CreateList(newList, {
+                                item -> selectedItem = item
+                            selectState = QuickSelectState.SHOW_SELECTED
+                        })
                     }
-                    Button(onClick = { showNewList = true }) {
-                        Text(text = "Enter new list")
+                    QuickSelectState.LIST_SELECT -> {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(600.dp)
+                                .padding(16.dp),
+                            shape = RoundedCornerShape(16.dp),
+                        ) {
+                            Column(Modifier.align(Alignment.CenterHorizontally)) {
+                                DropDownText(
+                                    items = categoryList.map { it.name },
+                                    onSelect = { index ->
+                                        newList = categoryList[index].things.toMutableStateList()
+                                        selectState = QuickSelectState.LIST_CREATE
+                                    }
+                                )
+                            }
+                            }
                     }
-                }
-                if(showSelected) {
-                    Text(selectedItem)
-                }
-                if (showExistingLists) {
-                    DropDownText(
-                        items = categoryList.map { it.name },
-                        onSelect = {
-                            index -> newList = categoryList[index].things.toMutableStateList()
-                            showExistingLists = false
-                            showNewList = true
+                    QuickSelectState.SHOW_SELECTED -> {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(600.dp)
+                                .padding(16.dp),
+                            shape = RoundedCornerShape(16.dp),
+                        ) {
+                            Column(Modifier.align(Alignment.CenterHorizontally)) {
+                                Text(selectedItem)
+                            }
                         }
+                    }
+                    QuickSelectState.DEFAULT -> {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(600.dp)
+                                .padding(16.dp),
+                            shape = RoundedCornerShape(16.dp),
+                        ) {
+                            Column(Modifier.align(Alignment.CenterHorizontally)) {
+                                Button(onClick = { selectState = QuickSelectState.LIST_SELECT }) {
+                                    Text(text = "Select from list")
+                                }
+                                Button(onClick = { selectState = QuickSelectState.LIST_CREATE }) {
+                                    Text(text = "Enter new list")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+      //  }
+    //}
+}
+
+@Composable
+private fun CreateList(
+    newList: MutableList<String>,
+    onSelect: (selected: String) -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(600.dp)
+            .padding(16.dp),
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Column(Modifier.align(Alignment.CenterHorizontally)) {
+            LazyColumn(Modifier.weight(1f, fill = false)) {
+                itemsIndexed(newList) { index, item ->
+                    EditableSingleLineItem(
+                        text = item,
+                        remove = { newList.remove(it) },
+                        update = { newList[index] = it }
                     )
                 }
-                if (showNewList) {
-                    LazyColumn(Modifier.weight(1f, fill = false)) {
-                        itemsIndexed(newList) {index, item ->
-                            EditableSingleLineItem(
-                                text = item,
-                                remove = { newList.remove(it) },
-                                update = { newList[index] = it }
-                            )
-                        }
-                    }
-                    Row {
-                        Button(
-                            modifier = Modifier.wrapContentSize(),
-                            onClick = {
-                                newList.add("")
-                            }) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = stringResource(R.string.add)
-                            )
-                        }
-                        Button(
-                            modifier = Modifier.wrapContentSize(),
-                            onClick = {
-                                selectedItem = newList.random()
-                                showExistingLists = false
-                                showNewList = false
-                                showSelected = true
-                            }) {
-                            Icon(painter = painterResource(id = R.drawable.casino_24px),
-                                contentDescription = stringResource(
-                                id = R.string.roll
-                            ))
-                        }
-                    }
+            }
+            Row {
+                Button(
+                    modifier = Modifier.wrapContentSize(),
+                    onClick = {
+                        newList.add("")
+                    }) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add)
+                    )
+                }
+                Button(
+                    modifier = Modifier.wrapContentSize(),
+                    onClick = {
+                        onSelect(newList.random())
+                    }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.casino_24px),
+                        contentDescription = stringResource(
+                            id = R.string.roll
+                        )
+                    )
                 }
             }
         }
     }
 }
-
 
 private fun addSampleData(mainViewModel: MainViewModel) {
     mainViewModel.insertParty(createSamplePartyData())
