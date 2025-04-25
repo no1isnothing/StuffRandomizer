@@ -86,12 +86,13 @@ fun QuickSelectDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(dimensionResource(R.dimen.dialog_height_small))
-                        .padding(dimensionResource(R.dimen.padding_medium)),
+                        .padding(dimensionResource(R.dimen.padding_medium),),
                     shape = RoundedCornerShape(dimensionResource(R.dimen.padding_medium)),
                 ) {
                     Column(Modifier
                         .align(Alignment.CenterHorizontally)
-                        .fillMaxHeight()) {
+                        .fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center) {
                         DropDownText(
                             items = categoryList.map { it.name },
                             onSelect = { index ->
@@ -136,12 +137,13 @@ fun QuickSelectDialog(
                         Modifier
                             .align(Alignment.CenterHorizontally)
                             .fillMaxHeight(),
-                        verticalArrangement = Arrangement.Center) {
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally) {
                         Button(onClick = { selectState = QuickSelectState.LIST_SELECT }){
-                            Text(text = "Select from list")
+                            Text(text = stringResource(R.string.select_existing_list))
                         }
                         Button(onClick = { selectState = QuickSelectState.LIST_CREATE }) {
-                            Text(text = "Enter new list")
+                            Text(text = stringResource(R.string.enter_new_list))
                         }
                     }
                 }
@@ -162,7 +164,7 @@ private fun CreateList(
             .padding(dimensionResource(R.dimen.padding_medium)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.padding_medium)),
     ) {
-        Column(Modifier.align(Alignment.CenterHorizontally)) {
+        Column(Modifier.align(Alignment.CenterHorizontally).padding(dimensionResource(R.dimen.padding_small))) {
             LazyColumn(Modifier.weight(1f, fill = false)) {
                 itemsIndexed(newList) { index, item ->
                     EditableSingleLineItem(

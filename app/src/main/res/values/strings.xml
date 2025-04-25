@@ -43,5 +43,9 @@
     <string name="reroll">Reroll</string>
     <string name="add_match">Add match</string>
     <string name="selected">Selected:</string>
+    <string name="menu">menu</string>
+    <string name="quick_select">Quick Select</string>
+    <string name="select_existing_list">Select existing list</string>
+    <string name="enter_new_list">Enter new list</string>
 
 </resources>
