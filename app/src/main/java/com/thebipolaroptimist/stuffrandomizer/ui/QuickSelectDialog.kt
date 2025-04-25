@@ -56,6 +56,11 @@ fun QuickSelectDialogPreview()
         Category(name = "3", things = listOf("1", "2", "3"))))
 }
 
+/**
+ * A dialog for quickly selecting something from a list.
+ * @param onDismiss function to call on dismiss
+ * @param categoryList The list of things to select from
+ */
 @Composable
 fun QuickSelectDialog(
     onDismiss: () -> Unit = {},

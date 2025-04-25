@@ -36,6 +36,7 @@ import java.util.UUID
 
 /**
  * A simple [Composable] as the default destination in the navigation.
+ * Allows the user to launch [QuickSelectDialog].
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
