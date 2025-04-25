@@ -2,4 +2,7 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="padding_small">8dp</dimen>
     <dimen name="padding_text">4dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="dialog_height_small">200dp</dimen>
+    <dimen name="dialog_height_large">600dp</dimen>
 </resources>

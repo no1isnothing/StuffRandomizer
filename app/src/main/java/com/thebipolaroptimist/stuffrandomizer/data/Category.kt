@@ -16,7 +16,7 @@ import java.util.UUID
  */
 @Entity
 data class Category(
-    @PrimaryKey val uid : UUID,
+    @PrimaryKey val uid : UUID = UUID.randomUUID(),
     var name: String,
-    var things: List<String>
+    var things: List<String> = listOf()
 )

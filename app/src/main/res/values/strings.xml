@@ -42,5 +42,6 @@
     <string name="previous">Previous</string>
     <string name="reroll">Reroll</string>
     <string name="add_match">Add match</string>
+    <string name="selected">Selected:</string>
 
 </resources>
