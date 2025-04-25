@@ -18,5 +18,5 @@ import java.util.UUID
 data class Category(
     @PrimaryKey val uid : UUID = UUID.randomUUID(),
     var name: String,
-    var things: List<String> = listOf()
+    var things: List<String>,
 )

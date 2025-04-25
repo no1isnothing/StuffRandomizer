@@ -52,8 +52,8 @@ fun QuickSelectDialogPreview()
 {
     QuickSelectDialog(categoryList = listOf(
         Category(name = "1", things = listOf("1", "2", "3")),
-        Category(name = "2"),
-        Category(name = "3")))
+        Category(name = "2", things = listOf("1", "2", "3")),
+        Category(name = "3", things = listOf("1", "2", "3"))))
 }
 
 @Composable
