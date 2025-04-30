@@ -3,12 +3,25 @@ package com.thebipolaroptimist.stuffrandomizer
 import android.content.Context
 import androidx.room.Room
 import com.thebipolaroptimist.stuffrandomizer.data.MainDatabase
+import com.thebipolaroptimist.stuffrandomizer.data.MainRepository
+import com.thebipolaroptimist.stuffrandomizer.data.Repository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
+
+@InstallIn(SingletonComponent::class)
+@Module
+interface StuffRandomizerBindingModule {
+    @Binds
+    fun bindMainRepository(
+        mainRepository: MainRepository
+    ): Repository
+}
 
 @Module
 @InstallIn(SingletonComponent::class)

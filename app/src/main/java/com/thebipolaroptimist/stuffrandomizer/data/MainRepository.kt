@@ -1,9 +1,30 @@
 package com.thebipolaroptimist.stuffrandomizer.data
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-/**
+interface Repository {
+    fun getAllParties(): Flow<List<Party>>
+
+    fun getAllCategories(): Flow<List<Category>>
+
+    suspend fun getCategoriesByName(names : List<String>): List<Category>
+
+    suspend fun getCategoryByName(name: String): Category?
+
+    suspend fun insertParty(party: Party)
+
+    suspend fun insertCategory(category: Category)
+
+    suspend fun deleteCategory(category: Category)
+
+    suspend fun insertCategories(categories: List<Category>)
+
+    suspend fun deleteAllParties()
+    suspend fun deleteAllCategories()
+}
+/*
  * Repository for accessing saved [Party]s and [Category]s
  * Notes:
  * Since there's currently only one data source, this doesn't really do much.
@@ -11,45 +32,44 @@ import javax.inject.Inject
  * Similarly using Flow over LiveData here would make more sense if there's multiple data sources.
  */
 class MainRepository @Inject constructor(private val partyDao: PartyDao,
-                                         private val categoryDao: CategoryDao) {
-
-    fun getAllParties(): Flow<List<Party>> {
+                                         private val categoryDao: CategoryDao) : Repository {
+    override fun getAllParties(): Flow<List<Party>> {
         return partyDao.getAllParties()
     }
 
-    fun getAllCategories(): Flow<List<Category>> {
+    override fun getAllCategories(): Flow<List<Category>> {
         return categoryDao.getAllCategories()
     }
 
-    suspend fun getCategoriesByName(names : List<String>): List<Category> {
+    override suspend fun getCategoriesByName(names : List<String>): List<Category> {
         return categoryDao.getCategoriesByName(names)
     }
 
-    suspend fun getCategoryByName(name: String): Category? {
+    override suspend fun getCategoryByName(name: String): Category? {
         return categoryDao.getCategoryByName(name)
     }
 
-    suspend fun insertParty(party: Party) {
+    override suspend fun insertParty(party: Party) {
         partyDao.insertOrUpdate(party)
     }
 
-    suspend fun insertCategory(category: Category) {
+    override suspend fun insertCategory(category: Category) {
         categoryDao.insert(category)
     }
 
-    suspend fun deleteCategory(category: Category) {
+    override suspend fun deleteCategory(category: Category) {
         categoryDao.delete(category)
     }
 
-    suspend fun insertCategories(categories: List<Category>) {
+    override suspend fun insertCategories(categories: List<Category>) {
         categoryDao.insert(categories)
     }
 
-    suspend fun deleteAllParties() {
+    override suspend fun deleteAllParties() {
         partyDao.deleteAll()
     }
 
-    suspend fun deleteAllCategories() {
+    override suspend fun deleteAllCategories() {
         categoryDao.deleteAll()
     }
 }

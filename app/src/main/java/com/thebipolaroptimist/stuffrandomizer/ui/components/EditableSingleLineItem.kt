@@ -14,11 +14,16 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.thebipolaroptimist.stuffrandomizer.R
 
@@ -36,8 +41,9 @@ fun EditableSingleLineItem(
     update: (item: String) -> Unit = {},
     remove: (item: String) -> Unit = {}
 ) {
-    var editedItem by rememberSaveable {
-        mutableStateOf(text)
+
+    var editedItem by remember {
+        mutableStateOf(TextFieldValue(text))
     }
 
     Card(
@@ -47,17 +53,18 @@ fun EditableSingleLineItem(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer),) {
         TextField(
+            modifier = Modifier.semantics { contentDescription = "editable_item" },
             value = editedItem,
             onValueChange = {
                 editedItem = it
-                update(editedItem)
+                update(it.text)
             },
             trailingIcon = {
                 Icon(Icons.Default.Clear,
                     contentDescription = stringResource(R.string.clear),
                     modifier = Modifier
                         .clickable {
-                            remove(editedItem)
+                            remove(editedItem.toString())
                         }
                 )
             },

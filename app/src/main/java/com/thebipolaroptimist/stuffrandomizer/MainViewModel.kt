@@ -13,6 +13,7 @@ import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.MainRepository
 import com.thebipolaroptimist.stuffrandomizer.data.Member
 import com.thebipolaroptimist.stuffrandomizer.data.Party
+import com.thebipolaroptimist.stuffrandomizer.data.Repository
 import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -22,12 +23,12 @@ import javax.inject.Inject
  * A [ViewModel] for interactions between the [MainActivity], screens, and the [MainRepository].
  */
 @HiltViewModel
-class MainViewModel @Inject constructor(private val mainRepository: MainRepository) : ViewModel() {
+class MainViewModel @Inject constructor(private val mainRepository: Repository) : ViewModel() {
     private val logger: FluentLogger = FluentLogger.forEnclosingClass()
 
     val parties = mainRepository.getAllParties().asLiveData()
     val categories = mainRepository.getAllCategories().asLiveData()
-    
+
     var currentCategoryName by mutableStateOf("")
     var currentCategoryThings = mutableStateListOf<String>()
     var editPartyName by mutableStateOf("")

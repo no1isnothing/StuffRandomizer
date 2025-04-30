@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,69 +44,69 @@ import java.util.UUID
 /**
  * A simple [Composable] to create/edit [Category]s.
  *
- * @param mainViewModel The ViewModel to use for interacting with data.
- * @param navigateBack A function to handle back navigation.
- * @param id The UUID for the [Category] to edit, if null create a new category.
+ * @param viewModel The ViewModel to use for interacting with data.
+ * @param onBack A function to handle back navigation.
+ * @param categoryId The UUID for the [Category] to edit, if null create a new category.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryDetailsScreen(
-    mainViewModel: MainViewModel = hiltViewModel(),
-    navigateBack: () -> Unit = {},
-    id: String?
+    viewModel: MainViewModel = hiltViewModel(),
+    onBack: () -> Unit = {},
+    categoryId: String?
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarState = remember { SnackbarHostState() }
 
-    val category = id?.let {
-        mainViewModel.categories
-            .value?.first { c -> c.uid == UUID.fromString(id) }
+    val currentCategory = categoryId?.let {
+        viewModel.categories
+            .value?.first { category -> category.uid == UUID.fromString(categoryId) }
     } ?: Category(UUID.randomUUID(), "", listOf())
 
-    mainViewModel.setupCurrentCategory(category)
+    viewModel.setupCurrentCategory(currentCategory)
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = snackbarState)
         },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(id = R.string.category_details_label)) },
                 navigationIcon = {
                     IconButton(onClick = {
-                        category.let {
-                            if (mainViewModel.currentCategoryName.isEmpty() && mainViewModel.currentCategoryThings.isEmpty()) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(context.getString(R.string.removing_empty_category))
+                        currentCategory.let {
+                            if (viewModel.currentCategoryName.isEmpty() && viewModel.currentCategoryThings.isEmpty()) {
+                                coroutineScope.launch {
+                                    snackbarState.showSnackbar(context.getString(R.string.removing_empty_category))
                                 }
 
-                                mainViewModel.deleteCategory(category)
-                                navigateBack()
+                                viewModel.deleteCategory(currentCategory)
+                                onBack()
                                 return@IconButton
                             }
 
-                            if (mainViewModel.currentCategoryThings.isEmpty()) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(context.getString(R.string.warning_empty_item_list))
+                            if (viewModel.currentCategoryThings.isEmpty()) { //check filtered list isn't empty
+                                coroutineScope.launch {
+                                    snackbarState.showSnackbar(context.getString(R.string.warning_empty_item_list))
                                 }
                                 return@IconButton
                             }
 
-                            if (mainViewModel.currentCategoryName.isEmpty()) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(context.getString(R.string.warning_list_name_empty))
+                            if (viewModel.currentCategoryName.isEmpty()) {
+                                coroutineScope.launch {
+                                    snackbarState.showSnackbar(context.getString(R.string.warning_list_name_empty))
                                 }
                                 return@IconButton
                             }
 
                             it.things =
-                                mainViewModel.currentCategoryThings.filter { s -> s.isNotEmpty() }
+                                viewModel.currentCategoryThings.filter { thing -> thing.isNotEmpty() }
                                     .toList()
-                            it.name = mainViewModel.currentCategoryName
-                            mainViewModel.insertCategory(it)
+                            it.name = viewModel.currentCategoryName
+                            viewModel.insertCategory(it)
                         }
-                        navigateBack()
+                        onBack()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -115,10 +116,10 @@ fun CategoryDetailsScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        mainViewModel.currentCategoryThings.clear()
-                        category.let {
-                            mainViewModel.currentCategoryName = it.name
-                            mainViewModel.currentCategoryThings.addAll(it.things)
+                        viewModel.currentCategoryThings.clear()
+                        currentCategory.let {
+                            viewModel.currentCategoryName = it.name
+                            viewModel.currentCategoryThings.addAll(it.things)
                         }
                     }) {
                         Icon(
@@ -127,9 +128,9 @@ fun CategoryDetailsScreen(
                         )
                     }
                     IconButton(onClick = {
-                        mainViewModel.resetEditedParty()
-                        mainViewModel.deleteCategory(category)
-                        navigateBack()
+                        viewModel.resetEditedParty()
+                        viewModel.deleteCategory(currentCategory)
+                        onBack()
                     }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -144,8 +145,8 @@ fun CategoryDetailsScreen(
         Column(Modifier.padding(padding)) {
             OutlinedTextField(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
-                value = mainViewModel.currentCategoryName,
-                onValueChange = { mainViewModel.currentCategoryName = it },
+                value = viewModel.currentCategoryName,
+                onValueChange = { viewModel.currentCategoryName = it },
                 label = {
                     Text(
                         stringResource(R.string.hint_list_name),
@@ -154,24 +155,24 @@ fun CategoryDetailsScreen(
                 colors = mainOutlinedTextfieldColors()
             )
             LabelText(text = stringResource(id = R.string.items))
-            LazyColumn(Modifier.weight(1f, fill = false)) {
-                itemsIndexed(mainViewModel.currentCategoryThings) { index, item ->
+            LazyColumn(Modifier.weight(1f, fill = false).testTag("items")) {
+                itemsIndexed(viewModel.currentCategoryThings) { index, item ->
                     key(item) {
                         EditableSingleLineItem(text = item,
                             update = { text ->
-                                mainViewModel.updateCurrentCategoryThings(
+                                viewModel.updateCurrentCategoryThings(
                                     index,
                                     text
                                 )
                             },
-                            remove = { text -> mainViewModel.currentCategoryThings.remove(text) }
+                            remove = { text -> viewModel.currentCategoryThings.remove(text) }
                         )
                     }
                 }
             }
             Button(modifier = Modifier.wrapContentSize(),
                 onClick = {
-                    mainViewModel.currentCategoryThings.add("")
+                    viewModel.currentCategoryThings.add("")
                 }) {
                 Icon(
                     Icons.Default.Add,

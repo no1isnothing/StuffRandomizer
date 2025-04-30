@@ -79,8 +79,8 @@ fun StuffRandomizerNavHost(
                 val viewModel = hiltViewModel<MainViewModel>(homeEntry)
                 CategoryDetailsScreen(
                     viewModel,
-                    id = categoryDetailsEntry.id,
-                    navigateBack = { navController.popBackStack() })
+                    categoryId = categoryDetailsEntry.id,
+                    onBack = { navController.popBackStack() })
 
             }
             composable<CategoryListNav> { backStackEntry ->
