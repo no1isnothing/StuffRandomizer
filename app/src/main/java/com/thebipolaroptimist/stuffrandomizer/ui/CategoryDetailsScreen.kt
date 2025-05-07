@@ -166,7 +166,9 @@ fun CategoryDetailsScreen(
                                     text
                                 )
                             },
-                            remove = { text -> viewModel.currentCategoryThings.remove(text) }
+                            remove = {
+                                text -> viewModel.currentCategoryThings.remove(text)
+                            }
                         )
                     }
                 }

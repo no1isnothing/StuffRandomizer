@@ -64,7 +64,7 @@ fun EditableSingleLineItem(
                     contentDescription = stringResource(R.string.clear),
                     modifier = Modifier
                         .clickable {
-                            remove(editedItem.toString())
+                            remove(editedItem.text)
                         }
                 )
             },
