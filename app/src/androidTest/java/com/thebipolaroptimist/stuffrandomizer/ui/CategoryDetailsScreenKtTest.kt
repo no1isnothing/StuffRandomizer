@@ -3,6 +3,7 @@ package com.thebipolaroptimist.stuffrandomizer.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasParent
 import androidx.compose.ui.test.hasText
@@ -12,70 +13,24 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.data.Category
-import com.thebipolaroptimist.stuffrandomizer.data.Party
-import com.thebipolaroptimist.stuffrandomizer.data.Repository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import com.thebipolaroptimist.stuffrandomizer.fakes.FakeRepository
+import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_ZERO
+import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_ZERO_STRING
+import junit.framework.TestCase.assertTrue
+import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.UUID
 
-class FakeRepository : Repository {
-    val categoryMap = mutableMapOf<UUID, Category>()
-    val partyMap = mutableMapOf<UUID, Party>()
-    override fun getAllParties(): Flow<List<Party>> {
-        return flowOf(partyMap.entries.map { it.value })
-    }
-
-    override fun getAllCategories(): Flow<List<Category>> {
-        return flowOf(categoryMap.entries.map { it.value })
-    }
-
-    override suspend fun getCategoriesByName(names: List<String>): List<Category> {
-        return categoryMap.values.filter { names.contains(it.name) }
-    }
-
-    override suspend fun getCategoryByName(name: String): Category? {
-        return categoryMap.values.firstOrNull { it.name == name }
-    }
-
-    override suspend fun insertParty(party: Party) {
-        partyMap[party.uid] = party
-    }
-
-    override suspend fun insertCategory(category: Category) {
-        categoryMap[category.uid] = category
-    }
-
-    override suspend fun deleteCategory(category: Category) {
-        categoryMap.remove(category.uid)
-    }
-
-    override suspend fun insertCategories(categories: List<Category>) {
-        categoryMap.putAll(categories.map { it.uid to it })
-    }
-
-    override suspend fun deleteAllParties() {
-        partyMap.clear()
-    }
-
-    override suspend fun deleteAllCategories() {
-        categoryMap.clear()
-    }
-}
 
 // unused by might need later
 //composeTestRule.onNodeWithTag("items").onChildAt(0).performTextInput("item1")
 // add espresso testing?
 // change out to inject a different module or test runner instead
 // fill in rest of tests
-
-
 
 @RunWith(AndroidJUnit4::class)
 class CategoryDetailsScreenKtTest {
@@ -86,39 +41,34 @@ class CategoryDetailsScreenKtTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @Test
-    fun int_withNoCategory_uiFieldsEmpty() {
-        val fakeRepository = FakeRepository()
-        // Setup and check the initial state of the screen
+    // Helper function to set content and improve readability
+    private fun setupScreenWith(viewModel: MainViewModel, categoryId: String?) {
         composeTestRule.setContent {
-            CategoryDetailsScreen(viewModel = MainViewModel(fakeRepository),
-                categoryId = null)
+            CategoryDetailsScreen(viewModel = viewModel, categoryId = categoryId)
         }
+    }
+
+    @Test
+    fun initialScreen_withNoCategory_uiFieldsEmpty() {
+        // Setup with no initial category
+        setupScreenWith(MainViewModel(FakeRepository()), null)
+
+        // Verify UI fields are empty
         composeTestRule.onNodeWithText("List Name").assert(hasText(""))
         composeTestRule.onNodeWithContentDescription("Add").assertExists()
         composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(0)
     }
 
-    val UUID_ZERO_STRING = "00000000-0000-0000-0000-000000000000"
-    val UUID_ZERO = UUID.fromString(UUID_ZERO_STRING)
-
     @Test
     fun init_withCategory_uiFieldsPopulated() {
-        // Setup and check the initial state of the screen
-        val category = Category(
-            UUID_ZERO,
-            "Category 1",
-            listOf("Item 1", "Item 2"))
-
-        val repository = FakeRepository()
-        repository.categoryMap[category.uid] = category
+        // Setup with a pre-populated category
+        val category = Category(UUID_ZERO, "Category 1", listOf("Item 1", "Item 2"))
+        val repository = FakeRepository().apply { categoryMap[category.uid] = category }
         val viewModel = MainViewModel(repository)
         viewModel.categories.observeForever {  }
-        composeTestRule.setContent {
-            CategoryDetailsScreen(viewModel = viewModel,
-                categoryId = UUID_ZERO_STRING)
-        }
+        setupScreenWith(viewModel, UUID_ZERO_STRING)
 
+        // Verify that UI fields are populated
         composeTestRule.onNodeWithText("List Name").assert(hasText("Category 1"))
         composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(2)
         composeTestRule.onNodeWithText("Item 2").assertExists()
@@ -126,94 +76,80 @@ class CategoryDetailsScreenKtTest {
     }
 
     @Test
-    fun backNavigation_withCategory_categorySaved() {
-        // Check that clicking the back button saves the current category 
-        // (name and items) if they have been changed.
+    fun backNavigation_withNewCategory_categorySaved() {
+        // Setup with no initial category
         val fakeRepository = FakeRepository()
-        composeTestRule.setContent {
-            CategoryDetailsScreen(viewModel = MainViewModel(fakeRepository),
-                categoryId = null)
-        }
+        setupScreenWith(MainViewModel(fakeRepository), null)
 
-        // Perform actions
+        // Perform actions to create and save a new category
         composeTestRule.onNodeWithContentDescription("Add").performClick()
         composeTestRule.onNodeWithText("List Name").performTextInput("List 1")
         composeTestRule.onNodeWithContentDescription("editable_item").performTextInput("item1")
         composeTestRule.onNodeWithContentDescription("back").performClick()
+
+
+        // Verify that the category was saved correctly
+        val savedCategory = fakeRepository.categoryMap.values.first()
+        Assert.assertEquals(1, fakeRepository.categoryMap.size)
+        Assert.assertEquals("List 1", savedCategory.name)
+        Assert.assertEquals(listOf("item1"), savedCategory.things)
 
         // Verify the updated UI state
         composeTestRule.onNodeWithContentDescription("editable_item").assert(hasText("item1"))
         composeTestRule.onNodeWithText("List Name").assert(hasText("List 1"))
         composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(1)
-
-        // Verify that the category was saved
-        assert(fakeRepository.categoryMap.size == 1)
-        // check equality in one step?
-        val category = fakeRepository.categoryMap.values.first()
-        assert(category.name == "List 1")
-        assert(category.things.size == 1)
-        assert(category.things[0] == "item1")
     }
 
     @Test
-    fun backNavigation_EmptyCategory_categoryNotSaved() {
-        // Ensure that if the category name and all items are empty, 
-        // clicking back deletes the category and navigates back.
+    fun backNavigation_withEmptyNewCategory_categoryNotSaved() {
+        // Setup with no initial category
         val fakeRepository = FakeRepository()
-        composeTestRule.setContent {
-            CategoryDetailsScreen(viewModel = MainViewModel(fakeRepository),
-                categoryId = null)
-        }
+        setupScreenWith(MainViewModel(fakeRepository), null)
 
-        // Perform actions
+        // Perform actions (clicking back without adding name or item)
         composeTestRule.onNodeWithContentDescription("back").performClick()
 
-        assert(fakeRepository.categoryMap.isEmpty())
-        composeTestRule.onNodeWithText("Removing Empty Category").assertExists()
+
+        // Verify that the category was not saved and warning is displayed
+        assertTrue("Category should not be saved in the repository when there are no name or items.", fakeRepository.categoryMap.isEmpty())
+        composeTestRule.onNodeWithText("Removing Empty Category").assertIsDisplayed()
     }
 
     @Test
-    fun `Back Navigation   Empty Items`() {
-        // Verify that if the category has a name but no items, 
-        // a snackbar warning is displayed and the category is not saved.
+    fun backNavigation_withNameButNoItems_showsWarningAndDoesNotSave() {
+        // Setup with no initial category
         val fakeRepository = FakeRepository()
-        composeTestRule.setContent {
-            CategoryDetailsScreen(viewModel = MainViewModel(fakeRepository),
-                categoryId = null)
-        }
+        setupScreenWith(MainViewModel(fakeRepository), null)
 
-        // Perform actions
+        // Perform actions (clicking back after adding name but no items)
         composeTestRule.onNodeWithText("List Name").performTextInput("List 1")
         composeTestRule.onNodeWithContentDescription("back").performClick()
 
-        assert(fakeRepository.categoryMap.isEmpty())
-        composeTestRule.onNodeWithText("Can\'t Save Category Without Items").assertExists()
+        // Verify category not saved and warning displayed
+        assertTrue("Category should not be saved in the repository when there are no items.", fakeRepository.categoryMap.isEmpty())
+        composeTestRule.onNodeWithText("Can\'t Save Category Without Items").assertIsDisplayed()
     }
 
     @Test
-    fun `Back Navigation   Empty Name`() {
-        // Check that if the category has items but no name, a snackbar 
-        // warning is shown and the category is not saved.
+    fun backNavigation_withItemsButNoName_showsWarningAndDoesNotSave() {
+        // Setup with no initial category
         val fakeRepository = FakeRepository()
-        composeTestRule.setContent {
-            CategoryDetailsScreen(viewModel = MainViewModel(fakeRepository),
-                categoryId = null)
-        }
+        setupScreenWith(MainViewModel(fakeRepository), null)
 
-        // Perform actions
+        // Perform actions (clicking back after adding items but no name)
         composeTestRule.onNodeWithContentDescription("Add").performClick()
         composeTestRule.onNodeWithContentDescription("editable_item").performTextInput("item1")
         composeTestRule.onNodeWithContentDescription("back").performClick()
 
-        assert(fakeRepository.categoryMap.isEmpty())
-        composeTestRule.onNodeWithText("Can\'t Save Category Without Name").assertExists()
+
+        // Verify category not saved and warning displayed
+        assertTrue("Category should not be saved in the repository when there are no list name.", fakeRepository.categoryMap.isEmpty())
+        composeTestRule.onNodeWithText("Can\'t Save Category Without Name").assertIsDisplayed()
     }
 
     @Test
-    fun `Refresh Button Functionality`() {
-        // Test that the refresh button resets the category name and items 
-        // to their original values when the screen was loaded.
-        // Setup
+    fun refreshButton_resetsCategoryToOriginalState() {
+        // Setup with preexisting category
         val category = Category(
             UUID_ZERO,
             "Category 1",
@@ -223,12 +159,10 @@ class CategoryDetailsScreenKtTest {
         repository.categoryMap[category.uid] = category
         val viewModel = MainViewModel(repository)
         viewModel.categories.observeForever {  }
-        composeTestRule.setContent {
-            CategoryDetailsScreen(viewModel = viewModel,
-                categoryId = UUID_ZERO_STRING)
-        }
+        setupScreenWith(viewModel, UUID_ZERO_STRING)
 
-        // Edit and refresh
+
+        // Edit the category and then refresh
         composeTestRule.onNodeWithText("List Name").performTextInput("List 1")
         composeTestRule.onNodeWithContentDescription("Add").performClick()
         composeTestRule.onNodeWithContentDescription("Add").performClick()
