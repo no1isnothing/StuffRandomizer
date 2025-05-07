@@ -66,6 +66,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     debugImplementation(libs.androidx.ui.test.manifest.v154)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.core.testing)
 
     annotationProcessor(libs.room.compiler)
     

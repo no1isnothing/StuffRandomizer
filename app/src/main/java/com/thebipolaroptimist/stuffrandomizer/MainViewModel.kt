@@ -5,7 +5,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.common.flogger.FluentLogger
@@ -28,6 +30,8 @@ class MainViewModel @Inject constructor(private val mainRepository: Repository) 
 
     val parties = mainRepository.getAllParties().asLiveData()
     val categories = mainRepository.getAllCategories().asLiveData()
+    val _categories = MutableLiveData<List<Category>>()
+    //val categories : LiveData<List<Category>> = _categories
 
     var currentCategoryName by mutableStateOf("")
     var currentCategoryThings = mutableStateListOf<String>()
@@ -37,6 +41,18 @@ class MainViewModel @Inject constructor(private val mainRepository: Repository) 
     var newPartyName by mutableStateOf("")
     var newPartyCheckedState = mutableStateListOf<Boolean>()
     var newAssigneeSelection by mutableIntStateOf(0)
+
+    /**
+     *     val _charactersLiveData = MutableLiveData<Result<ArrayList<Character>>>()
+     *     val charactersLiveData: LiveData<Result<ArrayList<Character>>> = _charactersLiveData
+     */
+
+    fun fetchCategories() {
+        viewModelScope.launch {
+            var data = mainRepository.getAllCategories()
+            _categories.value = mainRepository.getAllCategories().asLiveData().value
+        }
+    }
 
     /**
      * Reset data for [Party] being created.

@@ -1,19 +1,16 @@
 package com.thebipolaroptimist.stuffrandomizer.ui
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasParent
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithContentDescription
-import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.test.espresso.matcher.ViewMatchers.withParent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.data.Category
@@ -25,6 +22,7 @@ import kotlinx.coroutines.flow.flowOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.UUID
 
 
 class FakeRepository : Repository {
@@ -34,7 +32,11 @@ class FakeRepository : Repository {
     }
 
     override fun getAllCategories(): Flow<List<Category>> {
-        return flowOf(emptyList())
+        return flowOf(listOf(
+            Category(
+                UUID.fromString("00000000-0000-0000-0000-000000000000"),
+                "Category 1",
+                listOf("Item 1", "Item 2"))))
     }
 
     override suspend fun getCategoriesByName(names: List<String>): List<Category> {
@@ -54,7 +56,7 @@ class FakeRepository : Repository {
     }
 
     override suspend fun deleteCategory(category: Category) {
-        TODO("Not yet implemented")
+        lastCategory = null
     }
 
     override suspend fun insertCategories(categories: List<Category>) {
@@ -72,6 +74,9 @@ class FakeRepository : Repository {
 
 // unused by might need later
 //composeTestRule.onNodeWithTag("items").onChildAt(0).performTextInput("item1")
+// add espresso testing?
+// add mockito? or other mock framework?
+// change out to inject a different module or test runner instead
 
 @RunWith(AndroidJUnit4::class)
 class CategoryDetailsScreenKtTest {
@@ -79,8 +84,11 @@ class CategoryDetailsScreenKtTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
+
     @Test
-    fun `New Category Creation`() {
+    fun int_withNoCategory_uiFieldsEmpty() {
         val fakeRepository = FakeRepository()
         // Setup and check the initial state of the screen
         composeTestRule.setContent {
@@ -89,7 +97,34 @@ class CategoryDetailsScreenKtTest {
         }
         composeTestRule.onNodeWithText("List Name").assert(hasText(""))
         composeTestRule.onNodeWithContentDescription("Add").assertExists()
-        composeTestRule.onAllNodes(hasParent(hasTestTag("items"))).assertCountEquals(0)
+        composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(0)
+    }
+
+    @Test
+    fun init_withCategory_uiFieldsPopulated() {
+        // Setup and check the initial state of the screen
+        val viewModel = MainViewModel(FakeRepository())
+        viewModel.categories.observeForever {  }
+        composeTestRule.setContent {
+            CategoryDetailsScreen(viewModel = viewModel,
+                categoryId = "00000000-0000-0000-0000-000000000000")
+        }
+
+        composeTestRule.onNodeWithText("List Name").assert(hasText("Category 1"))
+        composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(2)
+        composeTestRule.onNodeWithText("Item 2").assertExists()
+        composeTestRule.onNodeWithText("Item 1").assertExists()
+    }
+
+    @Test
+    fun backNavigation_withCategory_categorySaved() {
+        // Check that clicking the back button saves the current category 
+        // (name and items) if they have been changed.
+        val fakeRepository = FakeRepository()
+        composeTestRule.setContent {
+            CategoryDetailsScreen(viewModel = MainViewModel(fakeRepository),
+                categoryId = null)
+        }
 
         // Perform actions
         composeTestRule.onNodeWithContentDescription("Add").performClick()
@@ -97,13 +132,14 @@ class CategoryDetailsScreenKtTest {
         composeTestRule.onNodeWithContentDescription("editable_item").performTextInput("item1")
         composeTestRule.onNodeWithContentDescription("back").performClick()
 
-        // Verify the updated state
+        // Verify the updated UI state
         composeTestRule.onNodeWithContentDescription("editable_item").assert(hasText("item1"))
         composeTestRule.onNodeWithText("List Name").assert(hasText("List 1"))
-        composeTestRule.onAllNodes(hasParent(hasTestTag("items"))).assertCountEquals(1)
+        composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(1)
 
         // Verify that the category was saved
         assert(fakeRepository.lastCategory != null)
+        // check equality in one step?
         assertNotNull(fakeRepository.lastCategory?.name)
         assert(fakeRepository.lastCategory?.name  == "List 1")
         assertNotNull(fakeRepository.lastCategory?.things)
@@ -112,37 +148,57 @@ class CategoryDetailsScreenKtTest {
     }
 
     @Test
-    fun `Category Editing`() {
-        // Test editing an existing category by providing a valid categoryId.
-        // TODO implement test
-    }
-
-    @Test
-    fun `Back Navigation   Save`() {
-        // Check that clicking the back button saves the current category 
-        // (name and items) if they have been changed.
-        // TODO implement test
-    }
-
-    @Test
-    fun `Back Navigation   Empty Name   Items`() {
+    fun backNavigation_EmptyCategory_categoryNotSaved() {
         // Ensure that if the category name and all items are empty, 
         // clicking back deletes the category and navigates back.
-        // TODO implement test
+        val fakeRepository = FakeRepository()
+        composeTestRule.setContent {
+            CategoryDetailsScreen(viewModel = MainViewModel(fakeRepository),
+                categoryId = null)
+        }
+
+        // Perform actions
+        composeTestRule.onNodeWithContentDescription("back").performClick()
+
+        assert(fakeRepository.lastCategory == null)
+        composeTestRule.onNodeWithText("Removing Empty Category").assertExists()
     }
 
     @Test
     fun `Back Navigation   Empty Items`() {
         // Verify that if the category has a name but no items, 
         // a snackbar warning is displayed and the category is not saved.
-        // TODO implement test
+        val fakeRepository = FakeRepository()
+        composeTestRule.setContent {
+            CategoryDetailsScreen(viewModel = MainViewModel(fakeRepository),
+                categoryId = null)
+        }
+
+        // Perform actions
+        composeTestRule.onNodeWithText("List Name").performTextInput("List 1")
+        composeTestRule.onNodeWithContentDescription("back").performClick()
+
+        assert(fakeRepository.lastCategory == null)
+        composeTestRule.onNodeWithText("Can\'t Save Category Without Items").assertExists()
     }
 
     @Test
     fun `Back Navigation   Empty Name`() {
         // Check that if the category has items but no name, a snackbar 
         // warning is shown and the category is not saved.
-        // TODO implement test
+        val fakeRepository = FakeRepository()
+        composeTestRule.setContent {
+            CategoryDetailsScreen(viewModel = MainViewModel(fakeRepository),
+                categoryId = null)
+        }
+
+        // Perform actions
+        composeTestRule.onNodeWithContentDescription("Add").performClick()
+        composeTestRule.onNodeWithContentDescription("editable_item").performTextInput("item1")
+        composeTestRule.onNodeWithContentDescription("back").performClick()
+
+        assert(fakeRepository.lastCategory == null)
+        composeTestRule.onNodeWithText("Can\'t Save Category Without Name").assertExists()
     }
 
     @Test
@@ -192,23 +248,6 @@ class CategoryDetailsScreenKtTest {
         // TODO implement test
     }
 
-    @Test
-    fun `Snackbar   Empty Category`() {
-        //Verify a snackbar is shown when name and list is empty, if user clicks back
-        // TODO implement test
-    }
-
-    @Test
-    fun `Snackbar   Empty List`() {
-        //Verify a snackbar is shown when list is empty, if user clicks back
-        // TODO implement test
-    }
-
-    @Test
-    fun `Snackbar   Empty Category Name`() {
-        //Verify a snackbar is shown when the category name is empty, if user clicks back
-        // TODO implement test
-    }
 
     @Test
     fun `Non Existent Category ID`() {
@@ -232,7 +271,7 @@ class CategoryDetailsScreenKtTest {
 
     @Test
     fun `Empty String in Category items`() {
-        // verify that when user adds empty strings, and clicks the back button 
+        // verify that when user adds empty strings, and clicks the back button
         // that these empty strings are NOT saved to the category.
         // TODO implement test
     }

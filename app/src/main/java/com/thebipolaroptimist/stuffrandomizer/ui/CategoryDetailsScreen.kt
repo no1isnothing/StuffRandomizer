@@ -26,9 +26,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
@@ -58,6 +59,7 @@ fun CategoryDetailsScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
+    viewModel.fetchCategories()
 
     val currentCategory = categoryId?.let {
         viewModel.categories
@@ -86,7 +88,7 @@ fun CategoryDetailsScreen(
                                 return@IconButton
                             }
 
-                            if (viewModel.currentCategoryThings.isEmpty()) { //check filtered list isn't empty
+                            if (viewModel.currentCategoryThings.isEmpty()) {
                                 coroutineScope.launch {
                                     snackbarState.showSnackbar(context.getString(R.string.warning_empty_item_list))
                                 }
@@ -155,7 +157,7 @@ fun CategoryDetailsScreen(
                 colors = mainOutlinedTextfieldColors()
             )
             LabelText(text = stringResource(id = R.string.items))
-            LazyColumn(Modifier.weight(1f, fill = false).testTag("items")) {
+            LazyColumn(Modifier.weight(1f, fill = false).semantics { contentDescription = "items" }) {
                 itemsIndexed(viewModel.currentCategoryThings) { index, item ->
                     key(item) {
                         EditableSingleLineItem(text = item,
