@@ -5,19 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="QuickSelectDialogPreview">
+      <SelectionState runConfigName="Back Navigation   Empty Items()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="New Category Creation()">
+      <SelectionState runConfigName="Back Navigation   Empty Name()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Category Editing()">
+      <SelectionState runConfigName="CategoryDetailsScreenKtTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Back Navigation   Save()">
+      <SelectionState runConfigName="init_withCategory_uiFieldsPopulated()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="backNagivation_EmptyCategory_categoryNotSaved()">
+      <SelectionState runConfigName="Refresh Button Functionality()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

@@ -7,16 +7,17 @@ import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasParent
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.data.Repository
-import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Rule
@@ -24,59 +25,57 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.UUID
 
-
 class FakeRepository : Repository {
-    var lastCategory: Category? = null
+    val categoryMap = mutableMapOf<UUID, Category>()
+    val partyMap = mutableMapOf<UUID, Party>()
     override fun getAllParties(): Flow<List<Party>> {
-        return flowOf(emptyList())
+        return flowOf(partyMap.entries.map { it.value })
     }
 
     override fun getAllCategories(): Flow<List<Category>> {
-        return flowOf(listOf(
-            Category(
-                UUID.fromString("00000000-0000-0000-0000-000000000000"),
-                "Category 1",
-                listOf("Item 1", "Item 2"))))
+        return flowOf(categoryMap.entries.map { it.value })
     }
 
     override suspend fun getCategoriesByName(names: List<String>): List<Category> {
-        TODO("Not yet implemented")
+        return categoryMap.values.filter { names.contains(it.name) }
     }
 
     override suspend fun getCategoryByName(name: String): Category? {
-        TODO("Not yet implemented")
+        return categoryMap.values.firstOrNull { it.name == name }
     }
 
     override suspend fun insertParty(party: Party) {
-        TODO("Not yet implemented")
+        partyMap[party.uid] = party
     }
 
     override suspend fun insertCategory(category: Category) {
-        lastCategory = category
+        categoryMap[category.uid] = category
     }
 
     override suspend fun deleteCategory(category: Category) {
-        lastCategory = null
+        categoryMap.remove(category.uid)
     }
 
     override suspend fun insertCategories(categories: List<Category>) {
-        TODO("Not yet implemented")
+        categoryMap.putAll(categories.map { it.uid to it })
     }
 
     override suspend fun deleteAllParties() {
-        TODO("Not yet implemented")
+        partyMap.clear()
     }
 
     override suspend fun deleteAllCategories() {
-        TODO("Not yet implemented")
+        categoryMap.clear()
     }
 }
 
 // unused by might need later
 //composeTestRule.onNodeWithTag("items").onChildAt(0).performTextInput("item1")
 // add espresso testing?
-// add mockito? or other mock framework?
 // change out to inject a different module or test runner instead
+// fill in rest of tests
+
+
 
 @RunWith(AndroidJUnit4::class)
 class CategoryDetailsScreenKtTest {
@@ -100,14 +99,24 @@ class CategoryDetailsScreenKtTest {
         composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(0)
     }
 
+    val UUID_ZERO_STRING = "00000000-0000-0000-0000-000000000000"
+    val UUID_ZERO = UUID.fromString(UUID_ZERO_STRING)
+
     @Test
     fun init_withCategory_uiFieldsPopulated() {
         // Setup and check the initial state of the screen
-        val viewModel = MainViewModel(FakeRepository())
+        val category = Category(
+            UUID_ZERO,
+            "Category 1",
+            listOf("Item 1", "Item 2"))
+
+        val repository = FakeRepository()
+        repository.categoryMap[category.uid] = category
+        val viewModel = MainViewModel(repository)
         viewModel.categories.observeForever {  }
         composeTestRule.setContent {
             CategoryDetailsScreen(viewModel = viewModel,
-                categoryId = "00000000-0000-0000-0000-000000000000")
+                categoryId = UUID_ZERO_STRING)
         }
 
         composeTestRule.onNodeWithText("List Name").assert(hasText("Category 1"))
@@ -138,13 +147,12 @@ class CategoryDetailsScreenKtTest {
         composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(1)
 
         // Verify that the category was saved
-        assert(fakeRepository.lastCategory != null)
+        assert(fakeRepository.categoryMap.size == 1)
         // check equality in one step?
-        assertNotNull(fakeRepository.lastCategory?.name)
-        assert(fakeRepository.lastCategory?.name  == "List 1")
-        assertNotNull(fakeRepository.lastCategory?.things)
-        assert(fakeRepository.lastCategory?.things?.size == 1)
-        assert(fakeRepository.lastCategory?.things?.get(0) == "item1")
+        val category = fakeRepository.categoryMap.values.first()
+        assert(category.name == "List 1")
+        assert(category.things.size == 1)
+        assert(category.things[0] == "item1")
     }
 
     @Test
@@ -160,7 +168,7 @@ class CategoryDetailsScreenKtTest {
         // Perform actions
         composeTestRule.onNodeWithContentDescription("back").performClick()
 
-        assert(fakeRepository.lastCategory == null)
+        assert(fakeRepository.categoryMap.isEmpty())
         composeTestRule.onNodeWithText("Removing Empty Category").assertExists()
     }
 
@@ -178,7 +186,7 @@ class CategoryDetailsScreenKtTest {
         composeTestRule.onNodeWithText("List Name").performTextInput("List 1")
         composeTestRule.onNodeWithContentDescription("back").performClick()
 
-        assert(fakeRepository.lastCategory == null)
+        assert(fakeRepository.categoryMap.isEmpty())
         composeTestRule.onNodeWithText("Can\'t Save Category Without Items").assertExists()
     }
 
@@ -197,7 +205,7 @@ class CategoryDetailsScreenKtTest {
         composeTestRule.onNodeWithContentDescription("editable_item").performTextInput("item1")
         composeTestRule.onNodeWithContentDescription("back").performClick()
 
-        assert(fakeRepository.lastCategory == null)
+        assert(fakeRepository.categoryMap.isEmpty())
         composeTestRule.onNodeWithText("Can\'t Save Category Without Name").assertExists()
     }
 
@@ -205,7 +213,34 @@ class CategoryDetailsScreenKtTest {
     fun `Refresh Button Functionality`() {
         // Test that the refresh button resets the category name and items 
         // to their original values when the screen was loaded.
-        // TODO implement test
+        // Setup
+        val category = Category(
+            UUID_ZERO,
+            "Category 1",
+            listOf("Item 1", "Item 2"))
+
+        val repository = FakeRepository()
+        repository.categoryMap[category.uid] = category
+        val viewModel = MainViewModel(repository)
+        viewModel.categories.observeForever {  }
+        composeTestRule.setContent {
+            CategoryDetailsScreen(viewModel = viewModel,
+                categoryId = UUID_ZERO_STRING)
+        }
+
+        // Edit and refresh
+        composeTestRule.onNodeWithText("List Name").performTextInput("List 1")
+        composeTestRule.onNodeWithContentDescription("Add").performClick()
+        composeTestRule.onNodeWithContentDescription("Add").performClick()
+        composeTestRule.onAllNodesWithContentDescription("editable_item")[0].performTextInput("item1")
+        composeTestRule.onAllNodesWithContentDescription("editable_item")[3].performTextInput("item one million")
+        composeTestRule.onNodeWithContentDescription("refresh").performClick()
+
+        // Verify Original Values
+        composeTestRule.onNodeWithText("List Name").assert(hasText("Category 1"))
+        composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(2)
+        composeTestRule.onNodeWithText("Item 2").assertExists()
+        composeTestRule.onNodeWithText("Item 1").assertExists()
     }
 
     @Test

@@ -59,11 +59,10 @@ fun CategoryDetailsScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
-    viewModel.fetchCategories()
 
     val currentCategory = categoryId?.let {
         viewModel.categories
-            .value?.first { category -> category.uid == UUID.fromString(categoryId) }
+            .value?.firstOrNull { category -> category.uid == UUID.fromString(categoryId) }
     } ?: Category(UUID.randomUUID(), "", listOf())
 
     viewModel.setupCurrentCategory(currentCategory)
