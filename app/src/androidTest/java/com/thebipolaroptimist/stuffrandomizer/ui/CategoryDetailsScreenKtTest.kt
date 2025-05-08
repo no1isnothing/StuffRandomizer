@@ -26,14 +26,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
-// unused by might need later
-//composeTestRule.onNodeWithTag("items").onChildAt(0).performTextInput("item1")
-// add espresso testing?
-// change out to inject a different module or test runner instead
-// fill in rest of tests
-// finish changing from strings to textfieldvalues in composables with textfields
-
 @RunWith(AndroidJUnit4::class)
 class CategoryDetailsScreenKtTest {
 
@@ -222,6 +214,7 @@ class CategoryDetailsScreenKtTest {
         composeTestRule.onNodeWithText("List Name").performTextClearance()
         composeTestRule.onNodeWithText("List Name").performTextInput(newName)
 
+        // Verify that the name is updated in the view model
         composeTestRule.onNodeWithText("List Name").assert(hasText(newName))
         assertEquals(newName, viewModel.currentCategoryName)
     }
@@ -274,53 +267,84 @@ class CategoryDetailsScreenKtTest {
         viewModel.categories.observeForever { }
         setupScreenWith(viewModel, UUID_ZERO_STRING)
 
-        // Check that clicking the remove button on an EditableSingleLineItem
-        // removes the item from currentCategoryThings.
+        // Click Remove Button
         composeTestRule.onAllNodesWithContentDescription("Clear")[1].performClick()
 
+        // Verify Item has been removed
         composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(2)
         assertEquals(listOf("Item 1", "Item 3"), viewModel.currentCategoryThings)
     }
 
     @Test
-    fun `Empty Item Strings Are Removed`() {
-        //Check that if the category is saved, only non empty item strings are saved
-        // TODO implement test
-    }
+    fun savingListWithEmptyStrings_emptyStringsAreRemoved() {
+        // Check that if the category is saved, only non empty item strings are saved
+        val category = Category(UUID_ZERO, "Category 1", listOf("Item 1", "Item 3"))
+        val repository = FakeRepository().apply { categoryMap[category.uid] = category }
+        val viewModel = MainViewModel(repository)
+        viewModel.categories.observeForever { }
+        setupScreenWith(viewModel, UUID_ZERO_STRING)
 
+        // Add two empty items using the add button
+        composeTestRule.onNodeWithContentDescription("Add").performClick()
+        composeTestRule.onNodeWithContentDescription("Add").performClick()
 
-    @Test
-    fun `Non Existent Category ID`() {
-        // Test behavior when a non-existent or invalid categoryId is provided.
-        // TODO implement test
-    }
+        // Simulate saving by clicking back button
+        composeTestRule.onNodeWithContentDescription("back").performClick()
 
-    @Test
-    fun `Large Category Name`() {
-        // Test behavior with a very long category name to ensure 
-        // UI components handle it correctly without breaking
-        // TODO implement test
-    }
-
-    @Test
-    fun `Large Number of Items`() {
-        // Check how the UI handles a category with a large number 
-        // of items (e.g., more than 100).
-        // TODO implement test
+        // Verify empty strings have been removed
+        val savedCategory = repository.categoryMap.values.first()
+        assertEquals(listOf("Item 1", "Item 3"), savedCategory.things)
     }
 
     @Test
-    fun `Empty String in Category items`() {
-        // verify that when user adds empty strings, and clicks the back button
-        // that these empty strings are NOT saved to the category.
-        // TODO implement test
+    fun nonExistentCategoryId_showsEmptyScreen() {
+        // Setup screen with non-existent category ID
+        val fakeRepository = FakeRepository()
+        val viewModel = MainViewModel(fakeRepository)
+        viewModel.categories.observeForever { }
+        setupScreenWith(viewModel, "non_existent_id")
+
+        // Verify UI fields are empty, indicating no category was loaded
+        composeTestRule.onNodeWithText("List Name").assert(hasText(""))
+        composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(0)
     }
 
     @Test
-    fun `Invalid Category ID Format`() {
-        // Verify that an invalid Category ID format (not a UUID) 
-        // is handled gracefully without causing crashes
-        // TODO implement test
+    fun largeCategoryName_isAccepted() {
+        // Setup screen and init long category name
+        val veryLongName = "A".repeat(500)
+        val fakeRepository = FakeRepository()
+        setupScreenWith(MainViewModel(fakeRepository), null)
+
+        // Type the very long name
+        composeTestRule.onNodeWithText("List Name").performTextInput(veryLongName)
+
+        // Verify that the typed text is in the field
+        composeTestRule.onNodeWithText("List Name").assert(hasText(veryLongName))
+    }
+
+
+
+    @Test
+    fun largeNumberOfItems_displayedAndBackedByViewModel() {
+        // Setup screen and large number of items
+        val largeNumberOfItems = 150
+        val fakeRepository = FakeRepository()
+        val viewModel = MainViewModel(fakeRepository)
+        setupScreenWith(viewModel, null)
+
+        // Add a large number of items
+        repeat(largeNumberOfItems) {
+            composeTestRule.onNodeWithContentDescription("Add").performClick()
+        }
+
+        // Verify that the correct number of items are in viewmodel
+        assertEquals(largeNumberOfItems, viewModel.currentCategoryThings.size)
+
+        // Verify that the add button is still displayed
+        // Note: You cannot verify there are 150 items displayed in the LazyList due to the nature
+        // how LazyLists populate views on the screen
+        composeTestRule.onNodeWithContentDescription("Add").assertIsDisplayed()
     }
 
 }

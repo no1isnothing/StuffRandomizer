@@ -5,19 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Category Name Change()">
+      <SelectionState runConfigName="savingListWithEmptyStrings_emptyStringsAreRemoved()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="categoryNameChange_updatesViewModel()">
+      <SelectionState runConfigName="Non Existent Category ID()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Adding Items()">
+      <SelectionState runConfigName="Large Category Name()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Editing Item Content()">
+      <SelectionState runConfigName="Large Number of Items()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Removing Items()">
+      <SelectionState runConfigName="CategoryDetailsScreenKtTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
