@@ -47,5 +47,7 @@
     <string name="quick_select">Quick Select</string>
     <string name="select_existing_list">Select existing list</string>
     <string name="enter_new_list">Enter new list</string>
+    <string name="no_categories_tagline">No categories to display</string>
+    <string name="no_categories_message">Create categories and they will be displayed here.</string>
 
 </resources>

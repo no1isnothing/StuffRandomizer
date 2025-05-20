@@ -19,11 +19,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.ui.components.ClickableTwoLineItem
+import com.thebipolaroptimist.stuffrandomizer.ui.components.EmptyStateScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
 
 /**
@@ -32,11 +35,11 @@ import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryListScreen(
-    mainViewModel: MainViewModel = hiltViewModel(),
+    viewModel: MainViewModel = hiltViewModel(),
     toCategoryCreation: () -> Unit = {},
-    toCategoryEdit: (uuid: String) -> Unit
+    toCategoryEdit: (uuid: String) -> Unit = {},
 ) {
-    val categoryList by mainViewModel.categories.observeAsState(listOf())
+    val categoryList by viewModel.categories.observeAsState(listOf())
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(id = R.string.category_list_label)) },
@@ -49,16 +52,25 @@ fun CategoryListScreen(
                 },
                 colors = mainTopAppBarColors())
         }) { padding ->
-        LazyColumn(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            items(categoryList) { item ->
-                ClickableTwoLineItem(item.name,
-                    item.things.joinToString()
-                ) { toCategoryEdit(item.uid.toString()) }
+        if(categoryList.isEmpty()) {
+            EmptyStateScreen(
+                stringResource(R.string.no_categories_tagline),
+                stringResource(R.string.no_categories_message)
+            )
+        } else {
+            LazyColumn(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .background(MaterialTheme.colorScheme.background)
+                    .semantics { contentDescription = "items" }
+            ) {
+                items(categoryList) { item ->
+                    ClickableTwoLineItem(
+                        item.name,
+                        item.things.joinToString()
+                    ) { toCategoryEdit(item.uid.toString()) }
+                }
             }
         }
     }

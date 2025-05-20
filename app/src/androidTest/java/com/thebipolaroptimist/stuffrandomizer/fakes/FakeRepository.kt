@@ -7,8 +7,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.util.UUID
 
-val UUID_ZERO_STRING = "00000000-0000-0000-0000-000000000000"
-val UUID_ZERO = UUID.fromString(UUID_ZERO_STRING)
+const val UUID_ZERO_STRING = "00000000-0000-0000-0000-000000000000"
+val UUID_ZERO: UUID = UUID.fromString(UUID_ZERO_STRING)
+const val UUID_ONE_STRING = "00000000-0000-0000-0000-000000000001"
+val UUID_ONE: UUID = UUID.fromString(UUID_ONE_STRING)
+const val UUID_TWO_STRING = "00000000-0000-0000-0000-000000000002"
+val UUID_TWO: UUID = UUID.fromString(UUID_TWO_STRING)
 
 /**
  * A fake implementation of the [Repository] interface for testing purposes.

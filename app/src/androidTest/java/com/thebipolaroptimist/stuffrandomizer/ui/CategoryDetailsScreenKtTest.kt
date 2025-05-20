@@ -323,8 +323,6 @@ class CategoryDetailsScreenKtTest {
         composeTestRule.onNodeWithText("List Name").assert(hasText(veryLongName))
     }
 
-
-
     @Test
     fun largeNumberOfItems_displayedAndBackedByViewModel() {
         // Setup screen and large number of items
