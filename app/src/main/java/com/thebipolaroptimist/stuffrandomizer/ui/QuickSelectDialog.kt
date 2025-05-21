@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
@@ -54,6 +56,15 @@ fun QuickSelectDialogPreview()
         Category(name = "1", things = listOf("1", "2", "3")),
         Category(name = "2", things = listOf("1", "2", "3")),
         Category(name = "3", things = listOf("1", "2", "3"))))
+}
+
+@Composable
+fun Modifier.quickSelectDialogModifier() : Modifier {
+    val description = stringResource(R.string.quick_select_dialog)
+    return this
+        .fillMaxWidth()
+        .padding(dimensionResource(R.dimen.padding_medium))
+        .semantics { contentDescription = description }
 }
 
 /**
@@ -89,9 +100,8 @@ fun QuickSelectDialog(
             QuickSelectState.LIST_SELECT -> {
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(dimensionResource(R.dimen.dialog_height_small))
-                        .padding(dimensionResource(R.dimen.padding_medium),),
+                        .quickSelectDialogModifier()
+                        .height(dimensionResource(R.dimen.dialog_height_small)),
                     shape = RoundedCornerShape(dimensionResource(R.dimen.padding_medium)),
                 ) {
                     Column(Modifier
@@ -112,9 +122,8 @@ fun QuickSelectDialog(
             QuickSelectState.SHOW_SELECTED -> {
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(dimensionResource(R.dimen.dialog_height_small))
-                        .padding(dimensionResource(R.dimen.padding_medium)),
+                        .quickSelectDialogModifier()
+                        .height(dimensionResource(R.dimen.dialog_height_small)),
                     shape = RoundedCornerShape(dimensionResource(R.dimen.padding_medium)),
                 ) {
                     Column(Modifier
@@ -133,9 +142,8 @@ fun QuickSelectDialog(
             QuickSelectState.DEFAULT -> {
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(dimensionResource(R.dimen.dialog_height_small))
-                        .padding(dimensionResource(R.dimen.padding_medium)),
+                        .quickSelectDialogModifier()
+                        .height(dimensionResource(R.dimen.dialog_height_small)),
                     shape = RoundedCornerShape(dimensionResource(R.dimen.padding_medium)),
                 ) {
                     Column(
@@ -164,12 +172,13 @@ private fun CreateList(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(dimensionResource(R.dimen.dialog_height_large))
-            .padding(dimensionResource(R.dimen.padding_medium)),
+            .quickSelectDialogModifier()
+            .height(dimensionResource(R.dimen.dialog_height_large)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.padding_medium)),
     ) {
-        Column(Modifier.align(Alignment.CenterHorizontally).padding(dimensionResource(R.dimen.padding_small))) {
+        Column(Modifier
+            .align(Alignment.CenterHorizontally)
+            .padding(dimensionResource(R.dimen.padding_small))) {
             LazyColumn(Modifier.weight(1f, fill = false)) {
                 itemsIndexed(newList) { index, item ->
                     EditableSingleLineItem(

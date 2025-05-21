@@ -41,9 +41,9 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    mainViewModel: MainViewModel = hiltViewModel(),
+    viewModel: MainViewModel = hiltViewModel(),
 ) {
-    val categoryList by mainViewModel.categories.observeAsState(listOf())
+    val categoryList by viewModel.categories.observeAsState(listOf())
     val races = stringArrayResource(id = R.array.bg_race)
     val backgrounds = stringArrayResource(id = R.array.bg_background)
     val classes = stringArrayResource(id = R.array.bg_char_class)
@@ -73,33 +73,33 @@ fun HomeScreen(
                         DropdownMenuItem(
                             text = { Text(stringResource(id = R.string.action_add_data)) },
                             onClick = {
-                                mainViewModel.insertCategory(
+                                viewModel.insertCategory(
                                     Category(
                                         UUID.randomUUID(),
                                         "BG Backgrounds",
                                         backgrounds.toList()
                                     )
                                 )
-                                mainViewModel.insertCategory(
+                                viewModel.insertCategory(
                                     Category(
                                         UUID.randomUUID(),
                                         "BG Races",
                                         races.toList()
                                     )
                                 )
-                                mainViewModel.insertCategory(
+                                viewModel.insertCategory(
                                     Category(
                                         UUID.randomUUID(),
                                         "BG Classes",
                                         classes.toList()
                                     )
                                 )
-                                addSampleData(mainViewModel)
+                                addSampleData(viewModel)
                             })
                         // TODO #7: Remove, hide behind flag, or move to advanced settings with a warning
                         DropdownMenuItem(
                             text = { Text(stringResource(id = R.string.action_clear_data)) },
-                            onClick = { clearAllData(mainViewModel) })
+                            onClick = { clearAllData(viewModel) })
                     }
                 },
                 colors = mainTopAppBarColors()

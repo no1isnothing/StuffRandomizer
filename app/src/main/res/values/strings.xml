@@ -49,5 +49,6 @@
     <string name="enter_new_list">Enter new list</string>
     <string name="no_categories_tagline">No categories to display</string>
     <string name="no_categories_message">Create categories and they will be displayed here.</string>
+    <string name="quick_select_dialog">quick select dialog</string>
 
 </resources>
