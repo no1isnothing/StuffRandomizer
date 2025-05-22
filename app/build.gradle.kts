@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.devtools.ksp) // faster/newer alternative to kapt
-    alias(libs.plugins.mannodermaus.junit5.android)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
@@ -49,30 +48,25 @@ android {
         add("META-INF/LICENSE-notice.md")}
     }
 
-    tasks.withType<Test> {
-            useJUnitPlatform()
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
     }
 }
 
 dependencies {
-    implementation(libs.androidx.runtime.livedata)
-    val composeBom = platform("androidx.compose:compose-bom:2024.12.01")
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.ui.tooling.preview)
-    debugImplementation(libs.androidx.ui.tooling)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.test.manifest)
-    debugImplementation(libs.androidx.ui.test.manifest.v154)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.core.testing)
-
     annotationProcessor(libs.room.compiler)
-    
+
     ksp(libs.hilt.android.compiler)
     ksp(libs.room.compiler)
 
+    val composeBom = platform("androidx.compose:compose-bom:2024.12.01")
+    implementation(composeBom)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.junit.ktx)
     implementation(libs.hilt.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -91,11 +85,20 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    testImplementation(libs.junit.jupiter)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+    debugImplementation(libs.androidx.ui.test.manifest.v154)
 
-    testRuntimeOnly(libs.junit.jupiter.engine)
-
-    androidTestImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.core.testing)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(composeBom)
+
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(composeBom)
+    testImplementation(kotlin("test"))
 }

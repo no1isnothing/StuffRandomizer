@@ -3,16 +3,33 @@ package com.thebipolaroptimist.stuffrandomizer.data
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNull
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
 import java.util.UUID
 
+@RunWith(AndroidJUnit4::class)
 class CategoryDaoTest {
+    private lateinit var database: MainDatabase
+    private lateinit var dao: CategoryDao
+
+    @Before
+    fun setup() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        database = Room.inMemoryDatabaseBuilder(context, MainDatabase::class.java).build()
+        dao = database.categoryDao()
+    }
+
+    @After
+    fun tearDown() {
+        database.close()
+    }
 
     @Test
     fun insert_singleCategory_success() = runTest {
@@ -49,7 +66,7 @@ class CategoryDaoTest {
 
         dao.insert(categories)
 
-        assertEquals(categories, dao.getByIds(listOf( uuid1, uuid2)))
+        assertEquals(categories, dao.getByIds(listOf( uuid1, uuid2)).sortedBy { it.name })
     }
 
     @Test
@@ -91,26 +108,6 @@ class CategoryDaoTest {
     @Test
     fun getCategoriesByName_nonePresent_empty() = runTest  {
         assertTrue(dao.getCategoriesByName(listOf("NotACategory", "Nope")).isEmpty())
-    }
-
-
-    companion object {
-        private lateinit var database: MainDatabase
-        private lateinit var dao: CategoryDao
-
-        @JvmStatic
-        @BeforeAll
-        fun setup() {
-            val context = ApplicationProvider.getApplicationContext<Context>()
-            database = Room.inMemoryDatabaseBuilder(context, MainDatabase::class.java).build()
-            dao = database.categoryDao()
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun tearDown() {
-            database.close()
-        }
     }
 
 }

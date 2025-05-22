@@ -171,7 +171,7 @@ class CategoryDetailsScreenKtTest {
         composeTestRule.onNodeWithContentDescription("Add").performClick()
         composeTestRule.onNodeWithContentDescription("Add").performClick()
         composeTestRule.onAllNodesWithContentDescription("editable_item")[0].performTextInput("item1")
-        composeTestRule.onAllNodesWithContentDescription("editable_item")[3].performTextInput("item one million")
+        composeTestRule.onAllNodesWithContentDescription("editable_item")[2].performTextInput("item one million")
         composeTestRule.onNodeWithContentDescription("refresh").performClick()
 
         // Verify Original Values

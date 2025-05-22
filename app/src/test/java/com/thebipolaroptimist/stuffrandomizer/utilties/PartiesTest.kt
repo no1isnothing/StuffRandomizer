@@ -1,9 +1,9 @@
 package com.thebipolaroptimist.stuffrandomizer.utilties
 
 import com.thebipolaroptimist.stuffrandomizer.data.Category
-import org.junit.jupiter.api.Assertions.*
-
-import org.junit.jupiter.api.Test
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
+import org.junit.Test
 import java.util.UUID
 
 class PartiesTest {
