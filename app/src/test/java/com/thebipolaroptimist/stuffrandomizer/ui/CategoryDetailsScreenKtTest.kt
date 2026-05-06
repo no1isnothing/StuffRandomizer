@@ -22,6 +22,7 @@ import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_ZERO
 import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_ZERO_STRING
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,7 +58,8 @@ class CategoryDetailsScreenKtTest {
     fun init_withCategory_uiFieldsPopulated() {
         // Setup with a pre-populated category
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1", "Item 2"))
-        val repository = FakeRepository().apply { categoryMap[category.uid] = category }
+        val repository = FakeRepository()
+        runBlocking { repository.insertCategory(category) }
         val viewModel = MainViewModel(repository)
         viewModel.categories.observeForever { }
         setupScreenWith(viewModel, UUID_ZERO_STRING)
@@ -83,8 +85,8 @@ class CategoryDetailsScreenKtTest {
 
 
         // Verify that the category was saved correctly
-        val savedCategory = fakeRepository.categoryMap.values.first()
-        assertEquals(1, fakeRepository.categoryMap.size)
+        val savedCategory = fakeRepository.categoryMap.value.values.first()
+        assertEquals(1, fakeRepository.categoryMap.value.size)
         assertEquals("List 1", savedCategory.name)
         assertEquals(listOf("item1"), savedCategory.things)
 
@@ -107,7 +109,7 @@ class CategoryDetailsScreenKtTest {
         // Verify that the category was not saved and warning is displayed
         assertTrue(
             "Category should not be saved in the repository when there are no name or items.",
-            fakeRepository.categoryMap.isEmpty()
+            fakeRepository.categoryMap.value.isEmpty()
         )
         composeTestRule.onNodeWithText("Removing Empty Category").assertIsDisplayed()
     }
@@ -125,7 +127,7 @@ class CategoryDetailsScreenKtTest {
         // Verify category not saved and warning displayed
         assertTrue(
             "Category should not be saved in the repository when there are no items.",
-            fakeRepository.categoryMap.isEmpty()
+            fakeRepository.categoryMap.value.isEmpty()
         )
         composeTestRule.onNodeWithText("Can\'t Save Category Without Items").assertIsDisplayed()
     }
@@ -145,7 +147,7 @@ class CategoryDetailsScreenKtTest {
         // Verify category not saved and warning displayed
         assertTrue(
             "Category should not be saved in the repository when there are no list name.",
-            fakeRepository.categoryMap.isEmpty()
+            fakeRepository.categoryMap.value.isEmpty()
         )
         composeTestRule.onNodeWithText("Can\'t Save Category Without Name").assertIsDisplayed()
     }
@@ -160,7 +162,7 @@ class CategoryDetailsScreenKtTest {
         )
 
         val repository = FakeRepository()
-        repository.categoryMap[category.uid] = category
+        runBlocking { repository.insertCategory(category) }
         val viewModel = MainViewModel(repository)
         viewModel.categories.observeForever { }
         setupScreenWith(viewModel, UUID_ZERO_STRING)
@@ -185,7 +187,8 @@ class CategoryDetailsScreenKtTest {
     fun deleteButton_removesCategoryFromRepository() {
         // Setup with a pre-populated category
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1"))
-        val repository = FakeRepository().apply { categoryMap[category.uid] = category }
+        val repository = FakeRepository()
+        runBlocking { repository.insertCategory(category) }
         val viewModel = MainViewModel(repository)
         viewModel.categories.observeForever { }
         setupScreenWith(viewModel, UUID_ZERO_STRING)
@@ -196,7 +199,7 @@ class CategoryDetailsScreenKtTest {
         // Verify that the category is removed from the repository
         assertTrue(
             "Category should be removed from the repository after deleting.",
-            repository.categoryMap.isEmpty()
+            repository.categoryMap.value.isEmpty()
         )
     }
 
@@ -204,7 +207,8 @@ class CategoryDetailsScreenKtTest {
     fun categoryNameChange_updatesViewModel() {
         // Setup with a pre-populated category
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1"))
-        val repository = FakeRepository().apply { categoryMap[category.uid] = category }
+        val repository = FakeRepository()
+        runBlocking { repository.insertCategory(category) }
         val viewModel = MainViewModel(repository)
         viewModel.categories.observeForever { }
         setupScreenWith(viewModel, UUID_ZERO_STRING)
@@ -239,7 +243,8 @@ class CategoryDetailsScreenKtTest {
     fun editingItem_updatesViewModelAndField() {
         // Setup with pre-populated category
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1"))
-        val repository = FakeRepository().apply { categoryMap[category.uid] = category }
+        val repository = FakeRepository()
+        runBlocking { repository.insertCategory(category) }
         val viewModel = MainViewModel(repository)
         setupScreenWith(viewModel, null)
 
@@ -262,7 +267,8 @@ class CategoryDetailsScreenKtTest {
     fun clickingClearButton_removesItemFromList() {
         // Setup with a category with 3 items
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1", "Item 2", "Item 3"))
-        val repository = FakeRepository().apply { categoryMap[category.uid] = category }
+        val repository = FakeRepository()
+        runBlocking { repository.insertCategory(category) }
         val viewModel = MainViewModel(repository)
         viewModel.categories.observeForever { }
         setupScreenWith(viewModel, UUID_ZERO_STRING)
@@ -279,7 +285,8 @@ class CategoryDetailsScreenKtTest {
     fun savingListWithEmptyStrings_emptyStringsAreRemoved() {
         // Check that if the category is saved, only non empty item strings are saved
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1", "Item 3"))
-        val repository = FakeRepository().apply { categoryMap[category.uid] = category }
+        val repository = FakeRepository()
+        runBlocking { repository.insertCategory(category) }
         val viewModel = MainViewModel(repository)
         viewModel.categories.observeForever { }
         setupScreenWith(viewModel, UUID_ZERO_STRING)
@@ -292,7 +299,7 @@ class CategoryDetailsScreenKtTest {
         composeTestRule.onNodeWithContentDescription("back").performClick()
 
         // Verify empty strings have been removed
-        val savedCategory = repository.categoryMap.values.first()
+        val savedCategory = repository.categoryMap.value.values.first()
         assertEquals(listOf("Item 1", "Item 3"), savedCategory.things)
     }
 

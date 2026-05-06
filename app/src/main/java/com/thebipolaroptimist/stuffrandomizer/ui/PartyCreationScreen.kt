@@ -16,12 +16,16 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -50,9 +54,15 @@ fun PartyCreationScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val categoryNames by remember(categoryList) {
+        derivedStateOf { categoryList.map { it.name } }
+    }
+    val newPartyName by mainViewModel.newPartyName.collectAsState()
+    val newPartyCheckedState by mainViewModel.newPartyCheckedState.collectAsState()
+    val newAssigneeSelection by mainViewModel.newAssigneeSelection.collectAsState()
 
-    mainViewModel.setupNewPartyState(categoryList.size)
-
+    LaunchedEffect(categoryList.size) {  mainViewModel.setupNewPartyState(categoryList.size) }
+    
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
@@ -69,20 +79,20 @@ fun PartyCreationScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        if (mainViewModel.newPartyName.isEmpty()) {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(context.getString(R.string.warning_match_name_empty))
-                            }
-                            return@IconButton
-                        }
-                        val party = mainViewModel.createAndSaveNewParty(categoryList)
-                        if (party != null) {
-                            toPartyEdit(party.uid.toString())
-                        } else {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(context.getString(R.string.warning_match_assignments_empty))
-                            }
-                        } }) {
+                        mainViewModel.attemptToCreateAndSaveParty(
+                            categoryList = categoryList,
+                            onSuccess = { partyUid -> toPartyEdit(partyUid) },
+                            onNameEmpty = {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(context.getString(R.string.warning_match_name_empty))
+                                }
+                            },
+                            onAssignmentsEmpty = {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(context.getString(R.string.warning_match_assignments_empty))
+                                }
+                            })}
+                        ) {
                         Icon(painter = painterResource(id = R.drawable.casino_24px), contentDescription = stringResource(
                             id = R.string.roll
                         ))
@@ -93,9 +103,11 @@ fun PartyCreationScreen(
     ) { padding ->
         Column(Modifier.padding(padding)) {
             OutlinedTextField(
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
-                value = mainViewModel.newPartyName,
-                onValueChange = { mainViewModel.newPartyName = it },
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_small))
+                    .testTag("party_name_field"),
+                value = newPartyName,
+                onValueChange = { mainViewModel.updateNewPartyName(it) },
                 label = { Text(stringResource(R.string.hint_match_name)) },
                 colors = mainOutlinedTextfieldColors()
             )
@@ -103,17 +115,29 @@ fun PartyCreationScreen(
                 text = stringResource(R.string.assignees),
             )
             DropDownText(
-                items = categoryList.map { it.name },
-                onSelect = { index -> mainViewModel.newAssigneeSelection = index})
+                modifier = Modifier.testTag("assignee_dropdown"),
+                items = categoryNames,
+                selectedIndex = newAssigneeSelection,
+                onSelect = { index -> mainViewModel.updateNewAssigneeSelection(index)})
             LabelText(
                 text = stringResource(R.string.assignments),
             )
-            LazyColumn(Modifier.weight(1f, fill = false)) {
-                itemsIndexed(categoryList)
-                { index, category ->
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f, fill = false)
+                    .testTag("assignments_list")
+            ) {
+                itemsIndexed(
+                    items =categoryList,
+                    key = {_, category -> category.uid}
+                ) { index, category ->
                     CheckableItem(
+                        modifier = Modifier.testTag("assignment_item_${category.name}"),
                         name = category.name,
-                        onCheck = { checked -> mainViewModel.newPartyCheckedState[index] = checked }
+                        isChecked = newPartyCheckedState.getOrElse(index) { false },
+                        onCheck = { checked ->
+                            mainViewModel.updatePartyCheckedState(index, checked)
+                        }
                     )
                 }
             }

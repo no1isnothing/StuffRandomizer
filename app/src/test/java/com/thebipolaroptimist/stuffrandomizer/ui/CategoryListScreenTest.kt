@@ -18,12 +18,12 @@ import com.thebipolaroptimist.stuffrandomizer.fakes.FakeRepository
 import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_ONE
 import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_TWO
 import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_ZERO
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 
-// TODO: Change to robelectric for faster tests
 @RunWith(AndroidJUnit4::class)
 class CategoryListScreenKtTest {
 
@@ -58,10 +58,11 @@ class CategoryListScreenKtTest {
         val category = Category(UUID_ZERO, "Category 0", listOf("Item 1", "Item 2"))
         val category1 = Category(UUID_ONE, "Category 1", listOf("Item 1-1", "Item 1-2"))
         val category2 = Category(UUID_TWO, "Category 2", listOf("Item 2-1", "Item 2-2"))
-        val repository = FakeRepository().apply {
-            categoryMap[category.uid] = category
-            categoryMap[category1.uid] = category1
-            categoryMap[category2.uid] = category2
+        val repository = FakeRepository()
+        runBlocking {
+            repository.insertCategory(category)
+            repository.insertCategory(category1)
+            repository.insertCategory(category2)
         }
         val viewModel = MainViewModel(repository)
         setupScreenWith(viewModel)

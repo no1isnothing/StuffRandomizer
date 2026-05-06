@@ -26,24 +26,25 @@ import com.thebipolaroptimist.stuffrandomizer.R
  * A [Composable] for displaying a drop down menu of text.
  *
  * @param items The items to display in the drop down
+ * @param selectedIndex The index of the currently selected item
  * @param onSelect The function to call when an item is selected
  */
 @Preview(showBackground = true)
 @Composable
-fun DropDownText(items: List<String> = listOf("Item", "Item 2", "Item3"),
-                 onSelect: (index: Int) -> Unit = {}) {
+fun DropDownText(
+    modifier: Modifier = Modifier,
+    items: List<String> = listOf("Item", "Item 2", "Item3"),
+    selectedIndex: Int = 0,
+    onSelect: (index: Int) -> Unit = {}
+) {
     var expanded by remember {
         mutableStateOf(false)
     }
 
-    var selected by remember {
-        mutableStateOf(0)
-    }
-
-    Box(Modifier.wrapContentSize().padding(dimensionResource(id = R.dimen.padding_small))) {
+    Box(modifier.wrapContentSize().padding(dimensionResource(id = R.dimen.padding_small))) {
         Row(Modifier.clickable { expanded = true }) {
-            if (items.size > selected) {
-                Text(items[selected])
+            if (items.size > selectedIndex) {
+                Text(items[selectedIndex])
             }
             Image(
                 Icons.Default.KeyboardArrowDown,
@@ -61,7 +62,6 @@ fun DropDownText(items: List<String> = listOf("Item", "Item 2", "Item3"),
                 },
                     onClick = {
                         expanded = false
-                        selected = index
                         onSelect(index)
                     })
             }

@@ -1,7 +1,6 @@
 package com.thebipolaroptimist.stuffrandomizer
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,6 +15,9 @@ import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.data.Repository
 import com.thebipolaroptimist.stuffrandomizer.utilties.Parties
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,17 +36,49 @@ class MainViewModel @Inject constructor(private val mainRepository: Repository) 
     var editPartyName by mutableStateOf("")
     var editPartyMembers = mutableStateListOf<Member>()
     var editPartyUuid by mutableStateOf("")
-    var newPartyName by mutableStateOf("")
-    var newPartyCheckedState = mutableStateListOf<Boolean>()
-    var newAssigneeSelection by mutableIntStateOf(0)
+   // var newAssigneeSelection by mutableIntStateOf(0)
+
+    private val _newAssigneeSelection = MutableStateFlow(0)
+    val newAssigneeSelection = _newAssigneeSelection.asStateFlow()
+    fun updateNewAssigneeSelection(selectedIndex: Int) {
+        _newAssigneeSelection.value = selectedIndex
+    }
+
+    private val _newPartyName = MutableStateFlow("")
+    val newPartyName: StateFlow<String> = _newPartyName.asStateFlow()
+    fun updateNewPartyName(name: String) {
+        _newPartyName.value = name
+    }
+
+    private val _newPartyCheckedState = MutableStateFlow<List<Boolean>>(emptyList())
+    val newPartyCheckedState: StateFlow<List<Boolean>> = _newPartyCheckedState.asStateFlow()
+    fun updatePartyCheckedState(index: Int, isChecked: Boolean) {
+        _newPartyCheckedState.value = _newPartyCheckedState.value.toMutableList().apply {
+            // Ensure the list is large enough before setting
+            while (size <= index) { add(false) }
+            this[index] = isChecked
+        }
+    }
+
+    /**
+     * Setup [newPartyCheckedState]
+     *
+     * If it hasn't been initialized, this will make it an array of [size] filled with false.
+     * If it's already initialized, this does nothing.
+     */
+    fun setupNewPartyState(size: Int) {
+        if(_newPartyCheckedState.value.isEmpty()) {
+            _newPartyCheckedState.value = List(size) { false }
+        }
+    }
 
     /**
      * Reset data for [Party] being created.
      */
     private fun resetNewParty() {
-        newPartyName = ""
-        newPartyCheckedState.clear()
-        newAssigneeSelection = 0
+        _newPartyName.value = ""
+        _newPartyCheckedState.value = emptyList()
+        _newAssigneeSelection.value = 0
     }
 
     /**
@@ -147,17 +181,6 @@ class MainViewModel @Inject constructor(private val mainRepository: Repository) 
     }
 
     /**
-     * Setup [newPartyCheckedState]
-     *
-     * If it hasn't been initialized, this will make it an array of [size] filled with false.
-     * If it's already initialized, this does nothing.
-     */
-    fun setupNewPartyState(size: Int) {
-        if(newPartyCheckedState.size == 0) {
-            newPartyCheckedState.addAll(Array(size) { false })
-        }
-    }
-    /**
      * Create and save [Party] with new party variables.
      *
      * Use the [newAssigneeSelection] and [newPartyCheckedState] to gather data for making a new
@@ -167,11 +190,14 @@ class MainViewModel @Inject constructor(private val mainRepository: Repository) 
     fun createAndSaveNewParty(
         categoryList: List<Category>,
     ): Party? {
-        val selectedCategoryList = ArrayList<Category>()
-        val assigneeList = categoryList[newAssigneeSelection]
+        if (categoryList.isEmpty()) return null
 
-        for ((index, checkBoxState) in newPartyCheckedState.withIndex()) {
-            if (checkBoxState) {
+        val selectedCategoryList = ArrayList<Category>()
+        val safeAssigneeIndex = if (newAssigneeSelection.value < categoryList.size) newAssigneeSelection.value else 0
+        val assigneeList = categoryList[safeAssigneeIndex]
+
+        for ((index, checkBoxState) in newPartyCheckedState.value.withIndex()) {
+            if (index < categoryList.size && checkBoxState) {
                 selectedCategoryList.add(categoryList[index])
             }
         }
@@ -179,10 +205,31 @@ class MainViewModel @Inject constructor(private val mainRepository: Repository) 
             return null
         }
 
-        val party = Parties.create(newPartyName, assigneeList, selectedCategoryList)
+        val party = Parties.create(_newPartyName.value, assigneeList, selectedCategoryList)
         insertParty(party)
         resetNewParty()
         return party
+    }
+
+    /**
+     * Attempt to create and save party.
+     */
+    fun attemptToCreateAndSaveParty(
+        categoryList: List<Category>,
+        onSuccess: (partyUid: String) -> Unit,
+        onNameEmpty: () -> Unit,
+        onAssignmentsEmpty: () -> Unit
+    ) {
+        if (_newPartyName.value.isEmpty()) {
+            onNameEmpty()
+            return
+        }
+        val party = createAndSaveNewParty(categoryList)
+        if (party != null) {
+            onSuccess(party.uid.toString())
+        } else {
+            onAssignmentsEmpty()
+        }
     }
 
     /**
