@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -74,9 +73,10 @@ class PartyCreationViewModel @Inject constructor(private val repository: Reposit
 
     /**
      * Build and save a new [com.thebipolaroptimist.stuffrandomizer.data.Party] from the current
-     * form state.
+     * form state. Suspends until the party is persisted, so callers can safely navigate to it
+     * (e.g. a party edit screen) once this returns.
      */
-    fun createParty(): SaveResult {
+    suspend fun createParty(): SaveResult {
         if (newPartyName.value.isEmpty()) {
             return SaveResult.NameRequired
         }
@@ -88,9 +88,7 @@ class PartyCreationViewModel @Inject constructor(private val repository: Reposit
             categories.value
         ) ?: return SaveResult.SelectionRequired
 
-        viewModelScope.launch {
-            repository.insertParty(party)
-        }
+        repository.insertParty(party)
         resetForm()
         return SaveResult.Created(party.uid.toString())
     }

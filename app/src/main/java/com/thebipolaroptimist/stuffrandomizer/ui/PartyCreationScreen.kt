@@ -73,21 +73,19 @@ fun PartyCreationScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        when (val result = viewModel.createParty()) {
-                            PartyCreationViewModel.SaveResult.NameRequired -> {
-                                scope.launch {
+                        scope.launch {
+                            when (val result = viewModel.createParty()) {
+                                PartyCreationViewModel.SaveResult.NameRequired -> {
                                     snackbarHostState.showSnackbar(context.getString(R.string.warning_match_name_empty))
                                 }
-                            }
 
-                            PartyCreationViewModel.SaveResult.SelectionRequired -> {
-                                scope.launch {
+                                PartyCreationViewModel.SaveResult.SelectionRequired -> {
                                     snackbarHostState.showSnackbar(context.getString(R.string.warning_match_assignments_empty))
                                 }
-                            }
 
-                            is PartyCreationViewModel.SaveResult.Created -> {
-                                toPartyEdit(result.partyId)
+                                is PartyCreationViewModel.SaveResult.Created -> {
+                                    toPartyEdit(result.partyId)
+                                }
                             }
                         }
                     }) {

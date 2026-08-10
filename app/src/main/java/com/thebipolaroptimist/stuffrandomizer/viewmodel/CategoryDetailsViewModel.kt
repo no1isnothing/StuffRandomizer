@@ -10,7 +10,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
@@ -51,7 +52,9 @@ class CategoryDetailsViewModel @Inject constructor(private val repository: Repos
         hasLoaded = true
         viewModelScope.launch {
             val category = categoryId?.let { id ->
-                repository.getAllCategories().first().firstOrNull { it.uid.toString() == id }
+                repository.getAllCategories()
+                    .mapNotNull { categories -> categories.firstOrNull { it.uid.toString() == id } }
+                    .firstOrNull()
             } ?: Category(UUID.randomUUID(), "", listOf())
 
             originalCategory = category
