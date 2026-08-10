@@ -14,7 +14,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -68,37 +67,21 @@ fun StuffRandomizerNavHost(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<HomeNav> {
-                //TODO #16: Make sure this works without the backstack entry
                 HomeScreen()
             }
             composable<CategoryDetailsNav> { backStackEntry ->
                 val categoryDetailsEntry = backStackEntry.toRoute<CategoryDetailsNav>()
-                val homeEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry(HomeNav)
-                }
-                val viewModel = hiltViewModel<MainViewModel>(homeEntry)
                 CategoryDetailsScreen(
-                    viewModel,
                     categoryId = categoryDetailsEntry.id,
                     onBack = { navController.popBackStack() })
-
             }
-            composable<CategoryListNav> { backStackEntry ->
-                val homeEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry(HomeNav)
-                }
-                val viewModel = hiltViewModel<MainViewModel>(homeEntry)
-                CategoryListScreen(viewModel,
+            composable<CategoryListNav> {
+                CategoryListScreen(
                     toCategoryCreation = { navController.navigate(CategoryDetailsNav(null)) },
                     toCategoryEdit = { id -> navController.navigate(CategoryDetailsNav(id)) })
             }
-            composable<PartyCreationNav> { backStackEntry ->
-                val homeEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry(HomeNav)
-                }
-                val viewModel = hiltViewModel<MainViewModel>(homeEntry)
+            composable<PartyCreationNav> {
                 PartyCreationScreen(
-                    viewModel,
                     navigateBack = { navController.popBackStack() },
                     toPartyEdit = { uuid ->
                         navController.navigate(PartyEditNav(uuid)) {
@@ -108,20 +91,12 @@ fun StuffRandomizerNavHost(
             }
             composable<PartyEditNav> { backStackEntry ->
                 val partyEdit = backStackEntry.toRoute<PartyEditNav>()
-                val homeEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry(HomeNav)
-                }
-                val viewModel = hiltViewModel<MainViewModel>(homeEntry)
-                PartyEditScreen(viewModel,
+                PartyEditScreen(
                     id = partyEdit.id,
                     navigateBack = { navController.popBackStack() })
             }
-            composable<PartyListNav> { backStackEntry ->
-                val homeEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry(HomeNav)
-                }
-                val viewModel = hiltViewModel<MainViewModel>(homeEntry)
-                PartyListScreen(viewModel,
+            composable<PartyListNav> {
+                PartyListScreen(
                     toPartyCreation = { navController.navigate(PartyCreationNav) },
                     toPartyEdit = { uuid -> navController.navigate(PartyEditNav(uuid)) })
             }
@@ -142,6 +117,7 @@ data object CategoryListNav
 data object PartyCreationNav
 
 @Serializable
+
 data class PartyEditNav(val id: String)
 
 @Serializable

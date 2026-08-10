@@ -15,8 +15,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -24,10 +24,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
-import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.ui.components.ClickableTwoLineItem
 import com.thebipolaroptimist.stuffrandomizer.ui.components.EmptyStateScreen
 import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
+import com.thebipolaroptimist.stuffrandomizer.viewmodel.CategoryListViewModel
 
 /**
  * A simple [Composable] for displaying [Category]s.
@@ -35,11 +35,12 @@ import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryListScreen(
-    viewModel: MainViewModel = hiltViewModel(),
+    viewModel: CategoryListViewModel = hiltViewModel(),
     toCategoryCreation: () -> Unit = {},
     toCategoryEdit: (uuid: String) -> Unit = {},
 ) {
-    val categoryList by viewModel.categories.observeAsState(listOf())
+    val uiState by viewModel.uiState.collectAsState()
+    val categoryList = uiState.categories
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(id = R.string.category_list_label)) },

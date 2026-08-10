@@ -13,16 +13,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.ui.components.ClickableTwoLineItem
 import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
+import com.thebipolaroptimist.stuffrandomizer.viewmodel.PartyListViewModel
 
 /**
  * A [Composable] for displaying [Party]s.
@@ -30,11 +30,12 @@ import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartyListScreen(
-    mainViewModel: MainViewModel = hiltViewModel(),
+    viewModel: PartyListViewModel = hiltViewModel(),
     toPartyCreation: () -> Unit = {},
     toPartyEdit: (uuid: String) -> Unit
 ) {
-    val partyList by mainViewModel.parties.observeAsState(listOf())
+    val uiState by viewModel.uiState.collectAsState()
+    val partyList = uiState.parties
 
     Scaffold(
         topBar = {

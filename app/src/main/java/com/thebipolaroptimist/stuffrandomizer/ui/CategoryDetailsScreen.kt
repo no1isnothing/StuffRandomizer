@@ -21,6 +21,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,15 +34,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.ui.components.EditableSingleLineItem
 import com.thebipolaroptimist.stuffrandomizer.ui.components.LabelText
 import com.thebipolaroptimist.stuffrandomizer.ui.components.mainOutlinedTextfieldColors
 import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
+import com.thebipolaroptimist.stuffrandomizer.viewmodel.CategoryDetailsViewModel
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 
 /**
@@ -52,20 +54,18 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryDetailsScreen(
-    viewModel: MainViewModel = hiltViewModel(),
+    viewModel: CategoryDetailsViewModel = hiltViewModel(),
     onBack: () -> Unit = {},
     categoryId: String?
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = remember { SnackbarHostState() }
+    val uiState by viewModel.uiState.collectAsState()
 
-    val currentCategory = categoryId?.let {
-        viewModel.categories
-            .value?.firstOrNull { category -> category.uid == UUID.fromString(categoryId) }
-    } ?: Category(UUID.randomUUID(), "", listOf())
-
-    viewModel.setupCurrentCategory(currentCategory)
+    LaunchedEffect(categoryId) {
+        viewModel.load(categoryId)
+    }
 
     Scaffold(
         snackbarHost = {
@@ -76,38 +76,22 @@ fun CategoryDetailsScreen(
                 title = { Text(stringResource(id = R.string.category_details_label)) },
                 navigationIcon = {
                     IconButton(onClick = {
-                        currentCategory.let {
-                            if (viewModel.currentCategoryName.isEmpty() && viewModel.currentCategoryThings.isEmpty()) {
+                        when (val action = viewModel.onBackRequested()) {
+                            CategoryDetailsViewModel.BackAction.DeleteEmpty -> {
                                 coroutineScope.launch {
                                     snackbarState.showSnackbar(context.getString(R.string.removing_empty_category))
                                 }
-
-                                viewModel.deleteCategory(currentCategory)
                                 onBack()
-                                return@IconButton
                             }
 
-                            if (viewModel.currentCategoryThings.isEmpty()) {
+                            is CategoryDetailsViewModel.BackAction.Warn -> {
                                 coroutineScope.launch {
-                                    snackbarState.showSnackbar(context.getString(R.string.warning_empty_item_list))
+                                    snackbarState.showSnackbar(context.getString(action.messageRes))
                                 }
-                                return@IconButton
                             }
 
-                            if (viewModel.currentCategoryName.isEmpty()) {
-                                coroutineScope.launch {
-                                    snackbarState.showSnackbar(context.getString(R.string.warning_list_name_empty))
-                                }
-                                return@IconButton
-                            }
-
-                            it.things =
-                                viewModel.currentCategoryThings.filter { thing -> thing.isNotEmpty() }
-                                    .toList()
-                            it.name = viewModel.currentCategoryName
-                            viewModel.insertCategory(it)
+                            CategoryDetailsViewModel.BackAction.Save -> onBack()
                         }
-                        onBack()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -116,21 +100,14 @@ fun CategoryDetailsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {
-                        viewModel.currentCategoryThings.clear()
-                        currentCategory.let {
-                            viewModel.currentCategoryName = it.name
-                            viewModel.currentCategoryThings.addAll(it.things)
-                        }
-                    }) {
+                    IconButton(onClick = { viewModel.resetToOriginal() }) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = stringResource(id = R.string.refresh)
                         )
                     }
                     IconButton(onClick = {
-                        viewModel.resetEditedParty()
-                        viewModel.deleteCategory(currentCategory)
+                        viewModel.deleteCategory()
                         onBack()
                     }) {
                         Icon(
@@ -146,8 +123,8 @@ fun CategoryDetailsScreen(
         Column(Modifier.padding(padding)) {
             OutlinedTextField(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
-                value = viewModel.currentCategoryName,
-                onValueChange = { viewModel.currentCategoryName = it },
+                value = uiState.currentCategoryName,
+                onValueChange = { viewModel.onNameChange(it) },
                 label = {
                     Text(
                         stringResource(R.string.hint_list_name),
@@ -157,17 +134,17 @@ fun CategoryDetailsScreen(
             )
             LabelText(text = stringResource(id = R.string.items))
             LazyColumn(Modifier.weight(1f, fill = false).semantics { contentDescription = "items" }) {
-                itemsIndexed(viewModel.currentCategoryThings) { index, item ->
+                itemsIndexed(uiState.currentCategoryThings) { index, item ->
                     key(item) {
                         EditableSingleLineItem(text = item,
                             update = { text ->
-                                viewModel.updateCurrentCategoryThings(
+                                viewModel.onThingChange(
                                     index,
                                     text
                                 )
                             },
                             remove = {
-                                text -> viewModel.currentCategoryThings.remove(text)
+                                text -> viewModel.removeThing(text)
                             }
                         )
                     }
@@ -175,7 +152,7 @@ fun CategoryDetailsScreen(
             }
             Button(modifier = Modifier.wrapContentSize(),
                 onClick = {
-                    viewModel.currentCategoryThings.add("")
+                    viewModel.addThing()
                 }) {
                 Icon(
                     Icons.Default.Add,
