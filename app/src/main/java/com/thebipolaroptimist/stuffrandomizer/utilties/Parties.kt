@@ -50,4 +50,32 @@ object Parties {
 
         return Party(UUID.randomUUID(), name, members, assigneeList.name)
     }
+
+    /**
+     * Build a new [Party] from checked categories, or `null` if nothing valid was selected.
+     *
+     * @param name Name of the new [Party]
+     * @param assigneeCategoryIndex Index into [categoryList] for the assignee [Category]
+     * @param checkedState Per-[categoryList]-index flag for whether that [Category] is included
+     * @param categoryList All [Category]s available to choose from
+     */
+    fun buildParty(
+        name: String,
+        assigneeCategoryIndex: Int,
+        checkedState: List<Boolean>,
+        categoryList: List<Category>,
+    ): Party? {
+        if (assigneeCategoryIndex !in categoryList.indices) {
+            return null
+        }
+
+        val selectedCategoryList = categoryList.filterIndexed { index, _ ->
+            checkedState.getOrElse(index) { false }
+        }
+        if (selectedCategoryList.isEmpty()) {
+            return null
+        }
+
+        return create(name, categoryList[assigneeCategoryIndex], selectedCategoryList)
+    }
 }

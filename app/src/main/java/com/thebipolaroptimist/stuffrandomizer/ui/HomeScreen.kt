@@ -16,23 +16,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
-import com.thebipolaroptimist.stuffrandomizer.data.Category
-import com.thebipolaroptimist.stuffrandomizer.data.Member
-import com.thebipolaroptimist.stuffrandomizer.data.Party
 import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
-import java.util.UUID
+import com.thebipolaroptimist.stuffrandomizer.viewmodel.HomeViewModel
 
 /**
  * A simple [Composable] as the default destination in the navigation.
@@ -41,12 +36,9 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: MainViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val categoryList by viewModel.categories.observeAsState(listOf())
-    val races = stringArrayResource(id = R.array.bg_race)
-    val backgrounds = stringArrayResource(id = R.array.bg_background)
-    val classes = stringArrayResource(id = R.array.bg_char_class)
+    val uiState by viewModel.uiState.collectAsState()
 
     var menuExpanded by remember {
         mutableStateOf(false)
@@ -72,34 +64,11 @@ fun HomeScreen(
                         // TODO #7: Remove, hide behind flag, or update to be 'default data'
                         DropdownMenuItem(
                             text = { Text(stringResource(id = R.string.action_add_data)) },
-                            onClick = {
-                                viewModel.insertCategory(
-                                    Category(
-                                        UUID.randomUUID(),
-                                        "BG Backgrounds",
-                                        backgrounds.toList()
-                                    )
-                                )
-                                viewModel.insertCategory(
-                                    Category(
-                                        UUID.randomUUID(),
-                                        "BG Races",
-                                        races.toList()
-                                    )
-                                )
-                                viewModel.insertCategory(
-                                    Category(
-                                        UUID.randomUUID(),
-                                        "BG Classes",
-                                        classes.toList()
-                                    )
-                                )
-                                addSampleData(viewModel)
-                            })
+                            onClick = { viewModel.addSampleData() })
                         // TODO #7: Remove, hide behind flag, or move to advanced settings with a warning
                         DropdownMenuItem(
                             text = { Text(stringResource(id = R.string.action_clear_data)) },
-                            onClick = { clearAllData(viewModel) })
+                            onClick = { viewModel.clearAllData() })
                     }
                 },
                 colors = mainTopAppBarColors()
@@ -120,74 +89,9 @@ fun HomeScreen(
             if (showDialog) {
                 QuickSelectDialog(
                     onDismiss = { showDialog = false },
-                    categoryList = categoryList
+                    categoryList = uiState.categories
                 )
             }
         }
     }
 }
-
-
-private fun addSampleData(mainViewModel: MainViewModel) {
-    mainViewModel.insertParty(createSamplePartyData())
-    mainViewModel.insertCategories(createSampleCategoryData())
-}
-
-private fun clearAllData(mainViewModel: MainViewModel) {
-    mainViewModel.deleteAllCategories()
-    mainViewModel.deleteAllParties()
-}
-
-private fun createSamplePartyData(): Party = Party(
-    UUID.randomUUID(),
-    "Skyrim 2024",
-    arrayListOf(
-        Member("Jane", hashMapOf(Pair("Aedra", "Talos"), Pair("Daedra", "Clavicus Vile"))),
-        Member("Bear", hashMapOf(Pair("Aedra", "Mara"), Pair("Daedra", "Peryite"))),
-        Member("The Tooth Fairy", hashMapOf(Pair("Aedra", "Julianos"), Pair("Daedra", "Vaermina"))),
-        Member("Gifty", hashMapOf(Pair("Aedra", "Stendar"), Pair("Daedra", "Merida"))),
-    ),
-    "Friends"
-)
-
-private fun createSampleCategoryData(): List<Category> = listOf(
-    Category(
-        UUID.randomUUID(),
-        "TES Aedra",
-        listOf(
-            "Talos",
-            "Julianos",
-            "Arkay",
-            "Akatosh",
-            "Mara",
-            "Stendarr",
-            "Dibella",
-            "Kynareth",
-            "Zenithar"
-        )
-    ),
-    Category(
-        UUID.randomUUID(),
-        "TES Daedra",
-        listOf(
-            "Clavicus Vile",
-            "Meridia",
-            "Peryite",
-            "Azura",
-            "Molag Bal",
-            "Hermaus Mora",
-            "Vaermina",
-            "Nocturnal"
-        )
-    ),
-    Category(
-        UUID.randomUUID(),
-        "Friends",
-        listOf(
-            "Jane",
-            "Bear",
-            "Gift",
-            "The Tooth Fairy"
-        )
-    )
-)

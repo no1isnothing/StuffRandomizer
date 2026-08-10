@@ -11,13 +11,13 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.fakes.FakeRepository
 import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_ONE
 import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_TWO
 import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_ZERO
+import com.thebipolaroptimist.stuffrandomizer.viewmodel.CategoryListViewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,7 +35,7 @@ class CategoryListScreenKtTest {
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
     // Helper function to set content and improve readability
-    private fun setupScreenWith(viewModel: MainViewModel) {
+    private fun setupScreenWith(viewModel: CategoryListViewModel) {
         composeTestRule.setContent {
             CategoryListScreen(viewModel = viewModel)
         }
@@ -44,7 +44,7 @@ class CategoryListScreenKtTest {
     @Test
     fun init_withEmptyList_emptyStateScreenDisplayed() {
         // Setup with no categories
-        setupScreenWith(MainViewModel(FakeRepository()))
+        setupScreenWith(CategoryListViewModel(FakeRepository()))
 
         // Verify UI display empty message and tagline
         composeTestRule.onNodeWithText(context.getString(R.string.no_categories_message)).assertExists()
@@ -63,7 +63,7 @@ class CategoryListScreenKtTest {
             categoryMap[category1.uid] = category1
             categoryMap[category2.uid] = category2
         }
-        val viewModel = MainViewModel(repository)
+        val viewModel = CategoryListViewModel(repository)
         setupScreenWith(viewModel)
 
         // Verify UI Displays List of Categories

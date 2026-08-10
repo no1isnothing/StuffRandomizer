@@ -15,32 +15,31 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.ui.components.ClickableTwoLineItem
 import com.thebipolaroptimist.stuffrandomizer.ui.components.mainOutlinedTextfieldColors
 import com.thebipolaroptimist.stuffrandomizer.ui.components.mainTopAppBarColors
+import com.thebipolaroptimist.stuffrandomizer.viewmodel.PartyEditViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartyEditScreen(
-    mainViewModel: MainViewModel = hiltViewModel(),
+    viewModel: PartyEditViewModel = hiltViewModel(),
     id: String,
     navigateBack: () -> Unit = {},
 ) {
-    val partyList by mainViewModel.parties.observeAsState(listOf())
+    val uiState by viewModel.uiState.collectAsState()
 
-    val party = partyList.firstOrNull { parties -> parties.uid.toString() == id }
-
-    if (id != mainViewModel.editPartyUuid && party != null) {
-        mainViewModel.loadEditParty(party)
+    LaunchedEffect(id) {
+        viewModel.load(id)
     }
 
     Scaffold(
@@ -55,11 +54,7 @@ fun PartyEditScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {
-                        if (party != null) {
-                            mainViewModel.rerollEditPartyMembers(party)
-                        }
-                    }) {
+                    IconButton(onClick = { viewModel.reroll() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.casino_24px),
                             contentDescription = stringResource(
@@ -68,10 +63,7 @@ fun PartyEditScreen(
                         )
                     }
                     IconButton(onClick = {
-                        if (party != null) {
-                            mainViewModel.saveEditedParty(party)
-                        }
-
+                        viewModel.save()
                         navigateBack()
                     }) {
                         Icon(
@@ -86,8 +78,8 @@ fun PartyEditScreen(
         Column(Modifier.padding(padding)) {
             OutlinedTextField(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
-                value = mainViewModel.editPartyName,
-                onValueChange = { mainViewModel.editPartyName = it },
+                value = uiState.partyName,
+                onValueChange = { viewModel.onNameChange(it) },
                 label = { Text(stringResource(R.string.hint_match_name)) },
                 colors = mainOutlinedTextfieldColors()
             )
@@ -95,7 +87,7 @@ fun PartyEditScreen(
                 Modifier
                     .weight(1f)
             ) {
-                items(mainViewModel.editPartyMembers) { item ->
+                items(uiState.members) { item ->
                     ClickableTwoLineItem(item.assignee,
                         item.assignments
                             .map { assignment -> assignment.key + ": " + assignment.value }

@@ -10,9 +10,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.fakes.FakeRepository
+import com.thebipolaroptimist.stuffrandomizer.viewmodel.HomeViewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,7 +28,7 @@ class HomeScreenKtTest {
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
     // Helper function to set content and improve readability
-    private fun setupScreenWith(viewModel: MainViewModel) {
+    private fun setupScreenWith(viewModel: HomeViewModel) {
         composeTestRule.setContent {
             HomeScreen(viewModel = viewModel)
         }
@@ -37,7 +37,7 @@ class HomeScreenKtTest {
     @Test
     fun init_uiCorrectDialogHidden() {
         // Setup
-        setupScreenWith(MainViewModel(FakeRepository()))
+        setupScreenWith(HomeViewModel(FakeRepository(), context))
 
         // Verify UI Fields
         composeTestRule.onNodeWithText(context.getString(R.string.quick_select)).assertIsDisplayed()
@@ -48,7 +48,7 @@ class HomeScreenKtTest {
     @Test
     fun onQuickSelectClicked_quickSelectDialogDisplay() {
         // Setup
-        setupScreenWith(MainViewModel(FakeRepository()))
+        setupScreenWith(HomeViewModel(FakeRepository(), context))
 
         // Click Quick Select Button
         composeTestRule.onNodeWithText(context.getString(R.string.quick_select)).performClick()

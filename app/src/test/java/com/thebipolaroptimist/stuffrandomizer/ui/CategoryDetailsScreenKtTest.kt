@@ -15,11 +15,11 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.thebipolaroptimist.stuffrandomizer.MainViewModel
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.fakes.FakeRepository
 import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_ZERO
 import com.thebipolaroptimist.stuffrandomizer.fakes.UUID_ZERO_STRING
+import com.thebipolaroptimist.stuffrandomizer.viewmodel.CategoryDetailsViewModel
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Rule
@@ -36,7 +36,7 @@ class CategoryDetailsScreenKtTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     // Helper function to set content and improve readability
-    private fun setupScreenWith(viewModel: MainViewModel, categoryId: String?) {
+    private fun setupScreenWith(viewModel: CategoryDetailsViewModel, categoryId: String?) {
         composeTestRule.setContent {
             CategoryDetailsScreen(viewModel = viewModel, categoryId = categoryId)
         }
@@ -45,7 +45,7 @@ class CategoryDetailsScreenKtTest {
     @Test
     fun initialScreen_withNoCategory_uiFieldsEmpty() {
         // Setup with no initial category
-        setupScreenWith(MainViewModel(FakeRepository()), null)
+        setupScreenWith(CategoryDetailsViewModel(FakeRepository()), null)
 
         // Verify UI fields are empty
         composeTestRule.onNodeWithText("List Name").assert(hasText(""))
@@ -58,8 +58,7 @@ class CategoryDetailsScreenKtTest {
         // Setup with a pre-populated category
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1", "Item 2"))
         val repository = FakeRepository().apply { categoryMap[category.uid] = category }
-        val viewModel = MainViewModel(repository)
-        viewModel.categories.observeForever { }
+        val viewModel = CategoryDetailsViewModel(repository)
         setupScreenWith(viewModel, UUID_ZERO_STRING)
 
         // Verify that UI fields are populated
@@ -73,7 +72,7 @@ class CategoryDetailsScreenKtTest {
     fun backNavigation_withNewCategory_categorySaved() {
         // Setup with no initial category
         val fakeRepository = FakeRepository()
-        setupScreenWith(MainViewModel(fakeRepository), null)
+        setupScreenWith(CategoryDetailsViewModel(fakeRepository), null)
 
         // Perform actions to create and save a new category
         composeTestRule.onNodeWithContentDescription("Add").performClick()
@@ -98,7 +97,7 @@ class CategoryDetailsScreenKtTest {
     fun backNavigation_withEmptyNewCategory_categoryNotSaved() {
         // Setup with no initial category
         val fakeRepository = FakeRepository()
-        setupScreenWith(MainViewModel(fakeRepository), null)
+        setupScreenWith(CategoryDetailsViewModel(fakeRepository), null)
 
         // Perform actions (clicking back without adding name or item)
         composeTestRule.onNodeWithContentDescription("back").performClick()
@@ -116,7 +115,7 @@ class CategoryDetailsScreenKtTest {
     fun backNavigation_withNameButNoItems_showsWarningAndDoesNotSave() {
         // Setup with no initial category
         val fakeRepository = FakeRepository()
-        setupScreenWith(MainViewModel(fakeRepository), null)
+        setupScreenWith(CategoryDetailsViewModel(fakeRepository), null)
 
         // Perform actions (clicking back after adding name but no items)
         composeTestRule.onNodeWithText("List Name").performTextInput("List 1")
@@ -134,7 +133,7 @@ class CategoryDetailsScreenKtTest {
     fun backNavigation_withItemsButNoName_showsWarningAndDoesNotSave() {
         // Setup with no initial category
         val fakeRepository = FakeRepository()
-        setupScreenWith(MainViewModel(fakeRepository), null)
+        setupScreenWith(CategoryDetailsViewModel(fakeRepository), null)
 
         // Perform actions (clicking back after adding items but no name)
         composeTestRule.onNodeWithContentDescription("Add").performClick()
@@ -161,8 +160,7 @@ class CategoryDetailsScreenKtTest {
 
         val repository = FakeRepository()
         repository.categoryMap[category.uid] = category
-        val viewModel = MainViewModel(repository)
-        viewModel.categories.observeForever { }
+        val viewModel = CategoryDetailsViewModel(repository)
         setupScreenWith(viewModel, UUID_ZERO_STRING)
 
 
@@ -186,8 +184,7 @@ class CategoryDetailsScreenKtTest {
         // Setup with a pre-populated category
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1"))
         val repository = FakeRepository().apply { categoryMap[category.uid] = category }
-        val viewModel = MainViewModel(repository)
-        viewModel.categories.observeForever { }
+        val viewModel = CategoryDetailsViewModel(repository)
         setupScreenWith(viewModel, UUID_ZERO_STRING)
 
         // Perform delete action
@@ -205,8 +202,7 @@ class CategoryDetailsScreenKtTest {
         // Setup with a pre-populated category
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1"))
         val repository = FakeRepository().apply { categoryMap[category.uid] = category }
-        val viewModel = MainViewModel(repository)
-        viewModel.categories.observeForever { }
+        val viewModel = CategoryDetailsViewModel(repository)
         setupScreenWith(viewModel, UUID_ZERO_STRING)
 
         // Perform name change
@@ -216,7 +212,7 @@ class CategoryDetailsScreenKtTest {
 
         // Verify that the name is updated in the view model
         composeTestRule.onNodeWithText("List Name").assert(hasText(newName))
-        assertEquals(newName, viewModel.currentCategoryName)
+        assertEquals(newName, viewModel.uiState.value.currentCategoryName)
     }
 
 
@@ -224,7 +220,7 @@ class CategoryDetailsScreenKtTest {
     fun clickingAddButton_addsItemsToList() {
         // Setup with no existing category
         val fakeRepository = FakeRepository()
-        setupScreenWith(MainViewModel(fakeRepository), null)
+        setupScreenWith(CategoryDetailsViewModel(fakeRepository), null)
 
         // Click add button twice
         composeTestRule.onNodeWithContentDescription("Add").performClick()
@@ -240,7 +236,7 @@ class CategoryDetailsScreenKtTest {
         // Setup with pre-populated category
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1"))
         val repository = FakeRepository().apply { categoryMap[category.uid] = category }
-        val viewModel = MainViewModel(repository)
+        val viewModel = CategoryDetailsViewModel(repository)
         setupScreenWith(viewModel, null)
 
         // Add an item and change its content
@@ -252,7 +248,7 @@ class CategoryDetailsScreenKtTest {
         // Verify that the item content is updated in the view model's currentCategoryThings
         assertEquals(
             listOf("New Item Content"),
-            viewModel.currentCategoryThings
+            viewModel.uiState.value.currentCategoryThings
         )
         composeTestRule.onAllNodesWithContentDescription("editable_item")[0].assert(hasText("New Item Content"))
     }
@@ -263,8 +259,7 @@ class CategoryDetailsScreenKtTest {
         // Setup with a category with 3 items
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1", "Item 2", "Item 3"))
         val repository = FakeRepository().apply { categoryMap[category.uid] = category }
-        val viewModel = MainViewModel(repository)
-        viewModel.categories.observeForever { }
+        val viewModel = CategoryDetailsViewModel(repository)
         setupScreenWith(viewModel, UUID_ZERO_STRING)
 
         // Click Remove Button
@@ -272,7 +267,7 @@ class CategoryDetailsScreenKtTest {
 
         // Verify Item has been removed
         composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(2)
-        assertEquals(listOf("Item 1", "Item 3"), viewModel.currentCategoryThings)
+        assertEquals(listOf("Item 1", "Item 3"), viewModel.uiState.value.currentCategoryThings)
     }
 
     @Test
@@ -280,8 +275,7 @@ class CategoryDetailsScreenKtTest {
         // Check that if the category is saved, only non empty item strings are saved
         val category = Category(UUID_ZERO, "Category 1", listOf("Item 1", "Item 3"))
         val repository = FakeRepository().apply { categoryMap[category.uid] = category }
-        val viewModel = MainViewModel(repository)
-        viewModel.categories.observeForever { }
+        val viewModel = CategoryDetailsViewModel(repository)
         setupScreenWith(viewModel, UUID_ZERO_STRING)
 
         // Add two empty items using the add button
@@ -300,8 +294,7 @@ class CategoryDetailsScreenKtTest {
     fun nonExistentCategoryId_showsEmptyScreen() {
         // Setup screen with non-existent category ID
         val fakeRepository = FakeRepository()
-        val viewModel = MainViewModel(fakeRepository)
-        viewModel.categories.observeForever { }
+        val viewModel = CategoryDetailsViewModel(fakeRepository)
         setupScreenWith(viewModel, "non_existent_id")
 
         // Verify UI fields are empty, indicating no category was loaded
@@ -314,7 +307,7 @@ class CategoryDetailsScreenKtTest {
         // Setup screen and init long category name
         val veryLongName = "A".repeat(500)
         val fakeRepository = FakeRepository()
-        setupScreenWith(MainViewModel(fakeRepository), null)
+        setupScreenWith(CategoryDetailsViewModel(fakeRepository), null)
 
         // Type the very long name
         composeTestRule.onNodeWithText("List Name").performTextInput(veryLongName)
@@ -328,7 +321,7 @@ class CategoryDetailsScreenKtTest {
         // Setup screen and large number of items
         val largeNumberOfItems = 150
         val fakeRepository = FakeRepository()
-        val viewModel = MainViewModel(fakeRepository)
+        val viewModel = CategoryDetailsViewModel(fakeRepository)
         setupScreenWith(viewModel, null)
 
         // Add a large number of items
@@ -337,7 +330,7 @@ class CategoryDetailsScreenKtTest {
         }
 
         // Verify that the correct number of items are in viewmodel
-        assertEquals(largeNumberOfItems, viewModel.currentCategoryThings.size)
+        assertEquals(largeNumberOfItems, viewModel.uiState.value.currentCategoryThings.size)
 
         // Verify that the add button is still displayed
         // Note: You cannot verify there are 150 items displayed in the LazyList due to the nature

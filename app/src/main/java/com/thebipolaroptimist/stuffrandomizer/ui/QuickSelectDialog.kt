@@ -19,11 +19,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +41,7 @@ import com.thebipolaroptimist.stuffrandomizer.R
 import com.thebipolaroptimist.stuffrandomizer.data.Category
 import com.thebipolaroptimist.stuffrandomizer.ui.components.DropDownText
 import com.thebipolaroptimist.stuffrandomizer.ui.components.EditableSingleLineItem
+import com.thebipolaroptimist.stuffrandomizer.utilties.QuickSelect
 
 
 enum class QuickSelectState {
@@ -47,6 +50,64 @@ enum class QuickSelectState {
     SHOW_SELECTED,
     DEFAULT,
 }
+
+/**
+ * Holds the state for [QuickSelectDialog].
+ *
+ * A plain remembered state holder rather than a `ViewModel`: [QuickSelectDialog] is a [Dialog],
+ * not a navigation destination, so a `hiltViewModel()` here would scope to the *enclosing*
+ * screen's backstack entry and wrongly survive the dialog being dismissed and reopened.
+ */
+@Stable
+class QuickSelectDialogState {
+    var newList: SnapshotStateList<String> by mutableStateOf(mutableStateListOf(""))
+        private set
+    var selectedItem: String by mutableStateOf("")
+        private set
+    var selectState: QuickSelectState by mutableStateOf(QuickSelectState.DEFAULT)
+        private set
+
+    fun showListSelect() {
+        selectState = QuickSelectState.LIST_SELECT
+    }
+
+    fun startNewList() {
+        selectState = QuickSelectState.LIST_CREATE
+    }
+
+    fun selectExistingList(category: Category) {
+        newList = category.things.toMutableStateList()
+        selectState = QuickSelectState.LIST_CREATE
+    }
+
+    fun addBlankItem() {
+        newList.add("")
+    }
+
+    fun updateItem(index: Int, value: String) {
+        if (index in newList.indices) {
+            newList[index] = value
+        }
+    }
+
+    fun removeItem(value: String) {
+        newList.remove(value)
+    }
+
+    /**
+     * Pick a random item from [newList] and move to [QuickSelectState.SHOW_SELECTED]. Does
+     * nothing if there's nothing to pick.
+     */
+    fun rollSelection() {
+        QuickSelect.pickRandom(newList)?.let {
+            selectedItem = it
+            selectState = QuickSelectState.SHOW_SELECTED
+        }
+    }
+}
+
+@Composable
+fun rememberQuickSelectDialogState(): QuickSelectDialogState = remember { QuickSelectDialogState() }
 
 @Preview
 @Composable
@@ -74,27 +135,15 @@ fun Modifier.quickSelectDialogModifier() : Modifier {
  */
 @Composable
 fun QuickSelectDialog(
+    state: QuickSelectDialogState = rememberQuickSelectDialogState(),
     onDismiss: () -> Unit = {},
     categoryList: List<Category> = listOf()
 ) {
-    var newList = remember {
-        mutableStateListOf("")
-    }
-    var selectedItem by remember {
-        mutableStateOf("")
-    }
-    var selectState by remember {
-        mutableStateOf(QuickSelectState.DEFAULT)
-    }
-
     Dialog(
         onDismissRequest = { onDismiss() }) {
-        when (selectState) {
+        when (state.selectState) {
             QuickSelectState.LIST_CREATE -> {
-                CreateList(newList, { item ->
-                    selectedItem = item
-                    selectState = QuickSelectState.SHOW_SELECTED
-                })
+                CreateList(state)
             }
 
             QuickSelectState.LIST_SELECT -> {
@@ -111,8 +160,7 @@ fun QuickSelectDialog(
                         DropDownText(
                             items = categoryList.map { it.name },
                             onSelect = { index ->
-                                newList = categoryList[index].things.toMutableStateList()
-                                selectState = QuickSelectState.LIST_CREATE
+                                state.selectExistingList(categoryList[index])
                             }
                         )
                     }
@@ -132,7 +180,7 @@ fun QuickSelectDialog(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(stringResource(R.string.selected))
-                        Text(selectedItem,
+                        Text(state.selectedItem,
                             style = MaterialTheme.typography.headlineLarge,
                             textAlign = TextAlign.Center)
                     }
@@ -152,10 +200,10 @@ fun QuickSelectDialog(
                             .fillMaxHeight(),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally) {
-                        Button(onClick = { selectState = QuickSelectState.LIST_SELECT }){
+                        Button(onClick = { state.showListSelect() }){
                             Text(text = stringResource(R.string.select_existing_list))
                         }
-                        Button(onClick = { selectState = QuickSelectState.LIST_CREATE }) {
+                        Button(onClick = { state.startNewList() }) {
                             Text(text = stringResource(R.string.enter_new_list))
                         }
                     }
@@ -166,10 +214,7 @@ fun QuickSelectDialog(
 }
 
 @Composable
-private fun CreateList(
-    newList: MutableList<String>,
-    onSelect: (selected: String) -> Unit,
-) {
+private fun CreateList(state: QuickSelectDialogState) {
     Card(
         modifier = Modifier
             .quickSelectDialogModifier()
@@ -180,20 +225,18 @@ private fun CreateList(
             .align(Alignment.CenterHorizontally)
             .padding(dimensionResource(R.dimen.padding_small))) {
             LazyColumn(Modifier.weight(1f, fill = false)) {
-                itemsIndexed(newList) { index, item ->
+                itemsIndexed(state.newList) { index, item ->
                     EditableSingleLineItem(
                         text = item,
-                        remove = { newList.remove(it) },
-                        update = { newList[index] = it }
+                        remove = { state.removeItem(it) },
+                        update = { state.updateItem(index, it) }
                     )
                 }
             }
             Row {
                 Button(
                     modifier = Modifier.wrapContentSize(),
-                    onClick = {
-                        newList.add("")
-                    }) {
+                    onClick = { state.addBlankItem() }) {
                     Icon(
                         Icons.Default.Add,
                         contentDescription = stringResource(R.string.add)
@@ -201,9 +244,7 @@ private fun CreateList(
                 }
                 Button(
                     modifier = Modifier.wrapContentSize(),
-                    onClick = {
-                        onSelect(newList.random())
-                    }) {
+                    onClick = { state.rollSelection() }) {
                     Icon(
                         painter = painterResource(id = R.drawable.casino_24px),
                         contentDescription = stringResource(
