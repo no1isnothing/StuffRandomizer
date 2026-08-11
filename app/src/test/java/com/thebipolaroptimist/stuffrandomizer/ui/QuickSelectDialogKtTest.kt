@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -41,7 +42,7 @@ class QuickSelectDialogKtTest {
         }
 
         composeTestRule.onNodeWithText(context.getString(R.string.enter_new_list)).performClick()
-        composeTestRule.onNodeWithContentDescription("editable_item").performTextInput("Only Item")
+        composeTestRule.onNodeWithTag("editable_item").performTextInput("Only Item")
         composeTestRule.onNodeWithContentDescription(context.getString(R.string.roll)).performClick()
 
         composeTestRule.onNodeWithText("Only Item").assertIsDisplayed()

@@ -50,5 +50,10 @@
     <string name="no_categories_tagline">No categories to display</string>
     <string name="no_categories_message">Create categories and they will be displayed here.</string>
     <string name="quick_select_dialog">quick select dialog</string>
+    <string name="no_items_tagline">No items yet</string>
+    <string name="no_items_message">Add items to this category to get started.</string>
+    <string name="add_item">Add item</string>
+    <string name="delete_category_title">Delete category?</string>
+    <string name="delete_category_message">This will permanently delete this category and its items.</string>
 
 </resources>

@@ -1,8 +1,8 @@
 package com.thebipolaroptimist.stuffrandomizer.ui.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Card
@@ -17,10 +17,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.thebipolaroptimist.stuffrandomizer.R
@@ -46,12 +45,14 @@ fun EditableSingleLineItem(
 
     Card(
         Modifier
-            .wrapContentSize()
+            .fillMaxWidth()
             .padding(dimensionResource(id = R.dimen.padding_text)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer),) {
         TextField(
-            modifier = Modifier.semantics { contentDescription = "editable_item" },
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("editable_item"),
             value = editedItem,
             onValueChange = {
                 editedItem = it

@@ -9,7 +9,9 @@ import androidx.compose.ui.test.hasParent
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
@@ -49,7 +51,7 @@ class CategoryDetailsScreenKtTest {
 
         // Verify UI fields are empty
         composeTestRule.onNodeWithText("List Name").assert(hasText(""))
-        composeTestRule.onNodeWithContentDescription("Add").assertExists()
+        composeTestRule.onNodeWithContentDescription("Add item").assertExists()
         composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(0)
     }
 
@@ -75,9 +77,9 @@ class CategoryDetailsScreenKtTest {
         setupScreenWith(CategoryDetailsViewModel(fakeRepository), null)
 
         // Perform actions to create and save a new category
-        composeTestRule.onNodeWithContentDescription("Add").performClick()
+        composeTestRule.onNodeWithContentDescription("Add item").performClick()
         composeTestRule.onNodeWithText("List Name").performTextInput("List 1")
-        composeTestRule.onNodeWithContentDescription("editable_item").performTextInput("item1")
+        composeTestRule.onNodeWithTag("editable_item").performTextInput("item1")
         composeTestRule.onNodeWithContentDescription("back").performClick()
 
 
@@ -88,7 +90,7 @@ class CategoryDetailsScreenKtTest {
         assertEquals(listOf("item1"), savedCategory.things)
 
         // Verify the updated UI state
-        composeTestRule.onNodeWithContentDescription("editable_item").assert(hasText("item1"))
+        composeTestRule.onNodeWithTag("editable_item").assert(hasText("item1"))
         composeTestRule.onNodeWithText("List Name").assert(hasText("List 1"))
         composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(1)
     }
@@ -136,8 +138,8 @@ class CategoryDetailsScreenKtTest {
         setupScreenWith(CategoryDetailsViewModel(fakeRepository), null)
 
         // Perform actions (clicking back after adding items but no name)
-        composeTestRule.onNodeWithContentDescription("Add").performClick()
-        composeTestRule.onNodeWithContentDescription("editable_item").performTextInput("item1")
+        composeTestRule.onNodeWithContentDescription("Add item").performClick()
+        composeTestRule.onNodeWithTag("editable_item").performTextInput("item1")
         composeTestRule.onNodeWithContentDescription("back").performClick()
 
 
@@ -166,10 +168,10 @@ class CategoryDetailsScreenKtTest {
 
         // Edit the category and then refresh
         composeTestRule.onNodeWithText("List Name").performTextInput("List 1")
-        composeTestRule.onNodeWithContentDescription("Add").performClick()
-        composeTestRule.onNodeWithContentDescription("Add").performClick()
-        composeTestRule.onAllNodesWithContentDescription("editable_item")[0].performTextInput("item1")
-        composeTestRule.onAllNodesWithContentDescription("editable_item")[2].performTextInput("item one million")
+        composeTestRule.onNodeWithContentDescription("Add item").performClick()
+        composeTestRule.onNodeWithContentDescription("Add item").performClick()
+        composeTestRule.onAllNodesWithTag("editable_item")[0].performTextInput("item1")
+        composeTestRule.onAllNodesWithTag("editable_item")[2].performTextInput("item one million")
         composeTestRule.onNodeWithContentDescription("refresh").performClick()
 
         // Verify Original Values
@@ -187,13 +189,34 @@ class CategoryDetailsScreenKtTest {
         val viewModel = CategoryDetailsViewModel(repository)
         setupScreenWith(viewModel, UUID_ZERO_STRING)
 
-        // Perform delete action
+        // Perform delete action and confirm the dialog
         composeTestRule.onNodeWithContentDescription("Delete").performClick()
+        composeTestRule.onNodeWithText("Delete category?").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Delete").performClick()
 
         // Verify that the category is removed from the repository
         assertTrue(
             "Category should be removed from the repository after deleting.",
             repository.categoryMap.isEmpty()
+        )
+    }
+
+    @Test
+    fun deleteButton_dismissingConfirmation_doesNotRemoveCategory() {
+        // Setup with a pre-populated category
+        val category = Category(UUID_ZERO, "Category 1", listOf("Item 1"))
+        val repository = FakeRepository().apply { categoryMap[category.uid] = category }
+        val viewModel = CategoryDetailsViewModel(repository)
+        setupScreenWith(viewModel, UUID_ZERO_STRING)
+
+        // Open the delete confirmation, then cancel it
+        composeTestRule.onNodeWithContentDescription("Delete").performClick()
+        composeTestRule.onNodeWithText("Cancel").performClick()
+
+        // Verify that the category is still present in the repository
+        assertTrue(
+            "Category should not be removed from the repository when the delete is cancelled.",
+            repository.categoryMap.isNotEmpty()
         )
     }
 
@@ -223,8 +246,8 @@ class CategoryDetailsScreenKtTest {
         setupScreenWith(CategoryDetailsViewModel(fakeRepository), null)
 
         // Click add button twice
-        composeTestRule.onNodeWithContentDescription("Add").performClick()
-        composeTestRule.onNodeWithContentDescription("Add").performClick()
+        composeTestRule.onNodeWithContentDescription("Add item").performClick()
+        composeTestRule.onNodeWithContentDescription("Add item").performClick()
 
         // Verify 2 empty items are added
         composeTestRule.onAllNodes(hasParent(hasContentDescription("items"))).assertCountEquals(2)
@@ -240,17 +263,17 @@ class CategoryDetailsScreenKtTest {
         setupScreenWith(viewModel, null)
 
         // Add an item and change its content
-        composeTestRule.onNodeWithContentDescription("Add").performClick()
+        composeTestRule.onNodeWithContentDescription("Add item").performClick()
 
-        composeTestRule.onAllNodesWithContentDescription("editable_item")[0].performTextClearance()
-        composeTestRule.onAllNodesWithContentDescription("editable_item")[0].performTextInput("New Item Content")
+        composeTestRule.onAllNodesWithTag("editable_item")[0].performTextClearance()
+        composeTestRule.onAllNodesWithTag("editable_item")[0].performTextInput("New Item Content")
 
         // Verify that the item content is updated in the view model's currentCategoryThings
         assertEquals(
             listOf("New Item Content"),
             viewModel.uiState.value.currentCategoryThings
         )
-        composeTestRule.onAllNodesWithContentDescription("editable_item")[0].assert(hasText("New Item Content"))
+        composeTestRule.onAllNodesWithTag("editable_item")[0].assert(hasText("New Item Content"))
     }
 
 
@@ -279,8 +302,8 @@ class CategoryDetailsScreenKtTest {
         setupScreenWith(viewModel, UUID_ZERO_STRING)
 
         // Add two empty items using the add button
-        composeTestRule.onNodeWithContentDescription("Add").performClick()
-        composeTestRule.onNodeWithContentDescription("Add").performClick()
+        composeTestRule.onNodeWithContentDescription("Add item").performClick()
+        composeTestRule.onNodeWithContentDescription("Add item").performClick()
 
         // Simulate saving by clicking back button
         composeTestRule.onNodeWithContentDescription("back").performClick()
@@ -326,7 +349,7 @@ class CategoryDetailsScreenKtTest {
 
         // Add a large number of items
         repeat(largeNumberOfItems) {
-            composeTestRule.onNodeWithContentDescription("Add").performClick()
+            composeTestRule.onNodeWithContentDescription("Add item").performClick()
         }
 
         // Verify that the correct number of items are in viewmodel
@@ -335,7 +358,7 @@ class CategoryDetailsScreenKtTest {
         // Verify that the add button is still displayed
         // Note: You cannot verify there are 150 items displayed in the LazyList due to the nature
         // how LazyLists populate views on the screen
-        composeTestRule.onNodeWithContentDescription("Add").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Add item").assertIsDisplayed()
     }
 
 }
